@@ -1,0 +1,19 @@
+[data-state="collapsed"] {
+    --sidebar-width: var(--sidebar-width-icon);
+  }
+  
+  [data-state="collapsed"] [data-sidebar="menu-button"] span {
+    display: none;
+  }
+  
+  [data-state="expanded"] [data-sidebar="menu-button"] span {
+    display: inline;
+  }
+  [data-state="collapsed"] [data-sidebar="trigger"] {
+    left: var(--sidebar-width-icon);
+  }
+  
+  [data-state="expanded"] [data-sidebar="trigger"] {
+    left: var(--sidebar-width);
+  }
+  
