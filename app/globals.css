@@ -48,6 +48,8 @@ body {
     --bgBody2 : #f0f0f0;
     --button : #729dac;
     --buttonHover : #92c0cf;
+    --forgotbutton : #a2a86d;
+    --forgotbuttonHover : #828656;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -88,6 +90,8 @@ body {
     --bgBody2 : #1d2020;
     --button : #0d3e4e;
     --buttonHover : #6C757D;
+    --forgotbutton : #484e0d;
+    --forgotbuttonHover : #828656;
   }
 }
 

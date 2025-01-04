@@ -34,6 +34,7 @@ const Page: React.FC = () => {
     company: "",
   });
   const [originalData, setOriginalData] = useState<FormData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const initializeData = async () => {
@@ -206,22 +207,89 @@ const Page: React.FC = () => {
                     className="mt-1 h-10 px-3 border-gray-300 rounded-md"
                   />
                 </div>
-                <div className="flex justify-between">
-                  <Button
-                    type="submit"
-                    className="w-full bg-[var(--button)] text-white py-2 px-4 rounded-md hover:bg-[var(--buttonHover)] transition-colors duration-200"
-                    onClick={handleSubmit}
-                  >
-                    Save Changes
-                  </Button>
+                <div className="d-flex flex-md-row flex-column justify-content-between align-items-center mt-3 gap-6" style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: "1rem"}}>
+                    <Button
+                       type="submit"
+                       className=" w-md-auto bg-[var(--forgotbutton)] text-white rounded-md hover:bg-[var(--forgotbuttonHover)] transition-colors duration-200"
+                       onClick={() => setIsModalOpen(true)}
+                       style={{width: "48%"}}
+                     >
+                       Forgot Password
+                     </Button>
+                    <Button
+                      type="submit"
+                      className="w-md-auto bg-[var(--button)] text-white rounded-md hover:bg-[var(--buttonHover)] transition-colors duration-200"
+                      onClick={handleSubmit}
+                      style={{width: "48%"}}
+                    >
+                      Save Changes
+                    </Button>
                 </div>
-              </div>
+            </div>
             )}
           </div>
         </div>
       </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-secondary rounded-lg p-6 w-full max-w-md shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-center">Reset Password</h2>
+            <p className="text-sm text-gray-500 mb-6 text-center">Enter your new password.</p>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium">
+                  Current Password
+                </label>
+                <Input
+                  type="password"
+                  name="currentPassword"
+                //   value={formData.currentPassword}
+                  onChange={handleChange}
+                  className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">New Password</label>
+                <Input
+                  type="password"
+                  name="newPassword"
+                //   value={formData.newPassword}
+                  onChange={handleChange}
+                  className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">
+                  Confirm Password
+                </label>
+                <Input
+                  type="password"
+                  name="confirmPassword"
+                //   value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="bg-green-500 text-white w-full py-2 rounded-md hover:bg-green-600 transition duration-200"
+              >
+                Submit
+              </Button>
+            </form>
+            <Button
+              onClick={() => setIsModalOpen(false)}
+              className="mt-4 w-full bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition duration-200"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Page;
+
+
