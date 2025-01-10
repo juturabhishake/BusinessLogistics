@@ -53,7 +53,7 @@ const Page = () => {
             { title: "Status" },
           ]}
           options={{
-            scrollX: true,
+            // scrollX: true,
             scrollY: "300px", 
             paging: true,
             searching: true, 
