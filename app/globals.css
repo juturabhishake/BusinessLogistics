@@ -50,6 +50,7 @@ body {
     --buttonHover : #92c0cf;
     --forgotbutton : #a2a86d;
     --forgotbuttonHover : #828656;
+    --borderclr : black;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -92,6 +93,7 @@ body {
     --buttonHover : #6C757D;
     --forgotbutton : #484e0d;
     --forgotbuttonHover : #828656;
+    --borderclr: white;
   }
 }
 

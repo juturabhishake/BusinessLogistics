@@ -46,7 +46,7 @@ export function UserNav() {
         console.log("No credentials found, redirecting to login.");
         secureLocalStorage.clear();
         secureLocalStorage.clear();
-        window.location.href = "/";
+        // window.location.href = "/";
         return;
       }
       const isAccess = await handleLogin(em, password);
