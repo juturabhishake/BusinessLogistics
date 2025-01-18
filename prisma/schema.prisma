@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,16 @@ generator client {
 datasource db {
   provider = "sqlserver"
   url      = env("DATABASE_URL")
+}
+
+model Web_Login {
+  Login_id     Int       @id @default(autoincrement())
+  Username     String?   @db.VarChar(100)
+  Email        String?   @db.VarChar(100)
+  Password     String?   @db.VarChar(15)
+  Phone        String?   @db.VarChar(20)
+  Company      String?   @db.VarChar(100)
+  Address      String?   @db.VarChar(Max)
+  Is_Active    Int?      @default(0, map: "DF_Web_Login_Is_Active")
+  Created_Date DateTime? @default(now(), map: "DF_Web_Login_Created_Date") @db.DateTime
 }
