@@ -71,8 +71,9 @@ const QuotationTable = () => {
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
                 onClick={() => toggleSection("origin")}
               >
-                <td colSpan="6" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} A. Origin Charges
+                <td>A.</td>
+                <td colSpan="5" className="py-2 px-3 text-start flex items-center">
+                  {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
               {sections.origin &&
@@ -110,8 +111,9 @@ const QuotationTable = () => {
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
                 onClick={() => toggleSection("seaFreight")}
               >
-                <td colSpan="6" className="py-2 px-3 text-start flex items-center">
-                  {sections.seaFreight ? "▼" : "▶"} B. Sea Freight Charges
+                <td>B.</td>
+                <td colSpan="5" className="py-2 px-3 text-start flex items-center">
+                  {sections.seaFreight ? "▼" : "▶"} Sea Freight Charges
                 </td>
               </tr>
               {sections.seaFreight &&
@@ -142,8 +144,9 @@ const QuotationTable = () => {
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
                 onClick={() => toggleSection("destination")}
               >
-                <td colSpan="6" className="py-2 px-3 text-start flex items-center">
-                  {sections.destination ? "▼" : "▶"} C. Destination Charges
+                <td>C.</td>
+                <td colSpan="5" className="py-2 px-3 text-start flex items-center">
+                  {sections.destination ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
               {sections.destination &&

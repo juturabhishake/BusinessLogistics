@@ -4,9 +4,9 @@ import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
 
 const QuotationTable = () => {
   const [sections, setSections] = useState({
-    origin: true,
-    seaFreight: true,
-    destination: true,
+    origin: false,
+    seaFreight: false,
+    destination: false,
   });
   const [saveState, setSaveState] = useState("idle");
 
@@ -18,6 +18,13 @@ const QuotationTable = () => {
         setSaveState("idle");
       }, 5000);
     }, 2000);
+  };
+
+  const toggleSection = (section) => {
+    setSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
   };
 
   return (
@@ -64,41 +71,66 @@ const QuotationTable = () => {
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody2)]">
-              <tr className="font-bold bg-[var(--bgBody)] border">
+              <tr
+                className="font-bold bg-[var(--bgBody)] border cursor-pointer"
+                onClick={() => toggleSection("origin")}
+              >
                 <td>A</td>
-                <td colSpan="9" className="py-2 px-3 text-start">Origin Charges</td>
+                <td colSpan="9" className="py-2 px-3 text-start flex items-center">
+                  {sections.origin ? "▼" : "▶"} Origin Charges
+                </td>
               </tr>
-              {["Customs Clearance & Documentation", "Local Transportation From GTI-Chennai", "Terminal Handling Charges - Origin", "Bill of Lading Charges", "Loading/Unloading / SSR", "CFS AT ACTUAL"].map((item, index) => (
-                <tr key={index} className="border">
-                  <td className="py-1 px-3 border">{index + 1}</td>
-                  <td className="py-1 px-3 border text-start">{item}</td>
-                  <td className="py-1 px-3 border">INR / Shipment</td>
+              {sections.origin &&
+                ["Customs Clearance & Documentation", "Local Transportation From GTI-Chennai", "Terminal Handling Charges - Origin", "Bill of Lading Charges", "Loading/Unloading / SSR", "CFS AT ACTUAL"].map((item, index) => (
+                  <tr key={index} className="border">
+                    <td className="py-1 px-3 border">{index + 1}</td>
+                    <td className="py-1 px-3 border text-start">{item}</td>
+                    <td className="py-1 px-3 border">INR / Shipment</td>
+                    {[...Array(6)].map((_, i) => (
+                      <td key={i} className="py-1 px-3 border">
+                        <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                      </td>
+                    ))}
+                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder={item === "CFS AT ACTUAL" ? "At Actual" : ""} /></td>
+                  </tr>
+                ))}
+              {sections.origin && (
+                <tr className="border font-bold">
+                  <td colSpan="3" className="py-1 px-3 border">Total Origin Cost in INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder={item === "CFS AT ACTUAL" ? "At Actual" : ""} /></td>
+                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
                 </tr>
-              ))}
-              <tr className="border font-bold">
-                <td colSpan="3" className="py-1 px-3 border">Total Origin Cost in INR</td>
-                {[...Array(6)].map((_, i) => (
-                  <td key={i} className="py-1 px-3 border">
-                    <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
-                  </td>
-                ))}
-                <td className="py-1 px-3 border"></td>
-              </tr>
-              <tr className="font-bold bg-[var(--bgBody)] border">
+              )}
+              <tr
+                className="font-bold bg-[var(--bgBody)] border cursor-pointer"
+                onClick={() => toggleSection("seaFreight")}
+              >
                 <td>B</td>
-                <td colSpan="9" className="py-2 px-3 text-start">Sea Freight Charges</td>
+                <td colSpan="9" className="py-2 px-3 text-start flex items-center">
+                  {sections.seaFreight ? "▼" : "▶"} Sea Freight Charges
+                </td>
               </tr>
-              {["Sea Freight", "FSC (Fuel Surcharge)"].map((item, index) => (
-                <tr key={index} className="border">
-                  <td className="py-1 px-3 border">{index + 7}</td>
-                  <td className="py-1 px-3 border text-start">{item}</td>
-                  <td className="py-1 px-3 border">USD / Shipment</td>
+              {sections.seaFreight &&
+                ["Sea Freight", "FSC (Fuel Surcharge)"].map((item, index) => (
+                  <tr key={index} className="border">
+                    <td className="py-1 px-3 border">{index + 7}</td>
+                    <td className="py-1 px-3 border text-start">{item}</td>
+                    <td className="py-1 px-3 border">USD / Shipment</td>
+                    {[...Array(6)].map((_, i) => (
+                      <td key={i} className="py-1 px-3 border">
+                        <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                      </td>
+                    ))}
+                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                  </tr>
+                ))}
+              {sections.seaFreight && (
+                <tr className="border font-bold">
+                  <td colSpan="3" className="py-1 px-3 border">Total Sea Freight Cost in INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
@@ -106,50 +138,49 @@ const QuotationTable = () => {
                   ))}
                   <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
                 </tr>
-              ))}
-              <tr className="border font-bold">
-                <td colSpan="3" className="py-1 px-3 border">Total Sea Freight Cost in INR</td>
-                {[...Array(6)].map((_, i) => (
-                  <td key={i} className="py-1 px-3 border">
-                    <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
-                  </td>
-                ))}
-                <td className="py-1 px-3 border"></td>
-              </tr>
-              <tr className="font-bold bg-[var(--bgBody)] border">
+              )}
+              <tr
+                className="font-bold bg-[var(--bgBody)] border cursor-pointer"
+                onClick={() => toggleSection("destination")}
+              >
                 <td>C</td>
-                <td colSpan="9" className="py-2 px-3 text-start">Destination Charges</td>
+                <td colSpan="9" className="py-2 px-3 text-start flex items-center">
+                  {sections.destination ? "▼" : "▶"} Destination Charges
+                </td>
               </tr>
-              {["Custom Clearance", "CC Fee", "D.O Charges per BL", "AAI Charges", "Loading/Unloading", "Delivery"].map((item, index) => (
-                <tr key={index} className="border">
-                  <td className="py-1 px-3 border">{index + 9}</td>
-                  <td className="py-1 px-3 border text-start">{item}</td>
-                  <td className="py-1 px-3 border">EURO / Shipment</td>
+              {sections.destination &&
+                ["Custom Clearance", "CC Fee", "D.O Charges per BL", "AAI Charges", "Loading/Unloading", "Delivery"].map((item, index) => (
+                  <tr key={index} className="border">
+                    <td className="py-1 px-3 border">{index + 9}</td>
+                    <td className="py-1 px-3 border text-start">{item}</td>
+                    <td className="py-1 px-3 border">EURO / Shipment</td>
+                    {[...Array(6)].map((_, i) => (
+                      <td key={i} className="py-1 px-3 border">
+                        <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                      </td>
+                    ))}
+                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                  </tr>
+                ))}
+              {sections.destination && (
+                <tr className="border font-bold">
+                  <td colSpan="3" className="py-1 px-3 border">Total Destination Cost in INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                  <td className="py-1 px-3 border"></td>
                 </tr>
-              ))}
-              <tr className="border font-bold">
-                <td colSpan="3" className="py-1 px-3 border text-start">Total Destination Cost in INR</td>
-                {[...Array(6)].map((_, i) => (
-                  <td key={i} className="py-1 px-3 border">
-                    <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
-                  </td>
-                ))}
-                <td className="py-1 px-3 border"></td>
-              </tr>
+              )}
               <tr className="border font-bold">
                 <td colSpan="3" className="py-1 px-3 border text-start">Total Shipment Cost in INR (A+B+C)</td>
                 {[...Array(6)].map((_, i) => (
                   <td key={i} className="py-1 px-3 border">
-                    <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                    <input type="text" readOnly  className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                   </td>
                 ))}
-                <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                <td className="py-1 px-3 border"></td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">INCO Term:</td>
@@ -168,7 +199,7 @@ const QuotationTable = () => {
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Required Transit Days:</td>
-                <td colSpan="7" className="py-1 px-3 border ">64 days</td>
+                <td colSpan="7" className="py-1 px-3 border">64 days</td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Estimated Transit Days Given by Forwarder:</td>
@@ -182,7 +213,6 @@ const QuotationTable = () => {
           </table>
           <div className="text-xs text-center py-1 pt-3">GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.</div> 
         </div>
-        
       </div>
     </div>
   );
