@@ -44,6 +44,7 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
     --bg : #f3fcff;
     --buttonBg: #729dac;
+    --buttonBgHover: #577884;
     --bgBody : #92c0cf;
     --bgBody2 : #f0f0f0;
     --button : #729dac;
@@ -92,6 +93,7 @@ body {
     --button : #0d3e4e;
     --buttonHover : #6C757D;
     --forgotbutton : #484e0d;
+    --buttonBgHover: #26353a;
     --forgotbuttonHover : #828656;
     --borderclr: white;
   }
