@@ -179,26 +179,26 @@ const QuotationTable = () => {
                 </tr>
               )}
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border">INCO Term</td>
+                <td colSpan="2" className="font-bold py-1 px-3 border text-start">INCO Term</td>
                 <td colSpan="4" className="py-1 px-3 border">DAP</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border">Delivery Address</td>
+                <td colSpan="2" className="font-bold py-1 px-3 border  text-start">Delivery Address</td>
                 <td colSpan="4" className="py-1 px-3 border">TRIGO - SCSI, LLC 1520 KEPNER DRIVE LAFAYETTE IN 47905 USA</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border">FX Rate</td>
+                <td colSpan="2" className="font-bold py-1 px-3 border  text-start">FX Rate</td>
                 <td className="py-1 px-3 border">USD</td>
                 <td className="py-1 px-3 border">84</td>
                 <td className="py-1 px-3 border">EURO</td>
                 <td className="py-1 px-3 border">93</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border">Required Transit Days</td>
+                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Required Transit Days</td>
                 <td colSpan="4" className="py-1 px-3 border">64 days</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border">Estimated Transit Days Given by Forwarder</td>
+                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Estimated Transit Days Given by Forwarder</td>
                 <td colSpan="4" className="py-1 px-3 border"></td>
               </tr>
             </tbody>

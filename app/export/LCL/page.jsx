@@ -49,18 +49,18 @@ const QuotationTable = () => {
             <thead className="bg-secondary text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Sea Export</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Forwarders</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[240px]">Sea Export</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[130px]">Forwarders</th>
                 <th colSpan="6" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to Hungary LCL shipment</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">1 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">2 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">3 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">4 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">5 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">6 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">1 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">2 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">3 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">4 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">5 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">6 CBM</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody2)]">
@@ -78,7 +78,7 @@ const QuotationTable = () => {
                       <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border">{item === "CFS AT ACTUAL" ? "At Actual" : ""}</td>
+                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder={item === "CFS AT ACTUAL" ? "At Actual" : ""} /></td>
                 </tr>
               ))}
               <tr className="border font-bold">
@@ -104,7 +104,7 @@ const QuotationTable = () => {
                       <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border"></td>
+                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
                 </tr>
               ))}
               <tr className="border font-bold">
@@ -130,7 +130,7 @@ const QuotationTable = () => {
                       <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border"></td>
+                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
                 </tr>
               ))}
               <tr className="border font-bold">
@@ -149,7 +149,7 @@ const QuotationTable = () => {
                     <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                   </td>
                 ))}
-                <td className="py-1 px-3 border"></td>
+                <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">INCO Term:</td>
@@ -180,8 +180,9 @@ const QuotationTable = () => {
               </tr>
             </tbody>
           </table>
+          <div className="text-xs text-center py-1 pt-3">GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.</div> 
         </div>
-        <div className="text-xs text-center py-3 pt-[-20px]">GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.</div>
+        
       </div>
     </div>
   );
