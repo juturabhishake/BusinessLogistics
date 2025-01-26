@@ -9,6 +9,66 @@ const QuotationTable = () => {
     destination: false,
   });
   const [saveState, setSaveState] = useState("idle");
+  const [originData, setOriginData] = useState(
+    Array(6).fill({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" })
+  );
+  const [seaFreightData, setSeaFreightData] = useState(
+    Array(2).fill({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" })
+  );
+  const [destinationData, setDestinationData] = useState(
+    Array(6).fill({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" })
+  );
+  const [totals, setTotals] = useState({
+    origin: { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 },
+    seaFreight: { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 },
+    destination: { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 },
+  });
+
+  const handleInputChange = (section, rowIndex, column, value) => {
+    let updatedData;
+    if (section === "origin") {
+      updatedData = originData.map((row, index) => {
+        if (index === rowIndex) {
+          return { ...row, [column]: value };
+        }
+        return row;
+      });
+      setOriginData(updatedData);
+    } else if (section === "seaFreight") {
+      updatedData = seaFreightData.map((row, index) => {
+        if (index === rowIndex) {
+          return { ...row, [column]: value };
+        }
+        return row;
+      });
+      setSeaFreightData(updatedData);
+    } else if (section === "destination") {
+      updatedData = destinationData.map((row, index) => {
+        if (index === rowIndex) {
+          return { ...row, [column]: value };
+        }
+        return row;
+      });
+      setDestinationData(updatedData);
+    }
+
+    const newTotals = {
+      ...totals,
+      [section]: updatedData.reduce(
+        (acc, row) => {
+          acc["1CBM"] += parseFloat(row["1CBM"] || 0);
+          acc["2CBM"] += parseFloat(row["2CBM"] || 0);
+          acc["3CBM"] += parseFloat(row["3CBM"] || 0);
+          acc["4CBM"] += parseFloat(row["4CBM"] || 0);
+          acc["5CBM"] += parseFloat(row["5CBM"] || 0);
+          acc["6CBM"] += parseFloat(row["6CBM"] || 0);
+          return acc;
+        },
+        { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 }
+      ),
+    };
+    setTotals(newTotals);
+  };
 
   const handleSave = () => {
     setSaveState("saving");
@@ -25,6 +85,15 @@ const QuotationTable = () => {
       ...prev,
       [section]: !prev[section],
     }));
+  };
+
+  const totalShipmentCost = {
+    "1CBM": totals.origin["1CBM"] + totals.seaFreight["1CBM"] + totals.destination["1CBM"],
+    "2CBM": totals.origin["2CBM"] + totals.seaFreight["2CBM"] + totals.destination["2CBM"],
+    "3CBM": totals.origin["3CBM"] + totals.seaFreight["3CBM"] + totals.destination["3CBM"],
+    "4CBM": totals.origin["4CBM"] + totals.seaFreight["4CBM"] + totals.destination["4CBM"],
+    "5CBM": totals.origin["5CBM"] + totals.seaFreight["5CBM"] + totals.destination["5CBM"],
+    "6CBM": totals.origin["6CBM"] + totals.seaFreight["6CBM"] + totals.destination["6CBM"],
   };
 
   return (
@@ -88,7 +157,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">INR / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder={item === "CFS AT ACTUAL" ? "At Actual" : ""} /></td>
@@ -99,7 +168,7 @@ const QuotationTable = () => {
                   <td colSpan="3" className="py-1 px-3 border">Total Origin Cost in INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                      <input value={totals.origin[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
                   <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
@@ -122,7 +191,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
@@ -133,7 +202,7 @@ const QuotationTable = () => {
                   <td colSpan="3" className="py-1 px-3 border">Total Sea Freight Cost in INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                      <input value={totals.seaFreight[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
                   <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
@@ -156,7 +225,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">EURO / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input type="number" onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
@@ -167,7 +236,7 @@ const QuotationTable = () => {
                   <td colSpan="3" className="py-1 px-3 border">Total Destination Cost in INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                      <input value={totals.destination[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
                   <td className="py-1 px-3 border"></td>
@@ -177,7 +246,7 @@ const QuotationTable = () => {
                 <td colSpan="3" className="py-1 px-3 border text-start">Total Shipment Cost in INR (A+B+C)</td>
                 {[...Array(6)].map((_, i) => (
                   <td key={i} className="py-1 px-3 border">
-                    <input type="text" readOnly  className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                    <input value={totalShipmentCost[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                   </td>
                 ))}
                 <td className="py-1 px-3 border"></td>
@@ -211,7 +280,6 @@ const QuotationTable = () => {
               </tr>
             </tbody>
           </table>
-          <div className="text-xs text-center py-1 pt-3">GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.</div> 
         </div>
       </div>
     </div>

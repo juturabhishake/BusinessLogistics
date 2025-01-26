@@ -32,7 +32,8 @@ export default async function handler(req, res) {
 
         try {
             const encryptedPassword = encodePasswordToBase64(password);
-
+            console.log("encryptedPassword", encryptedPassword);
+            console.log("password", password);
             const result = await prisma.$queryRaw`
                 DECLARE @message NVARCHAR(100);
                 EXEC [dbo].[SP_Check_Login] 

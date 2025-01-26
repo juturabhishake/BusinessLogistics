@@ -10,6 +10,33 @@ const QuotationTable = () => {
     destination: false,
   });
   const [saveState, setSaveState] = useState("idle");
+  
+  const [originCharges, setOriginCharges] = useState([
+    { description: "Customs Clearance & Documentation", 20: "", 40: "", remarks: "Per Container" },
+    { description: "Local Transportation From GTI-Chennai", 20: "", 40: "", remarks: "Per Container" },
+    { description: "Terminal Handling Charges - Origin", 20: "", 40: "", remarks: "Per Container" },
+    { description: "Bill of Lading Charges", 20: "", 40: "", remarks: "Per BL" },
+    { description: "Loading/Unloading / SSR", 20: "", 40: "", remarks: "At Actual" },
+    { description: "Halting", 20: "", 40: "", remarks: "INR 2300 Per Day" },
+  ]);
+  
+  const [seaFreightCharges, setSeaFreightCharges] = useState([
+    { description: "Sea Freight", 20: "", 40: "", remarks: "Per Container" },
+    { description: "ENS", 20: "", 40: "", remarks: "Per BL" },
+    { description: "ISPS", 20: "", 40: "", remarks: "Per Container" },
+    { description: "IT Transmission", 20: "", 40: "", remarks: "Per Container" },
+  ]);
+  
+  const [destinationCharges, setDestinationCharges] = useState([
+    { description: "Destination Terminal Handling Charges", 20: "", 40: "", remarks: "Per Container" },
+    { description: "BL Fee", 20: "", 40: "", remarks: "Per Container" },
+    { description: "Delivery by Barge/Road", 20: "", 40: "", remarks: "Per Container" },
+    { description: "Delivery Order Fees", 20: "", 40: "", remarks: "Per Container" },
+    { description: "Handling Charges", 20: "", 40: "", remarks: "Per Container" },
+    { description: "T1 Doc", 20: "", 40: "", remarks: "Per Container" },
+    { description: "LOLO Charges", 20: "", 40: "", remarks: "Per Container" },
+  ]);
+
   const handleSave = () => {
     setSaveState("saving");
     setTimeout(() => {
@@ -26,6 +53,39 @@ const QuotationTable = () => {
       [section]: !prev[section],
     }));
   };
+
+  const handleOriginChange = (index, field, value) => {
+    const updatedCharges = [...originCharges];
+    updatedCharges[index] = { ...updatedCharges[index], [field]: value };
+    setOriginCharges(updatedCharges);
+  };
+
+  const handleSeaFreightChange = (index, field, value) => {
+    const updatedCharges = [...seaFreightCharges];
+    updatedCharges[index] = { ...updatedCharges[index], [field]: value };
+    setSeaFreightCharges(updatedCharges);
+  };
+
+  const handleDestinationChange = (index, field, value) => {
+    const updatedCharges = [...destinationCharges];
+    updatedCharges[index] = { ...updatedCharges[index], [field]: value };
+    setDestinationCharges(updatedCharges);
+  };
+
+  const calculateTotal = (charges) => {
+    return charges.reduce(
+      (acc, charge) => {
+        acc[20] += parseFloat(charge[20] || 0);
+        acc[40] += parseFloat(charge[40] || 0);
+        return acc;
+      },
+      { 20: 0, 40: 0 }
+    );
+  };
+
+  const totalOrigin = calculateTotal(originCharges);
+  const totalSeaFreight = calculateTotal(seaFreightCharges);
+  const totalDestination = calculateTotal(destinationCharges);
 
   return (
     <div className="">
@@ -77,33 +137,45 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.origin &&
-                [
-                  { description: "Customs Clearance & Documentation", remarks: "Per Container" },
-                  { description: "Local Transportation From GTI-Chennai", remarks: "Per Container" },
-                  { description: "Terminal Handling Charges - Origin", remarks: "Per Container" },
-                  { description: "Bill of Lading Charges", remarks: "Per BL" },
-                  { description: "Loading/Unloading / SSR", remarks: "At Actual" },
-                  { description: "Halting", remarks: "INR 2300 Per Day" },
-                ].map((item, index) => (
+                originCharges.map((item, index) => (
                   <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">INR / Shipment</td>
                     <td className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" />
+                      <input
+                        type="number"
+                        placeholder="0"
+                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        value={item[20]}
+                        onChange={(e) => handleOriginChange(index, 20, e.target.value)}
+                      />
                     </td>
                     <td className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" />
+                      <input
+                        type="number"
+                        placeholder="0"
+                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        value={item[40]}
+                        onChange={(e) => handleOriginChange(index, 40, e.target.value)}
+                      />
                     </td>
-                    <td className="py-1 px-3 border">{item.remarks}</td>
+                    <td className="py-1 px-3 border">
+                      <input
+                        type="text"
+                        className="w-full bg-transparent border-none focus:outline-none text-center"
+                        value={item.remarks}
+                        onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
+                      />
+                    </td>
                   </tr>
                 ))}
               {sections.origin && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges in INR</td>
                   <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border">0</td>
-                  <td className="py-1 px-3 border">0</td>
+                  <td className="py-1 px-3 border">{totalOrigin[20]}</td>
+                  <td className="py-1 px-3 border">{totalOrigin[40]}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -117,26 +189,45 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.seaFreight &&
-                ["Sea Freight", "ENS", "ISPS", "IT Transmission"].map((desc, index) => (
+                seaFreightCharges.map((item, index) => (
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 7}</td>
-                    <td className="py-1 px-3 border text-start">{desc}</td>
+                    <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     <td className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" />
+                      <input
+                        type="number"
+                        placeholder="0"
+                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        value={item[20]}
+                        onChange={(e) => handleSeaFreightChange(index, 20, e.target.value)}
+                      />
                     </td>
                     <td className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" />
+                      <input
+                        type="number"
+                        placeholder="0"
+                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        value={item[40]}
+                        onChange={(e) => handleSeaFreightChange(index, 40, e.target.value)}
+                      />
                     </td>
-                    <td className="py-1 px-3 border">{desc === "ENS" ? "Per BL" : "Per Container"}</td>
+                    <td className="py-1 px-3 border">
+                      <input
+                        type="text"
+                        className="w-full bg-transparent border-none focus:outline-none text-center"
+                        value={item.remarks}
+                        onChange={(e) => handleSeaFreightChange(index, "remarks", e.target.value)}
+                      />
+                    </td>
                   </tr>
                 ))}
               {sections.seaFreight && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges in INR</td>
                   <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border">0</td>
-                  <td className="py-1 px-3 border">0</td>
+                  <td className="py-1 px-3 border">{totalSeaFreight[20]}</td>
+                  <td className="py-1 px-3 border">{totalSeaFreight[40]}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -150,34 +241,45 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.destination &&
-                [
-                  "Destination Terminal Handling Charges",
-                  "BL Fee",
-                  "Delivery by Barge/Road",
-                  "Delivery Order Fees",
-                  "Handling Charges",
-                  "T1 Doc",
-                  "LOLO Charges",
-                ].map((desc, index) => (
+                destinationCharges.map((item, index) => (
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 11}</td>
-                    <td className="py-1 px-3 border text-start">{desc}</td>
+                    <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     <td className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" />
+                      <input
+                        type="number"
+                        placeholder="0"
+                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        value={item[20]}
+                        onChange={(e) => handleDestinationChange(index, 20, e.target.value)}
+                      />
                     </td>
                     <td className="py-1 px-3 border">
-                      <input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" />
+                      <input
+                        type="number"
+                        placeholder="0"
+                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        value={item[40]}
+                        onChange={(e) => handleDestinationChange(index, 40, e.target.value)}
+                      />
                     </td>
-                    <td className="py-1 px-3 border">Per Container</td>
+                    <td className="py-1 px-3 border">
+                      <input
+                        type="text"
+                        className="w-full bg-transparent border-none focus:outline-none text-center"
+                        value={item.remarks}
+                        onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
+                      />
+                    </td>
                   </tr>
                 ))}
               {sections.destination && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges in INR</td>
                   <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border">0</td>
-                  <td className="py-1 px-3 border">0</td>
+                  <td className="py-1 px-3 border">{totalDestination[20]}</td>
+                  <td className="py-1 px-3 border">{totalDestination[40]}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
