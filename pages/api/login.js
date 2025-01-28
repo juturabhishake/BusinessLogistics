@@ -34,7 +34,7 @@ function encodePasswordToBase64(password) {
 //     for (let i = 0; i < decodedData.length; i++) {
 //         byteNumbers[i] = decodedData.charCodeAt(i);
 //     }
-//     const decodedString = new TextDecoder("utf-8").decode(byteNumbers);
+//     const decodedString = new TextDecoder("utf-8").decode(byteNumbers);  
 //     return decodedString;
 // }
 export default async function handler(req, res) {
