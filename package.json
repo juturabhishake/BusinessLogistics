@@ -30,6 +30,7 @@
     "bootstrap": "^5.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
     "datatables.net": "^2.1.8",
     "datatables.net-bs5": "^2.1.8",
     "datatables.net-dt": "^2.1.8",

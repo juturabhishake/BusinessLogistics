@@ -9,6 +9,10 @@ import {
   FiPhone,
   FiMapPin,
   FiBriefcase,
+  FiSave,
+  FiCheck,
+  FiLoader,
+  FiXCircle,
 } from "react-icons/fi";
 import secureLocalStorage from "react-secure-storage";
 import { handleLogin } from "@/lib/auth";
@@ -35,6 +39,13 @@ const Page: React.FC = () => {
   });
   const [originalData, setOriginalData] = useState<FormData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [forgotStatus, setForgotStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [passwords, setPasswords] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   useEffect(() => {
     const initializeData = async () => {
@@ -81,36 +92,119 @@ const Page: React.FC = () => {
     }
     setIsEditing(false);
   };
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswords((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
-    try{
-        const response = await fetch(`http://localhost:5188/UserProfile/update`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                email: formData.email,
-                username: formData.user,
-                phone: formData.phone,
-                company: formData.company,
-                address: formData.address
-            }),
-        });
-        if (response.ok) {
-            e.preventDefault();
-            setIsEditing(false);
-            secureLocalStorage.setItem("un", formData.user);
-            secureLocalStorage.setItem("pn", formData.phone);
-            secureLocalStorage.setItem("address", formData.address);
-            secureLocalStorage.setItem("company", formData.company);
-            setOriginalData(formData);
-            window.location.reload();
-        } else{
-            console.log("Failed to update profile.");
-        }
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setSaveStatus("saving");
+    try {
+      const response = await fetch(`/api/profile_update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          username: formData.user,
+          phone: formData.phone,
+          company: formData.company,
+          address: formData.address,
+        }),
+      });
+
+      if (response.ok) {
+        setSaveStatus("success");
+        secureLocalStorage.setItem("un", formData.user);
+        secureLocalStorage.setItem("pn", formData.phone);
+        secureLocalStorage.setItem("address", formData.address);
+        secureLocalStorage.setItem("company", formData.company);
+        setOriginalData(formData);
+
+        setTimeout(() => {
+          setSaveStatus("idle");
+          setIsEditing(false);
+        }, 3000);
+        window.location.reload();
+      } else {
+        setSaveStatus("error");
+        setTimeout(() => setSaveStatus("idle"), 3000);
+      }
     } catch (error) {
-        console.log(error);
+      console.log(error);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+    }
+  };
+  const renderSaveButtonContent = () => {
+    switch (saveStatus) {
+      case "saving":
+        return (
+          <div className="flex items-center justify-center">
+            <FiLoader className="animate-spin mr-2" />
+            Saving...
+          </div>
+        );
+      case "success":
+        return (
+          <div className="flex items-center justify-center">
+            <FiCheck className="mr-2" />
+            Saved!
+          </div>
+        );
+      case "error":
+        return (
+          <div className="flex items-center justify-center">
+            <FiXCircle className="mr-2" />
+            Error
+          </div>
+        );
+      default:
+        return (
+          <div className="flex items-center justify-center">
+            <FiSave className="mr-2" />
+            Save Changes
+          </div>
+        );
+    }
+  };
+  const handleForgotPassword = async () => {
+    setForgotStatus("saving");
+    try {
+      const response = await fetch(`/api/change_password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          currentPassword: passwords.currentPassword,
+          newPassword: passwords.newPassword,
+          confirmPassword: passwords.confirmPassword,
+        }),
+      });
+
+      if (response.ok) {
+        secureLocalStorage.setItem("pw", passwords.newPassword);
+        setForgotStatus("success");
+        setTimeout(() => {
+          setForgotStatus("idle");
+          setIsModalOpen(false);
+        }, 3000);
+        window.location.reload();
+      } else {
+        setForgotStatus("error");
+        setTimeout(() => setForgotStatus("idle"), 3000);
+      }
+    } catch (error) {
+      setForgotStatus("error");
+      console.log(error);
+      setTimeout(() => setForgotStatus("idle"), 3000);
     }
   };
 
@@ -207,23 +301,23 @@ const Page: React.FC = () => {
                     className="mt-1 h-10 px-3 border-gray-300 rounded-md"
                   />
                 </div>
-                <div className="d-flex flex-md-row flex-column justify-content-between align-items-center mt-3 gap-6" style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: "1rem"}}>
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-2 sm:justify-between mt-3" style={{display: "flex",  justifyContent: "space-between", alignItems: "center", gap: "1rem"}}>
                     <Button
                        type="submit"
                        className=" w-md-auto bg-[var(--forgotbutton)] text-white rounded-md hover:bg-[var(--forgotbuttonHover)] transition-colors duration-200"
                        onClick={() => setIsModalOpen(true)}
-                       style={{width: "48%"}}
+                       style={{width: "100%"}}
                      >
                        Forgot Password
                      </Button>
-                    <Button
-                      type="submit"
-                      className="w-md-auto bg-[var(--button)] text-white rounded-md hover:bg-[var(--buttonHover)] transition-colors duration-200"
-                      onClick={handleSubmit}
-                      style={{width: "48%"}}
-                    >
-                      Save Changes
-                    </Button>
+                     <Button
+                        type="submit"
+                        className="w-full bg-[var(--button)] text-white rounded-md hover:bg-[var(--buttonHover)] transition-colors duration-200"
+                        onClick={handleSubmit}
+                        disabled={saveStatus === "saving"}
+                      >
+                    {renderSaveButtonContent()}
+                  </Button>
                 </div>
             </div>
             )}
@@ -231,58 +325,83 @@ const Page: React.FC = () => {
         </div>
       </div>
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-secondary rounded-lg p-6 w-full max-w-md shadow-lg">
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+        >
+          <div
+            className="bg-secondary rounded-lg p-6 shadow-lg w-11/12 sm:w-[500px] max-w-full"
+            
+          >
             <h2 className="text-xl font-semibold mb-4 text-center">Reset Password</h2>
-            <p className="text-sm text-gray-500 mb-6 text-center">Enter your new password.</p>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleForgotPassword();
+              }}
+            >
               <div>
-                <label className="block text-sm font-medium">
-                  Current Password
-                </label>
+                <label className="block text-sm font-medium">Current Password</label>
                 <Input
                   type="password"
                   name="currentPassword"
-                //   value={formData.currentPassword}
-                  onChange={handleChange}
-                  className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
+                  className="mt-1 w-full"
+                  value={passwords.currentPassword}
+                  onChange={handlePasswordChange}
                 />
               </div>
-              <div>
+              <div className="mt-4">
                 <label className="block text-sm font-medium">New Password</label>
                 <Input
                   type="password"
                   name="newPassword"
-                //   value={formData.newPassword}
-                  onChange={handleChange}
-                  className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
+                  className="mt-1 w-full"
+                  value={passwords.newPassword}
+                  onChange={handlePasswordChange}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium">
-                  Confirm Password
-                </label>
+              <div className="mt-4">
+                <label className="block text-sm font-medium">Confirm Password</label>
                 <Input
                   type="password"
                   name="confirmPassword"
-                //   value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
+                  className="mt-1 w-full"
+                  value={passwords.confirmPassword}
+                  onChange={handlePasswordChange}
                 />
               </div>
-              <Button
-                type="submit"
-                className="bg-green-500 text-white w-full py-2 rounded-md hover:bg-green-600 transition duration-200"
-              >
-                Submit
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                <Button
+                  type="submit"
+                  style={{ width: "100%" }}
+                  className={`w-full sm:w-auto bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors duration-200 flex items-center justify-center ${
+                    forgotStatus === "saving" ? "opacity-75 cursor-not-allowed" : ""
+                  }`}
+                  disabled={forgotStatus === "saving"}
+                >
+                  {forgotStatus === "saving" ? (
+                    <FiLoader className="animate-spin mr-2" />
+                  ) : forgotStatus === "success" ? (
+                    <FiCheck className="mr-2" />
+                  ) : forgotStatus === "error" ? (
+                    <FiXCircle className="mr-2" />
+                  ) : null}
+                  {forgotStatus === "saving"
+                    ? "Submitting..."
+                    : forgotStatus === "success"
+                    ? "Success!"
+                    : forgotStatus === "error"
+                    ? "Error"
+                    : "Submit"}
+                </Button>
+                <Button
+                  onClick={() => setIsModalOpen(false)}
+                  style={{ width: "100%" }}
+                  className="w-full sm:w-auto bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors duration-200 flex items-center justify-center"
+                >
+                  Cancel
+                </Button>
+              </div>
             </form>
-            <Button
-              onClick={() => setIsModalOpen(false)}
-              className="mt-4 w-full bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition duration-200"
-            >
-              Cancel
-            </Button>
           </div>
         </div>
       )}

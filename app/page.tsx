@@ -38,7 +38,7 @@ export default function Home() {
         alert("Please enter both email and password");
         return;
       }
-      const response = await fetch(`http://localhost:5188/login`, {
+      const response = await fetch(`/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,30 +46,35 @@ export default function Home() {
         body: JSON.stringify({ 
           email: loginEmail,
           password: loginPassword
-         }),
+        }),
       });
+  
       if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        if (data.message === "Login Success") {
-          console.log("Login successful");
-          secureLocalStorage.setItem("un", data.user.username);
-          secureLocalStorage.setItem("pw", data.user.password);
-          secureLocalStorage.setItem("em", data.user.email);
-          secureLocalStorage.setItem("pn", data.user.phone);
-          secureLocalStorage.setItem("company", data.user.company);
-          secureLocalStorage.setItem("address", data.user.address);
+        const result = await response.json();
+        console.log(result);
+  
+        if (result.message === "Login Success" && result.data?.length > 0) {
+          const user = result.data[0]; 
+          secureLocalStorage.setItem("un", user.Username);
+          secureLocalStorage.setItem("pw", user.Password);
+          secureLocalStorage.setItem("em", user.Email);
+          secureLocalStorage.setItem("pn", user.Phone);
+          secureLocalStorage.setItem("company", user.Company);
+          secureLocalStorage.setItem("address", user.Address);
           window.location.href = "/dashboard";
+        } else {
+          alert("Invalid login details");
         }
       } else {
-        const data = await response.json();
-        alert(data.message);
+        const errorData = await response.json();
+        alert(errorData.message || "Something went wrong!");
       }
     } catch (error) {
       console.error("Error:", error);
       alert("500!! Internal Server Error");
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 font-sans">
@@ -79,7 +84,12 @@ export default function Home() {
           <CardDescription className="text-sm text-gray-500">Enter your credentials</CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleLogin();
+            }}}
+          >
             <div className="grid gap-4">
               <div>
                 <Label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</Label>
