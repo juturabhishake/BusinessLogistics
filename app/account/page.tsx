@@ -207,11 +207,11 @@ const Page: React.FC = () => {
       setTimeout(() => setForgotStatus("idle"), 3000);
     }
   };
-
+  //hover:scale-105
   return (
     <div className="py-12 px-12 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
-        <div className="shadow-xl rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105">
+        <div className="shadow-xl rounded-lg overflow-hidden transform transition-all duration-300 ">
           <div className="relative h-[10rem]" style={{ background: "var(--bg)" }}>
             <div className="absolute bottom-2 left-0 right-0 p-6">
               <div className="rounded-full w-24 h-24 border-4 border-white shadow-lg mx-auto flex items-center justify-center">
