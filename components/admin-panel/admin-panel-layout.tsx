@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export default function AdminPanelLayout({
   children,
-}: {
+} : {
   children: React.ReactNode;
 }) {
   const sidebar = useStore(useSidebar, (x) => x);
@@ -23,7 +23,6 @@ export default function AdminPanelLayout({
     <div id="layout" className="flex overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
-
       <div className="flex-1 overflow-x-hidden">
         {/* Main Content */}
         <main
