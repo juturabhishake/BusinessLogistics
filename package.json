@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start -p 3002",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prebuild":"npx prisma generate",
+    "postinstall":"npx prisma generate"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
