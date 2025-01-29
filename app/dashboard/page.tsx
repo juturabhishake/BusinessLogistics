@@ -30,7 +30,7 @@ const Page = () => {
         const em = secureLocalStorage.getItem("em");
       }, []);
   return (
-    <div>page</div>
+    <div>Dashboard</div>
   )
 };
 
