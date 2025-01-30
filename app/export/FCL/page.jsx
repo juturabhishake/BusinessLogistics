@@ -83,9 +83,16 @@ const QuotationTable = () => {
     );
   };
 
+  // Calculate totals for each section
   const totalOrigin = calculateTotal(originCharges);
   const totalSeaFreight = calculateTotal(seaFreightCharges);
   const totalDestination = calculateTotal(destinationCharges);
+
+  // Calculate total shipment cost (A + B + C)
+  const totalShipmentCost = {
+    20: totalOrigin[20] + totalSeaFreight[20] + totalDestination[20],
+    40: totalOrigin[40] + totalSeaFreight[40] + totalDestination[40],
+  };
 
   return (
     <div className="">
@@ -283,6 +290,13 @@ const QuotationTable = () => {
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
+              <tr className="border">
+                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Total Shipment Cost in INR (A + B + C)</td>
+                <td className="py-1 px-3 border"></td>
+                <td className="py-1 px-3 border">{totalShipmentCost[20]}</td>
+                <td className="py-1 px-3 border">{totalShipmentCost[40]}</td>
+                <td className="py-1 px-3 border"></td>
+              </tr>
               <tr>
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">INCO Term</td>
                 <td colSpan="4" className="py-1 px-3 border">DAP</td>
@@ -292,7 +306,7 @@ const QuotationTable = () => {
                 <td colSpan="4" className="py-1 px-3 border">TRIGO - SCSI, LLC 1520 KEPNER DRIVE LAFAYETTE IN 47905 USA</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border  text-start">FX Rate</td>
+                <td colSpan="2" className="font-bold py-1 px-3 border text-start">FX Rate</td>
                 <td className="py-1 px-3 border">USD</td>
                 <td className="py-1 px-3 border">84</td>
                 <td className="py-1 px-3 border">EURO</td>
