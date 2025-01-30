@@ -83,12 +83,10 @@ const QuotationTable = () => {
     );
   };
 
-  // Calculate totals for each section
   const totalOrigin = calculateTotal(originCharges);
   const totalSeaFreight = calculateTotal(seaFreightCharges);
   const totalDestination = calculateTotal(destinationCharges);
 
-  // Calculate total shipment cost (A + B + C)
   const totalShipmentCost = {
     20: totalOrigin[20] + totalSeaFreight[20] + totalDestination[20],
     40: totalOrigin[40] + totalSeaFreight[40] + totalDestination[40],
@@ -153,7 +151,7 @@ const QuotationTable = () => {
                       <input
                         type="number"
                         placeholder="0"
-                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
                         value={item[20]}
                         onChange={(e) => handleOriginChange(index, 20, e.target.value)}
                       />
