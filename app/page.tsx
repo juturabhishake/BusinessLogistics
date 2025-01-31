@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import  secureLocalStorage  from  "react-secure-storage";
+import secureLocalStorage from "react-secure-storage";
 import { FiLoader, FiCheck, FiXCircle } from "react-icons/fi";
 
 export default function Home() {
@@ -19,18 +19,101 @@ export default function Home() {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [step, setStep] = useState(1); // 1: Email Input, 2: OTP Input, 3: Reset Password
+  const [step, setStep] = useState(1);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginState, setLoginState] = useState("idle");
+  const [loading, setLoading] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(60);
+  const [otpExpired, setOtpExpired] = useState(false);
 
-  const handleNextStep = () => {
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      setIsPopupOpen(false);
-      setStep(1);
-      console.log("Final Submission:", { email, otp, newPassword, confirmPassword });
+  useEffect(() => {
+    let timer: string | number | NodeJS.Timeout | undefined;
+    if (isPopupOpen && step === 2 && otpTimer > 0) {
+      timer = setInterval(() => {
+        setOtpTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (otpTimer === 0) {
+      setOtpExpired(true);
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [isPopupOpen, step, otpTimer]);
+
+  const handleNextStep = async () => {
+    if (step === 1) {
+      if (email === "") {
+        alert("Please enter your email");
+        return;
+      }
+      setLoading(true);
+      const response = await fetch('/api/forgot_password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      setLoading(false);
+      if (response.ok) {
+        // alert('OTP sent to your email');
+        setStep(2);
+        setOtpTimer(60);
+        setOtpExpired(false);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Something went wrong!');
+      }
+    } else if (step === 2) {
+      if (otp === "") {
+        alert("Please enter the OTP");
+        return;
+      }
+      setLoading(true);
+      const response = await fetch('/api/forgot_password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      setLoading(false);
+      if (response.ok) {
+        // alert('OTP verified, please set your new password');
+        setStep(3);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Invalid OTP');
+      }
+    } else if (step === 3) {
+      if (newPassword === "" || confirmPassword === "") {
+        alert("Please enter a password");
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        alert("Passwords do not match");
+        return;
+      }
+      setLoading(true);
+      const response = await fetch('/api/forgot_password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, newPassword }),
+      });
+
+      setLoading(false);
+      if (response.ok) {
+        // alert('Password reset successfully');
+        setIsPopupOpen(false);
+        setStep(1);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Something went wrong!');
+      }
     }
   };
 
@@ -49,14 +132,11 @@ export default function Home() {
         },
         body: JSON.stringify({ 
           email: loginEmail,
-          password: loginPassword
-        }),
+          password: loginPassword }),
       });
-  
+
       if (response.ok) {
         const result = await response.json();
-        console.log(result);
-  
         if (result.message === "Login Success" && result.data?.length > 0) {
           const user = result.data[0]; 
           secureLocalStorage.setItem("un", user.Username);
@@ -84,7 +164,6 @@ export default function Home() {
       alert("500!! Internal Server Error");
     }
   };
-  
 
   return (
     <div 
@@ -106,11 +185,11 @@ export default function Home() {
             <div className="grid gap-4">
               <div>
                 <Label htmlFor="email" className="block text-sm font-medium text-white">Email</Label>
-                <Input id="email" style={{backgroundColor: "black", color:"white"}} value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="Enter your email" className="mt-1 h-10 px-3 border-gray-300 rounded-md" />
+                <Input id="email" style={{backgroundColor: "black", color:"white"}} value={loginEmail} onChange ={(e) => setLoginEmail(e.target.value)} placeholder="Enter your email" className="mt-1 h-10 px-3 border-gray-300 rounded-md" required />
               </div>
               <div>
                 <Label htmlFor="password" className="block text-sm font-medium text-white">Password</Label>
-                <Input id="password" style={{backgroundColor: "black", color:"white"}} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} type="password" placeholder="Enter password" className="mt-1 h-10 px-3 border-gray-300 rounded-md" />
+                <Input id="password" style={{backgroundColor: "black", color:"white"}} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} type="password" placeholder="Enter password" className="mt-1 h-10 px-3 border-gray-300 rounded-md" required />
               </div>
             </div>
           </form>
@@ -173,12 +252,21 @@ export default function Home() {
                     className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                   <Button
                     className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
                     onClick={handleNextStep}
+                    disabled={loading}
                   >
-                    Get OTP
+                    {loading ? (
+                      <>
+                        <FiLoader className="mr-2 animate-spin" />
+                        Please Wait...
+                      </>
+                    ) : (
+                      "Get OTP"
+                    )}
                   </Button>
                 </div>
               </>
@@ -202,12 +290,23 @@ export default function Home() {
                     </InputOTPGroup>
                   </InputOTP>
                 </div>
-                <Button
-                  className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
-                  onClick={handleNextStep}
-                >
-                  Submit OTP
-                </Button>
+                <div className="flex justify-between items-center mt-4">
+                  <Button
+                    className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+                    onClick={handleNextStep}
+                    disabled={loading || otpExpired}
+                  >
+                    {loading ? (
+                      <>
+                        <FiLoader className="mr-2 animate-spin" />
+                        Please Wait...
+                      </>
+                    ) : (
+                      "Submit OTP"
+                    )}
+                  </Button>
+                  <span className="ml-2 text-red-600">{otpExpired ? "OTP expired" : `${otpTimer}s`}</span>
+                </div>
               </>
             )}
             {step === 3 && (
@@ -223,6 +322,7 @@ export default function Home() {
                     className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
+                    required
                   />
                   <Label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mt-4">Confirm Password</Label>
                   <Input
@@ -232,12 +332,21 @@ export default function Home() {
                     className="mt-1 h-10 px-3 border-gray-300 rounded-md w-full"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
                   />
                   <Button
                     className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
                     onClick={handleNextStep}
+                    disabled={loading}
                   >
-                    Submit
+                    {loading ? (
+                      <>
+                        <FiLoader className="mr-2 animate-spin" />
+                        Please Wait...
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
                   </Button>
                 </div>
               </>

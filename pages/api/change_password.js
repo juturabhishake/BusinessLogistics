@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const cors = Cors({
   methods: ['POST', 'OPTIONS'],
   origin: '*',
-});
+}); 
 
 function encodePasswordToBase64(password) {
   try {
