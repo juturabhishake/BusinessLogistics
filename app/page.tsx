@@ -41,79 +41,87 @@ export default function Home() {
   }, [isPopupOpen, step, otpTimer]);
 
   const handleNextStep = async () => {
+    console.log('Current Step:', step);
+
     if (step === 1) {
-      if (email === "") {
-        alert("Please enter your email");
-        return;
-      }
-      setLoading(true);
-      const response = await fetch('/api/forgot_password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+        if (email === "") {
+            alert("Please enter your email");
+            return;
+        }
+        setLoading(true);
 
-      setLoading(false);
-      if (response.ok) {
-        // alert('OTP sent to your email');
-        setStep(2);
-        setOtpTimer(60);
-        setOtpExpired(false);
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || 'Something went wrong!');
-      }
+        const response = await fetch('/api/forgot_password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+
+        setLoading(false);
+        console.log('Response from OTP request:', response);
+
+        if (response.ok) {
+            setStep(2);
+            setOtpTimer(60);
+            setOtpExpired(false);
+        } else {
+            const errorData = await response.json();
+            console.error('Error data:', errorData);
+            alert(errorData.message || 'Something went wrong!');
+        }
+
     } else if (step === 2) {
-      if (otp === "") {
-        alert("Please enter the OTP");
-        return;
-      }
-      setLoading(true);
-      const response = await fetch('/api/forgot_password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, otp }),
-      });
+        if (otp === "") {
+            alert("Please enter the OTP");
+            return;
+        }
+        setLoading(true);
 
-      setLoading(false);
-      if (response.ok) {
-        // alert('OTP verified, please set your new password');
-        setStep(3);
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || 'Invalid OTP');
-      }
+        const response = await fetch('/api/forgot_password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp }),
+        });
+
+        setLoading(false);
+        console.log('Response from OTP verification:', response);
+
+        if (response.ok) {
+            setStep(3);
+        } else {
+            const errorData = await response.json();
+            console.error('Error data:', errorData);
+            alert(errorData.message || 'Invalid OTP');
+        }
+
     } else if (step === 3) {
-      if (newPassword === "" || confirmPassword === "") {
-        alert("Please enter a password");
-        return;
-      }
-      if (newPassword !== confirmPassword) {
-        alert("Passwords do not match");
-        return;
-      }
-      setLoading(true);
-      const response = await fetch('/api/forgot_password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, newPassword }),
-      });
+        if (newPassword === "" || confirmPassword === "") {
+            alert("Please enter a password");
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+        setLoading(true);
 
-      setLoading(false);
-      if (response.ok) {
-        // alert('Password reset successfully');
-        setIsPopupOpen(false);
-        setStep(1);
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || 'Something went wrong!');
-      }
+        const response = await fetch('/api/forgot_password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp, newPassword }),
+        });
+
+        setLoading(false);
+        console.log('Response from password reset:', response);
+
+        if (response.ok) {
+            alert('Password reset successfully');
+            setIsPopupOpen(false);
+            setStep(1);
+        } else {
+            const errorData = await response.json();
+            console.error('Error data:', errorData);
+            alert(errorData.message || 'Something went wrong!');
+        }
     }
   };
 
@@ -132,7 +140,8 @@ export default function Home() {
         },
         body: JSON.stringify({ 
           email: loginEmail,
-          password: loginPassword }),
+          password: loginPassword 
+        }),
       });
 
       if (response.ok) {
@@ -255,7 +264,7 @@ export default function Home() {
                     required
                   />
                   <Button
-                    className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+ className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
                     onClick={handleNextStep}
                     disabled={loading}
                   >
