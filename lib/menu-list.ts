@@ -60,6 +60,21 @@ export function getMenuList(pathname: string): Group[] {
           ]
         },
         {
+          href: "",
+          label: "RFQ-Prices",
+          icon: SquarePen,
+          submenus: [
+            {
+              href: "/RFQ-Prices/FCL",
+              label: "FCL"
+            },
+            {
+              href: "/RFQ-Prices/LCL",
+              label: "LCL"
+            }
+          ]
+        },
+        {
           href: "/categories",
           label: "Categories",
           icon: Bookmark
