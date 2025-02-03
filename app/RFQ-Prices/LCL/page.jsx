@@ -49,6 +49,7 @@ const QuotationTable = () => {
     seaFreight: { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 },
     destination: { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 },
   });
+  const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
   useEffect(() => {
     const currentDate = new Date();
@@ -145,14 +146,14 @@ const QuotationTable = () => {
               <p className="text-xs text-gray-400">"RFQ Import rates for Q2 20243 ({currentDateInfo})"</p>
               <p className="text-xs text-gray-400">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
-            <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4">
-              <div className="flex flex-col items-center justify-between lg:flex-row justify-end">
-                <Popover>
+            <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
+              <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
+                <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"10px" }}>
+                    <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
                       {selectedLocation ? selectedLocation.toUpperCase() : "Select Location..."}
                       <ChevronsUpDown className="opacity-50" />
-                    </Button>
+                    </Button> 
                   </PopoverTrigger>
                   <PopoverContent className="w-[200px] p-0">
                     <Command>
@@ -166,6 +167,7 @@ const QuotationTable = () => {
                               value={location.value}
                               onSelect={(currentValue) => {
                                 setSelectedLocation(currentValue === selectedLocation ? "" : currentValue);
+                                setOpen(false);
                               }}
                             >
                               {location.label}
@@ -186,7 +188,7 @@ const QuotationTable = () => {
               <div>
                 <button
                   onClick={handleSave}
-                  className="mt-2 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded"
+                  className="mt-0 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded"
                   style={{ minWidth: "80px" }}
                 >
                   {saveState === "idle" && <FiSave size={16} />}
