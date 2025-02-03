@@ -51,6 +51,45 @@ const QuotationTable = () => {
   });
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [locations, setLocations] = useState([]);
+  const [locationName, setLocationName] = useState("");
+  const [USD, setUSD] = useState(0.00);
+  const [EUR, setEUR] = useState(0.00);
+  const [incoterms, setIncoterms] = useState("");
+  const [transitDays, setTransitDays] = useState("");
+  const [Commodity, setCommodity] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch('/api/get_locations');
+        const data = await response.json();
+        setLocations(data.result);
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    };
+
+    fetchLocations();
+  }, []);
+
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const response = await fetch('/api/get_currency');
+        const data = await response.json();
+        if (data.result && data.result.length > 0) {
+          setUSD(parseFloat(data.result[0].USD));
+          setEUR(parseFloat(data.result[0].EURO));
+        }
+      } catch (error) {
+        console.error("Error fetching currency:", error);
+      }
+    };
+
+    fetchCurrency();
+  }, []);
+
   useEffect(() => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
@@ -135,7 +174,33 @@ const QuotationTable = () => {
     "5CBM": totals.origin["5CBM"] + totals.seaFreight["5CBM"] + totals.destination["5CBM"],
     "6CBM": totals.origin["6CBM"] + totals.seaFreight["6CBM"] + totals.destination["6CBM"],
   };
-  
+  const fetchSupplierDetails = async (locCode) => {
+    try {
+      const response = await fetch('/api/GET_Supplier_LOC_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Loc_Code: locCode }),
+      });
+      const data = await response.json();
+      if (data.result && data.result.length > 0) {
+        setIncoterms(data.result[0].Incoterms);
+        setTransitDays(data.result[0].Transit_Days);
+        setCommodity(data.result[0].Commodity);
+        setDeliveryAddress(data.result[0].Delivery_Address);
+        console.log("Supplier details fetched successfully:", data.result[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching supplier details:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedLocation) {
+      fetchSupplierDetails(selectedLocation);
+    }
+  }, [selectedLocation]);
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]">
@@ -151,7 +216,7 @@ const QuotationTable = () => {
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
-                      {selectedLocation ? selectedLocation.toUpperCase() : "Select Location..."}
+                      {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."}
                       <ChevronsUpDown className="opacity-50" />
                     </Button> 
                   </PopoverTrigger>
@@ -163,18 +228,19 @@ const QuotationTable = () => {
                         <CommandGroup>
                           {locations.map((location) => (
                             <CommandItem
-                              key={location.value}
-                              value={location.value}
+                              key={location.Location_Code}
+                              value={location.Location_Code}
                               onSelect={(currentValue) => {
                                 setSelectedLocation(currentValue === selectedLocation ? "" : currentValue);
+                                setLocationName(currentValue === selectedLocation ? "" : location.Location_Name);
                                 setOpen(false);
                               }}
                             >
-                              {location.label}
+                              {location.Location_Name}
                               <Check
                                 className={cn(
                                   "ml-auto",
-                                  selectedLocation === location.value ? "opacity-100" : "opacity-0"
+                                  selectedLocation === location.Location_Code ? "opacity-100" : "opacity-0"
                                 )}
                               />
                             </CommandItem>
@@ -206,7 +272,7 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[240px]">Descriptions</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[130px]">Currency in</th>
-                <th colSpan="6" className="py-1 px-2 border border-[var(--bgBody)]">{selectedLocation ? selectedLocation.toUpperCase() : "Select Location..."}</th>
+                <th colSpan="6" className="py-1 px-2 border border-[var(--bgBody)]">{locationName ? locationName.toUpperCase() : "Select Location..."}</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
@@ -332,26 +398,26 @@ const QuotationTable = () => {
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">INCO Term:</td>
-                <td colSpan="7" className="py-1 px-3 border">EXW</td>
+                <td colSpan="7" className="py-1 px-3 border">{incoterms}</td>
+              </tr>
+              <tr className="border">
+                <td colSpan="3" className="py-1 px-3 border text-start">Delivery Address:</td>
+                <td colSpan="7" className="py-1 px-3 border">{deliveryAddress}</td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">FX Rate:</td>
                 <td colSpan="2" className="py-1 px-3 border">USD</td>
-                <td colSpan="2" className="py-1 px-3 border">84</td>
+                <td colSpan="2" className="py-1 px-3 border">{USD}</td>
                 <td colSpan="2" className="py-1 px-3 border">EURO</td>
-                <td colSpan="2" className="py-1 px-3 border">93</td>
+                <td colSpan="2" className="py-1 px-3 border">{EUR}</td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Required Transit Days:</td>
-                <td colSpan="7" className="py-1 px-3 border">64 days</td>
-              </tr>
-              <tr className="border">
-                <td colSpan="3" className="py-1 px-3 border text-start">Estimated Transit Days Given by Forwarder:</td>
-                <td colSpan="7" className="py-1 px-3 border"></td>
+                <td colSpan="7" className="py-1 px-3 border">{transitDays}</td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Remarks:</td>
-                <td colSpan="7" className="py-1 px-3 border"></td>
+                <td colSpan="7" className="py-1 px-3 border">{Commodity}</td>
               </tr>
             </tbody>
           </table>

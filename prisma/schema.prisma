@@ -18,3 +18,130 @@ model Web_Login {
   Is_Active    Int?      @default(0, map: "DF_Web_Login_Is_Active")
   Created_Date DateTime? @default(now(), map: "DF_Web_Login_Created_Date") @db.DateTime
 }
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Currency_Exchange {
+  Cur_Tran_Id  Int       @default(autoincrement())
+  Month_No     Int?
+  Year_No      Int?
+  USD          Decimal?  @db.Decimal(18, 2)
+  EURO         Decimal?  @db.Decimal(18, 2)
+  Created_By   String?   @db.VarChar(50)
+  Created_Date DateTime? @default(now(), map: "DF_Currency_Exchange_Created_Date") @db.DateTime
+  Updated_By   String?   @db.VarChar(50)
+  Updated_Date DateTime? @db.DateTime
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model FCL_Quote {
+  FCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  Quote_Month     Int
+  Quote_Year      Int
+  Cont_Feet       Int
+  O_CCD           Decimal?  @db.Decimal(18, 2)
+  O_LTG           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_BLC           Decimal?  @db.Decimal(18, 2)
+  O_LUS           Decimal?  @db.Decimal(18, 2)
+  O_Halt          Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_ENS           Decimal?  @db.Decimal(18, 2)
+  S_ISPS          Decimal?  @db.Decimal(18, 2)
+  S_ITT           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_DTH           Decimal?  @db.Decimal(18, 2)
+  D_BLF           Decimal?  @db.Decimal(18, 2)
+  D_DBR           Decimal?  @db.Decimal(18, 2)
+  D_DOF           Decimal?  @db.Decimal(18, 2)
+  D_HC            Decimal?  @db.Decimal(18, 2)
+  D_TDO           Decimal?  @db.Decimal(18, 2)
+  D_LOC           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @default(now(), map: "DF_FCL_Quote_Created_Date") @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LCL_Quote {
+  LCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  Quote_Month     Int
+  Quote_Year      Int
+  CBM             Int
+  O_CCD           Decimal?  @db.Decimal(18, 2)
+  O_LTG           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_BLC           Decimal?  @db.Decimal(18, 2)
+  O_LUS           Decimal?  @db.Decimal(18, 2)
+  O_CFS           Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_FSC           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_CUC           Decimal?  @db.Decimal(18, 2)
+  D_CCF           Decimal?  @db.Decimal(18, 2)
+  D_DOC           Decimal?  @db.Decimal(18, 2)
+  D_AAI           Decimal?  @db.Decimal(18, 2)
+  D_LU            Decimal?  @db.Decimal(18, 2)
+  D_Del           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @default(now(), map: "DF_LCL_Quote_Created_Date") @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Location_Details {
+  Loc_Details_ID    Int             @default(autoincrement())
+  Location_Code     String          @db.VarChar(50)
+  Customer_Name     String?         @db.VarChar(100)
+  Delivery_Address  String          @db.VarChar(Max)
+  Commodity         String?         @db.VarChar(500)
+  HSN_Code          String?         @db.VarChar(100)
+  Incoterms         String          @db.VarChar(50)
+  Transit_Days      Int?
+  Dest_Port         String?         @db.VarChar(100)
+  Free_Days         Int?
+  Pref_Vessel       String?         @db.VarChar(100)
+  Pref_Service      String?         @db.VarChar(100)
+  Pref_Liners       String?         @db.VarChar(Max)
+  Avg_Cont_Per_Mnth String?         @db.VarChar(100)
+  Created_By        String?         @db.VarChar(50)
+  Created_Date      DateTime?       @default(now(), map: "DF_Location_Details_Created_Date") @db.DateTime
+  Updated_By        String?         @db.VarChar(50)
+  Updated_Date      DateTime?       @db.DateTime
+  Location_Master   Location_Master @relation(fields: [Location_Code], references: [Location_Code], onUpdate: NoAction, map: "FK_Location_Details_Location_Master")
+
+  @@ignore
+}
+
+model Location_Master {
+  Location_Id      Int                @default(autoincrement())
+  Location_Code    String             @id(map: "PK_Location_Master_1") @db.VarChar(50)
+  Location         String             @db.VarChar(100)
+  Country          String             @db.VarChar(100)
+  Currency         String             @db.VarChar(10)
+  Status           Int
+  CreatedDate      DateTime?          @default(now(), map: "DF_Location_Master_CreatedDate") @db.DateTime
+  CreatedBy        String?            @db.VarChar(100)
+  UpdatedDate      DateTime?          @db.DateTime
+  UpdatedBy        String?            @db.VarChar(100)
+  Location_Details Location_Details[] @ignore
+}

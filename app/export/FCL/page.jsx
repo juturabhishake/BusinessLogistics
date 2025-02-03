@@ -1,9 +1,24 @@
 "use client";
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from "react";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 const QuotationTable = () => {
+  const [currentDateInfo, setCurrentDateInfo] = useState("");
   const [sections, setSections] = useState({
     origin: false,
     seaFreight: false,
@@ -36,7 +51,60 @@ const QuotationTable = () => {
     { description: "T1 Doc", 20: "", 40: "", remarks: "Per Container" },
     { description: "LOLO Charges", 20: "", 40: "", remarks: "Per Container" },
   ]);
+  const [open, setOpen] = React.useState(false)
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [locations, setLocations] = useState([]);
+  const [locationName, setLocationName] = useState("");
+  const [USD, setUSD] = useState(0.00);
+  const [EUR, setEUR] = useState(0.00);
+  const [incoterms, setIncoterms] = useState("");
+  const [transitDays, setTransitDays] = useState("");
+  const [Commodity, setCommodity] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch('/api/get_locations');
+        const data = await response.json();
+        setLocations(data.result);
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    };
 
+    fetchLocations();
+  }, []);
+
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const response = await fetch('/api/get_currency');
+        const data = await response.json();
+        if (data.result && data.result.length > 0) {
+          setUSD(parseFloat(data.result[0].USD));
+          setEUR(parseFloat(data.result[0].EURO));
+        }
+      } catch (error) {
+        console.error("Error fetching currency:", error);
+      }
+    };
+
+    fetchCurrency();
+  }, []);
+
+  useEffect(() => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth(); 
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    
+    const formattedDate = `${monthNames[currentMonth]} ${currentYear} - ${monthNames[currentMonth + 3]} ${currentYear}`;
+    console.log(formattedDate);
+    setCurrentDateInfo(formattedDate);
+  }, []);
   const handleSave = () => {
     setSaveState("saving");
     setTimeout(() => {
@@ -91,29 +159,95 @@ const QuotationTable = () => {
     20: totalOrigin[20] + totalSeaFreight[20] + totalDestination[20],
     40: totalOrigin[40] + totalSeaFreight[40] + totalDestination[40],
   };
+  const fetchSupplierDetails = async (locCode) => {
+    try {
+      const response = await fetch('/api/GET_Supplier_LOC_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Loc_Code: locCode }),
+      });
+      const data = await response.json();
+      if (data.result && data.result.length > 0) {
+        setIncoterms(data.result[0].Incoterms);
+        setTransitDays(data.result[0].Transit_Days);
+        setCommodity(data.result[0].Commodity);
+        setDeliveryAddress(data.result[0].Delivery_Address);
+        console.log("Supplier details fetched successfully:", data.result[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching supplier details:", error);
+    }
+  };
 
+  useEffect(() => {
+    if (selectedLocation) {
+      fetchSupplierDetails(selectedLocation);
+    }
+  }, [selectedLocation]);
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]">
-        <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-2 px-3">
+      <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-2 px-3">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
-            <div>
-              <h2 className="text-sm font-bold">Comparative Statement of Quotations</h2>
-              <p className="mt-1 text-xs">
-                <span>RFQ Export rates for January 2025</span>
-                <br />
-                <span>We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</span>
-              </p>
+            <div className="flex flex-col">
+              <h2 className="text-sm font-bold">Sea Freight RFQ - FCL IMPORT</h2>
+              <p className="text-xs text-gray-400">"RFQ Import rates for Q2 20243 ({currentDateInfo})"</p>
+              <p className="text-xs text-gray-400">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
-            <button
-              onClick={handleSave}
-              className="mt-2 lg:mt-0 flex items-center justify-center text-[var(--borderclr)] bg-[var(--buttonBg)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-2 rounded"
-              style={{ minWidth: "80px" }}
-            >
-              {saveState === "idle" && <FiSave size={16} />}
-              {saveState === "saving" && <FiLoader size={16} className="animate-spin" />}
-              {saveState === "saved" && <FiCheck size={16} />}
-            </button>
+            <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
+              <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
+                      {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."}
+                      <ChevronsUpDown className="opacity-50" />
+                    </Button> 
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search location..." className="h-9" />
+                      <CommandList>
+                        <CommandEmpty>No location found.</CommandEmpty>
+                        <CommandGroup>
+                          {locations.map((location) => (
+                            <CommandItem
+                              key={location.Location_Code}
+                              value={location.Location_Code}
+                              onSelect={(currentValue) => {
+                                setSelectedLocation(currentValue === selectedLocation ? "" : currentValue);
+                                setLocationName(currentValue === selectedLocation ? "" : location.Location_Name);
+                                setOpen(false);
+                              }}
+                            >
+                              {location.Location_Name}
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  selectedLocation === location.Location_Code ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <button
+                  onClick={handleSave}
+                  className="mt-0 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded"
+                  style={{ minWidth: "80px" }}
+                >
+                  {saveState === "idle" && <FiSave size={16} />}
+                  {saveState === "saving" && <FiLoader size={16} className="animate-spin" />}
+                  {saveState === "saved" && <FiCheck size={16} />}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <div className="card-body p-0 overflow-x-auto pb-3">
@@ -123,7 +257,7 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Descriptions</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
-                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to Chicago USA shipment</th>
+                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
@@ -297,26 +431,26 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">INCO Term</td>
-                <td colSpan="4" className="py-1 px-3 border">DAP</td>
+                <td colSpan="4" className="py-1 px-3 border">{incoterms}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="font-bold py-1 px-3 border  text-start">Delivery Address</td>
-                <td colSpan="4" className="py-1 px-3 border">TRIGO - SCSI, LLC 1520 KEPNER DRIVE LAFAYETTE IN 47905 USA</td>
+                <td colSpan="4" className="py-1 px-3 border">{deliveryAddress}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">FX Rate</td>
                 <td className="py-1 px-3 border">USD</td>
-                <td className="py-1 px-3 border">84</td>
+                <td className="py-1 px-3 border">{USD}</td>
                 <td className="py-1 px-3 border">EURO</td>
-                <td className="py-1 px-3 border">93</td>
+                <td className="py-1 px-3 border">{EUR}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">Required Transit Days</td>
-                <td colSpan="4" className="py-1 px-3 border">64 days</td>
+                <td colSpan="4" className="py-1 px-3 border">{transitDays}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Estimated Transit Days Given by Forwarder</td>
-                <td colSpan="4" className="py-1 px-3 border"></td>
+                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Remarks</td>
+                <td colSpan="4" className="py-1 px-3 border">{Commodity}</td>
               </tr>
             </tbody>
           </table>
