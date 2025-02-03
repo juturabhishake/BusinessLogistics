@@ -167,12 +167,12 @@ const QuotationTable = () => {
   };
 
   const totalShipmentCost = {
-    "1CBM": totals.origin["1CBM"] + totals.seaFreight["1CBM"] + totals.destination["1CBM"],
-    "2CBM": totals.origin["2CBM"] + totals.seaFreight["2CBM"] + totals.destination["2CBM"],
-    "3CBM": totals.origin["3CBM"] + totals.seaFreight["3CBM"] + totals.destination["3CBM"],
-    "4CBM": totals.origin["4CBM"] + totals.seaFreight["4CBM"] + totals.destination["4CBM"],
-    "5CBM": totals.origin["5CBM"] + totals.seaFreight["5CBM"] + totals.destination["5CBM"],
-    "6CBM": totals.origin["6CBM"] + totals.seaFreight["6CBM"] + totals.destination["6CBM"],
+    "1CBM": totals.origin["1CBM"] + totals.seaFreight["1CBM"]*USD + totals.destination["1CBM"]*USD,
+    "2CBM": totals.origin["2CBM"] + totals.seaFreight["2CBM"]*USD + totals.destination["2CBM"]*USD,
+    "3CBM": totals.origin["3CBM"] + totals.seaFreight["3CBM"]*USD + totals.destination["3CBM"]*USD,
+    "4CBM": totals.origin["4CBM"] + totals.seaFreight["4CBM"]*USD + totals.destination["4CBM"]*USD,
+    "5CBM": totals.origin["5CBM"] + totals.seaFreight["5CBM"]*USD + totals.destination["5CBM"]*USD,
+    "6CBM": totals.origin["6CBM"] + totals.seaFreight["6CBM"]*USD + totals.destination["6CBM"]*USD,
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
@@ -195,12 +195,28 @@ const QuotationTable = () => {
       console.error("Error fetching supplier details:", error);
     }
   };
-
   useEffect(() => {
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
     }
   }, [selectedLocation]);
+  const totalDestinationCostInINR = {
+    "1CBM": totals.destination["1CBM"] * USD,
+    "2CBM": totals.destination["2CBM"] * USD,
+    "3CBM": totals.destination["3CBM"] * USD,
+    "4CBM": totals.destination["4CBM"] * USD,
+    "5CBM": totals.destination["5CBM"] * USD,
+    "6CBM": totals.destination["6CBM"] * USD,
+  };
+
+  const totalSeaFreightCostInINR = {
+    "1CBM": totals.seaFreight["1CBM"] * USD,
+    "2CBM": totals.seaFreight["2CBM"] * USD,
+    "3CBM": totals.seaFreight["3CBM"] * USD,
+    "4CBM": totals.seaFreight["4CBM"] * USD,
+    "5CBM": totals.seaFreight["5CBM"] * USD,
+    "6CBM": totals.seaFreight["6CBM"] * USD,
+  };
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]">
@@ -313,7 +329,7 @@ const QuotationTable = () => {
                   <td colSpan="3" className="py-1 px-3 border">Total Destination Cost in INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
-                      <input value={totals.destination[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                      <input value={totalDestinationCostInINR[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
                   <td className="py-1 px-3 border"></td>
@@ -347,7 +363,7 @@ const QuotationTable = () => {
                   <td colSpan="3" className="py-1 px-3 border">Total Sea Freight Cost in INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
-                      <input value={totals.seaFreight[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                      <input value={totalSeaFreightCostInINR[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
                   <td className="py-1 px-3 border"></td>

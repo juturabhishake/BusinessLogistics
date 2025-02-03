@@ -186,6 +186,7 @@ const QuotationTable = () => {
       fetchSupplierDetails(selectedLocation);
     }
   }, [selectedLocation]);
+  
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]">
