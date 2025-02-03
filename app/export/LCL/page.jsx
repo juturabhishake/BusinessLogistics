@@ -280,7 +280,7 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[240px]">Sea Export</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[130px]">Forwarders</th>
-                <th colSpan="6" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to Hungary LCL shipment</th>
+                <th colSpan="6" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{Select Location}"} LCL shipment</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
