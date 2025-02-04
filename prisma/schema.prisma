@@ -143,5 +143,7 @@ model Location_Master {
   CreatedBy        String?            @db.VarChar(100)
   UpdatedDate      DateTime?          @db.DateTime
   UpdatedBy        String?            @db.VarChar(100)
-  Location_Details Location_Details[] @ignore
+  Location_Details Location_Details[]
+
+  @@ignore
 }
