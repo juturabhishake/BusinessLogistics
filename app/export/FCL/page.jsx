@@ -105,16 +105,81 @@ const QuotationTable = () => {
     console.log(formattedDate);
     setCurrentDateInfo(formattedDate);
   }, []);
-  const handleSave = () => {
+  // const handleSave = () => {
+  //   setSaveState("saving");
+  //   setTimeout(() => {
+  //     setSaveState("saved");
+  //     setTimeout(() => {
+  //       setSaveState("idle");
+  //     }, 5000);
+  //   }, 2000);
+  // };
+  const handleSave = async () => {
     setSaveState("saving");
-    setTimeout(() => {
+  
+    const createQuoteData = (containerSize) => {
+      return {
+        supplierCode: "GTI", 
+        locationCode: selectedLocation,
+        quoteMonth: new Date().getMonth() + 1,
+        quoteYear: new Date().getFullYear(),
+        originData: originCharges.map(item => ({
+          description: item.description,
+          remarks: item.remarks,
+          [containerSize]: item[containerSize],
+        })),
+        seaFreightData: seaFreightCharges.map(item => ({
+          description: item.description,
+          remarks: item.remarks,
+          [containerSize]: item[containerSize],
+        })),
+        destinationData: destinationCharges.map(item => ({
+          description: item.description,
+          remarks: item.remarks,
+          [containerSize]: item[containerSize],
+        })),
+        totalShipmentCost: {
+          [containerSize]: totalShipmentCost[containerSize],
+        },
+        createdBy: localStorage.getItem('fullName'),
+        Cont_Feet: `${containerSize} ft`, 
+      };
+    };
+  
+    const postQuoteData = async (quoteData) => {
+      try {
+        const response = await fetch('/api/SaveFCLQuote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(quoteData),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to save quote');
+        }
+      } catch (error) {
+        console.error("Error saving quote:", error);
+        throw error;
+      }
+    };
+  
+    try {
+      const quoteData20ft = createQuoteData(20);
+      await postQuoteData(quoteData20ft);
+  
+      const quoteData40ft = createQuoteData(40);
+      await postQuoteData(quoteData40ft);
+  
       setSaveState("saved");
       setTimeout(() => {
         setSaveState("idle");
       }, 5000);
-    }, 2000);
+    } catch (error) {
+      setSaveState("idle");
+    }
   };
-
   const toggleSection = (section) => {
     setSections((prev) => ({
       ...prev,
