@@ -1,11 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-import Cors from 'cors';
+import { PrismaClient } from "@prisma/client";
+import Cors from "cors";
 
 const prisma = new PrismaClient();
-
 const cors = Cors({
-  methods: ['POST', 'OPTIONS'],
-  origin: '*',
+  methods: ["POST", "OPTIONS"],
+  origin: "*",
 });
 
 const runMiddleware = (req, res, fn) =>
@@ -21,105 +20,87 @@ const runMiddleware = (req, res, fn) =>
 export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
 
-  if (req.method === 'POST') {
-    const {
-      supplierCode,
-      locationCode,
-      quoteMonth,
-      quoteYear,
-      originData,
-      seaFreightData,
-      destinationData,
-      totalShipmentCost,
-      createdBy,
-    } = req.body;
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
 
-    if (!originData || !seaFreightData || !destinationData) {
-      return res.status(400).json({ error: 'Invalid data structure' });
-    }
-    const parseDecimal = (value) => (value ? parseFloat(value) : 0.0);
+  const {
+    supplierCode,
+    locationCode,
+    quoteMonth,
+    quoteYear,
+    containerSize,
+    originData,
+    seaFreightData,
+    destinationData,
+    totalShipmentCost,
+    totalOrigin,
+    totalSeaFreight,
+    totalDestination,
+    createdBy,
+  } = req.body;
 
-    const quoteData = [
-      {
-        Supplier_Code: supplierCode,
-        Location_Code: locationCode,
-        Quote_Month: quoteMonth,
-        Quote_Year: quoteYear,
-        Cont_Feet: 20,
-        O_CCD: parseDecimal(originData[0]?.[20]),
-        O_LTG: parseDecimal(originData[1]?.[20]),
-        O_THC: parseDecimal(originData[2]?.[20]),
-        O_BLC: parseDecimal(originData[3]?.[20]),
-        O_LUS: parseDecimal(originData[4]?.[20]),
-        O_Halt: parseDecimal(originData[5]?.[20]),
-        O_Total_Chg: parseDecimal(originData[6]?.[20]),
-        S_SeaFre: parseDecimal(seaFreightData[0]?.[20]),
-        S_ENS: parseDecimal(seaFreightData[1]?.[20]),
-        S_ISPS: parseDecimal(seaFreightData[2]?.[20]),
-        S_ITT: parseDecimal(seaFreightData[3]?.[20]),
-        S_Total_Chg: parseDecimal(seaFreightData[4]?.[20]),
-        D_DTH: parseDecimal(destinationData[0]?.[20]),
-        D_BLF: parseDecimal(destinationData[1]?.[20]),
-        D_DBR: parseDecimal(destinationData[2]?.[20]),
-        D_DOF: parseDecimal(destinationData[3]?.[20]),
-        D_HC: parseDecimal(destinationData[4]?.[20]),
-        D_TDO: parseDecimal(destinationData[5]?.[20]),
-        D_LOC: parseDecimal(destinationData[6]?.[20]),
-        D_Total_Chg: parseDecimal(destinationData[7]?.[20]),
-        Total_Ship_Cost: parseDecimal(totalShipmentCost[20]),
-        Is_Locked: null,
-        Created_Date: new Date(),
-        Created_By: createdBy,
-        Updated_Date: new Date(),
-        Updated_By: createdBy,
-      },
-      {
-        Supplier_Code: supplierCode,
-        Location_Code: locationCode,
-        Quote_Month: quoteMonth,
-        Quote_Year: quoteYear,
-        Cont_Feet: 40,
-        O_CCD: parseDecimal(originData[0]?.[40]),
-        O_LTG: parseDecimal(originData[1]?.[40]),
-        O_THC: parseDecimal(originData[2]?.[40]),
-        O_BLC: parseDecimal(originData[3]?.[40]),
-        O_LUS: parseDecimal(originData[4]?.[40]),
-        O_Halt: parseDecimal(originData[5]?.[40]),
-        O_Total_Chg: parseDecimal(originData[6]?.[40]),
-        S_SeaFre: parseDecimal(seaFreightData[0]?.[40]),
-        S_ENS: parseDecimal(seaFreightData[1]?.[40]),
-        S_ISPS: parseDecimal(seaFreightData[2]?.[40]),
-        S_ITT: parseDecimal(seaFreightData[3]?.[40]),
-        S_Total_Chg: parseDecimal(seaFreightData[4]?.[40]),
-        D_DTH: parseDecimal(destinationData[0]?.[40]),
-        D_BLF: parseDecimal(destinationData[1]?.[40]),
-        D_DBR: parseDecimal(destinationData[2]?.[40]),
-        D_DOF: parseDecimal(destinationData[3]?.[40]),
-        D_HC: parseDecimal(destinationData[4]?.[40]),
-        D_TDO: parseDecimal(destinationData[5]?.[40]),
-        D_LOC: parseDecimal(destinationData[6]?.[40]),
-        D_Total_Chg: parseDecimal(destinationData[7]?.[40]),
-        Total_Ship_Cost: parseDecimal(totalShipmentCost[40]),
-        Is_Locked: null,
-        Created_Date: new Date(),
-        Created_By: createdBy,
-        Updated_Date: new Date(),
-        Updated_By: createdBy,
-      },
-    ];
-    console.log(quoteData);
-    try {
-      for (const data of quoteData) {
-        await prisma.$executeRaw`EXEC InsertFCLQuote @QuoteData = ${data}`;
-      }
-      res.status(200).json({ message: 'Quote saved successfully' });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: 'Failed to save quote' });
-    }
-  } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+  if (
+    !supplierCode ||
+    !locationCode ||
+    !quoteMonth ||
+    !quoteYear ||
+    !containerSize ||
+    !originData ||
+    !seaFreightData ||
+    !destinationData ||
+    totalShipmentCost === undefined ||
+    totalOrigin === undefined ||
+    totalSeaFreight === undefined ||
+    totalDestination === undefined
+  ) {
+    return res.status(400).json({ error: "Missing or invalid required fields" });
+  }
+
+  const parseDecimal = (value) => (value ? parseFloat(value) : 0.0);
+
+  const quoteData = {
+    Supplier_Code: supplierCode,
+    Location_Code: locationCode || "N/A",
+    Quote_Month: quoteMonth,
+    Quote_Year: quoteYear,
+    Cont_Feet: containerSize,
+    O_CCD: parseDecimal(originData[0]?.[containerSize]),
+    O_LTG: parseDecimal(originData[1]?.[containerSize]),
+    O_THC: parseDecimal(originData[2]?.[containerSize]),
+    O_BLC: parseDecimal(originData[3]?.[containerSize]),
+    O_LUS: parseDecimal(originData[4]?.[containerSize]),
+    O_Halt: parseDecimal(originData[5]?.[containerSize]),
+    O_Total_Chg: parseDecimal(totalOrigin),
+    S_SeaFre: parseDecimal(seaFreightData[0]?.[containerSize]),
+    S_ENS: parseDecimal(seaFreightData[1]?.[containerSize]),
+    S_ISPS: parseDecimal(seaFreightData[2]?.[containerSize]),
+    S_ITT: parseDecimal(seaFreightData[3]?.[containerSize]),
+    S_Total_Chg: parseDecimal(totalSeaFreight),
+    D_DTH: parseDecimal(destinationData[0]?.[containerSize]),
+    D_BLF: parseDecimal(destinationData[1]?.[containerSize]),
+    D_DBR: parseDecimal(destinationData[2]?.[containerSize]),
+    D_DOF: parseDecimal(destinationData[3]?.[containerSize]),
+    D_HC: parseDecimal(destinationData[4]?.[containerSize]),
+    D_TDO: parseDecimal(destinationData[5]?.[containerSize]),
+    D_LOC: parseDecimal(destinationData[6]?.[containerSize]),
+    D_Total_Chg: parseDecimal(totalDestination),
+    Total_Ship_Cost: parseDecimal(totalShipmentCost),
+    Created_Date: new Date(),
+    Created_By: createdBy || "Unknown",
+  };
+
+  try {
+    console.log("Saving data to database for container size:", containerSize);
+    console.log("Payload:", quoteData);
+
+    await prisma.$executeRaw`EXEC SaveFCLQuote @jsonval = ${JSON.stringify(
+      quoteData
+    )}`;
+    res.status(200).json({ message: `Quote for ${containerSize}ft saved successfully` });
+  } catch (error) {
+    console.error("Database error:", error.message);
+    res.status(500).json({ error: "Failed to save quote", details: error.message });
   }
 }
-

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,9 +21,9 @@ import {
 const QuotationTable = () => {
   const [currentDateInfo, setCurrentDateInfo] = useState("");
   const [sections, setSections] = useState({
-    origin: false,
-    seaFreight: false,
-    destination: false,
+    origin: true,
+    seaFreight: true,
+    destination: true ,
   });
   const [saveState, setSaveState] = useState("idle");
   
@@ -105,72 +106,139 @@ const QuotationTable = () => {
     console.log(formattedDate);
     setCurrentDateInfo(formattedDate);
   }, []);
+  const fetchQuotationData = async (locationCode) => {
+    try {
+      const response = await fetch("/api/get_FCL_QUOTE", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Loc_Code: locationCode }),
+      });
+
+      const data = await response.json();
+
+      if (data.result && data.result.length > 0) {
+        const updatedOriginCharges = [...originCharges];
+        const updatedSeaFreightCharges = [...seaFreightCharges];
+        const updatedDestinationCharges = [...destinationCharges];
+
+        const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
+        const fcl40 = data.result.find((item) => item.Cont_Feet === 40) || {};
+
+        updatedOriginCharges[0][20] = fcl20.O_CCD || "";
+        updatedOriginCharges[0][40] = fcl40.O_CCD || "";
+        updatedOriginCharges[1][20] = fcl20.O_LTG || "";
+        updatedOriginCharges[1][40] = fcl40.O_LTG || "";
+        updatedOriginCharges[2][20] = fcl20.O_THC || "";
+        updatedOriginCharges[2][40] = fcl40.O_THC || "";
+        updatedOriginCharges[3][20] = fcl20.O_BLC || "";
+        updatedOriginCharges[3][40] = fcl40.O_BLC || "";
+        updatedOriginCharges[4][20] = fcl20.O_LUS || "";
+        updatedOriginCharges[4][40] = fcl40.O_LUS || "";
+        updatedOriginCharges[5][20] = fcl20.O_Halt || "";
+        updatedOriginCharges[5][40] = fcl40.O_Halt || "";
+
+        updatedSeaFreightCharges[0][20] = fcl20.S_SeaFre || "";
+        updatedSeaFreightCharges[0][40] = fcl40.S_SeaFre || "";
+        updatedSeaFreightCharges[1][20] = fcl20.S_ENS || "";
+        updatedSeaFreightCharges[1][40] = fcl40.S_ENS || "";
+        updatedSeaFreightCharges[2][20] = fcl20.S_ISPS || "";
+        updatedSeaFreightCharges[2][40] = fcl40.S_ISPS || "";
+        updatedSeaFreightCharges[3][20] = fcl20.S_ITT || "";
+        updatedSeaFreightCharges[3][40] = fcl40.S_ITT || "";
+
+        updatedDestinationCharges[0][20] = fcl20.D_DTH || "";
+        updatedDestinationCharges[0][40] = fcl40.D_DTH || "";
+        updatedDestinationCharges[1][20] = fcl20.D_BLF || "";
+        updatedDestinationCharges[1][40] = fcl40.D_BLF || "";
+        updatedDestinationCharges[2][20] = fcl20.D_DBR || "";
+        updatedDestinationCharges[2][40] = fcl40.D_DBR || "";
+        updatedDestinationCharges[3][20] = fcl20.D_DOF || "";
+        updatedDestinationCharges[3][40] = fcl40.D_DOF || "";
+        updatedDestinationCharges[4][20] = fcl20.D_HC || "";
+        updatedDestinationCharges[4][40] = fcl40.D_HC || "";
+        updatedDestinationCharges[5][20] = fcl20.D_TDO || "";
+        updatedDestinationCharges[5][40] = fcl40.D_TDO || "";
+        updatedDestinationCharges[6][20] = fcl20.D_LOC || "";
+        updatedDestinationCharges[6][40] = fcl40.D_LOC || "";
+
+        setOriginCharges(updatedOriginCharges);
+        setSeaFreightCharges(updatedSeaFreightCharges);
+        setDestinationCharges(updatedDestinationCharges);
+      } else {
+        setOriginCharges(originCharges.map((item) => ({ ...item, 20: "", 40: "" })));
+        setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, 20: "", 40: "" })));
+        setDestinationCharges(destinationCharges.map((item) => ({ ...item, 20: "", 40: "" })));
+      }
+    } catch (error) {
+      console.error("Error fetching quotation data:", error);
+    }
+  };
+
   // const handleSave = () => {
   //   setSaveState("saving");
-  //   setTimeout(() => {
-  //     setSaveState("saved");
-  //     setTimeout(() => {
-  //       setSaveState("idle");
-  //     }, 5000);
-  //   }, 2000);
+    // setTimeout(() => {
+    //   setSaveState("saved");
+    //   setTimeout(() => {
+    //     setSaveState("idle");
+    //   }, 5000);
+    // }, 2000);
   // };
-  const handleSave = async () => {
-    setSaveState("saving");
+  const saveQuote = async (containerSize) => {
+    const filterCharges = (charges) =>
+      charges.map((charge) => ({
+        description: charge.description,
+        [containerSize]: charge[containerSize],
+        remarks: charge.remarks,
+      }));
   
-    const createQuoteData = (containerSize) => {
-      return {
-        supplierCode: "GTI", 
-        locationCode: selectedLocation,
-        quoteMonth: new Date().getMonth() + 1,
-        quoteYear: new Date().getFullYear(),
-        originData: originCharges.map(item => ({
-          description: item.description,
-          remarks: item.remarks,
-          [containerSize]: item[containerSize],
-        })),
-        seaFreightData: seaFreightCharges.map(item => ({
-          description: item.description,
-          remarks: item.remarks,
-          [containerSize]: item[containerSize],
-        })),
-        destinationData: destinationCharges.map(item => ({
-          description: item.description,
-          remarks: item.remarks,
-          [containerSize]: item[containerSize],
-        })),
-        totalShipmentCost: {
-          [containerSize]: totalShipmentCost[containerSize],
-        },
-        createdBy: localStorage.getItem('fullName'),
-        Cont_Feet: `${containerSize} ft`, 
-      };
-    };
-  
-    const postQuoteData = async (quoteData) => {
-      try {
-        const response = await fetch('/api/SaveFCLQuote', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(quoteData),
-        });
-  
-        if (!response.ok) {
-          throw new Error('Failed to save quote');
-        }
-      } catch (error) {
-        console.error("Error saving quote:", error);
-        throw error;
-      }
+    const quoteData = {
+      supplierCode: "GTI",
+      locationCode: selectedLocation,
+      quoteMonth: new Date().getMonth() + 1,
+      quoteYear: new Date().getFullYear(),
+      containerSize,
+      originData: filterCharges(originCharges),
+      seaFreightData: filterCharges(seaFreightCharges),
+      destinationData: filterCharges(destinationCharges),
+      totalShipmentCost: totalShipmentCost[containerSize],
+      totalOrigin: totalOrigin[containerSize],
+      totalSeaFreight: totalSeaFreight[containerSize],
+      totalDestination: totalDestination[containerSize],
+      createdBy: secureLocalStorage.getItem("un") || "Unknown",
     };
   
     try {
-      const quoteData20ft = createQuoteData(20);
-      await postQuoteData(quoteData20ft);
+      console.log(`Saving quote for ${containerSize}ft:`, quoteData);
+      const response = await fetch("/api/SaveFCLQuote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(quoteData),
+      });
   
-      const quoteData40ft = createQuoteData(40);
-      await postQuoteData(quoteData40ft);
+      if (!response.ok) {
+        throw new Error(`Failed to save quote for ${containerSize}ft`);
+      }
+      console.log(`Quote for ${containerSize}ft saved successfully.`);
+    } catch (error) {
+      console.error(`Error saving quote for ${containerSize}ft:`, error);
+      alert(`Error saving quote for ${containerSize}ft`);
+    }
+  };
+  const handleSave = async () => {
+    if (!selectedLocation) {
+      alert("Please select a location before saving.");
+      return;
+    }
+  
+    setSaveState("saving");
+  
+    try {
+      await saveQuote(20);
+      await saveQuote(40);
   
       setSaveState("saved");
       setTimeout(() => {
@@ -186,24 +254,21 @@ const QuotationTable = () => {
       [section]: !prev[section],
     }));
   };
-
-  const handleOriginChange = (index, field, value) => {
-    const updatedCharges = [...originCharges];
-    updatedCharges[index] = { ...updatedCharges[index], [field]: value };
-    setOriginCharges(updatedCharges);
+  const handleInputChange = (setStateFunction, index, field, value) => {
+    setStateFunction(prevCharges => {
+      const updatedCharges = [...prevCharges];
+      updatedCharges[index] = {
+        ...updatedCharges[index],
+        [field]: value === "" ? 0 : parseFloat(value), 
+      };
+      return updatedCharges;
+    });
   };
-
-  const handleSeaFreightChange = (index, field, value) => {
-    const updatedCharges = [...seaFreightCharges];
-    updatedCharges[index] = { ...updatedCharges[index], [field]: value };
-    setSeaFreightCharges(updatedCharges);
-  };
-
-  const handleDestinationChange = (index, field, value) => {
-    const updatedCharges = [...destinationCharges];
-    updatedCharges[index] = { ...updatedCharges[index], [field]: value };
-    setDestinationCharges(updatedCharges);
-  };
+  
+  const handleOriginChange = (index, field, value) => handleInputChange(setOriginCharges, index, field, value);
+  const handleSeaFreightChange = (index, field, value) => handleInputChange(setSeaFreightCharges, index, field, value);
+  const handleDestinationChange = (index, field, value) => handleInputChange(setDestinationCharges, index, field, value);
+  
 
   const calculateTotal = (charges) => {
     return charges.reduce(
@@ -259,6 +324,7 @@ const QuotationTable = () => {
   useEffect(() => {
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
+      fetchQuotationData(selectedLocation);
     }
   }, [selectedLocation]);
   
@@ -269,8 +335,8 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Sea Freight RFQ - FCL IMPORT</h2>
-              <p className="text-xs text-gray-400">"RFQ Import rates for Q2 20243 ({currentDateInfo})"</p>
-              <p className="text-xs text-gray-400">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
+              <p className="text-xs text-gray-100">"RFQ Import rates for Q2 20243 ({currentDateInfo})"</p>
+              <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
               <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
@@ -328,7 +394,7 @@ const QuotationTable = () => {
         </div>
         <div className="card-body p-0 overflow-x-auto pb-3">
           <table className="table-auto border-[var(--primary)] text-center w-full min-w-[800px] text-xs">
-            <thead className="bg-secondary text-[var(--buttonHover)] border border-[var(--bgBody)]">
+            <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Descriptions</th>
@@ -341,7 +407,7 @@ const QuotationTable = () => {
                 <th className="py-1 px-2 border border-[var(--bgBody)]">40 ft</th>
               </tr>
             </thead>
-            <tbody className="bg-[var(--bgBody2)]">
+            <tbody className="bg-[var(--bgBody3)]">
               <tr
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
                 onClick={() => toggleSection("origin")}

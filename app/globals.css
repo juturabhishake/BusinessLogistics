@@ -47,6 +47,7 @@ body {
     --buttonBgHover: #577884;
     --bgBody : #92c0cf;
     --bgBody2 : #f0f0f0;
+    --bgBody3 : white;
     --button : #729dac;
     --buttonHover : #92c0cf;
     --forgotbutton : #a2a86d;
@@ -96,6 +97,7 @@ body {
     --buttonBgHover: #26353a;
     --forgotbuttonHover : #828656;
     --borderclr: white;
+    --bgBody3 : #1d2020;
   }
 }
 

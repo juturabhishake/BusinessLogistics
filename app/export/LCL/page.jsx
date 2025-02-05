@@ -216,8 +216,8 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Sea Freight RFQ - LCL IMPORT</h2>
-              <p className="text-xs text-gray-400">"RFQ Import rates for Q2 20243 ({currentDateInfo})"</p>
-              <p className="text-xs text-gray-400">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
+              <p className="text-xs text-gray-100">"RFQ Import rates for Q2 20243 ({currentDateInfo})"</p>
+              <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
               <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
@@ -275,7 +275,7 @@ const QuotationTable = () => {
         </div>
         <div className="card-body p-0 overflow-x-auto pb-3">
           <table className="table-auto border-[var(--primary)] text-center w-full min-w-[800px] text-xs">
-            <thead className="bg-secondary text-[var(--buttonHover)] border border-[var(--bgBody)]">
+            <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[240px]">Sea Export</th>
@@ -292,7 +292,7 @@ const QuotationTable = () => {
                 <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">6 CBM</th>
               </tr>
             </thead>
-            <tbody className="bg-[var(--bgBody2)]">
+            <tbody className="bg-[var(--bgBody3)]">
               <tr
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
                 onClick={() => toggleSection("origin")}

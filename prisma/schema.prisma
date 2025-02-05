@@ -147,3 +147,46 @@ model Location_Master {
 
   @@ignore
 }
+
+model ErrorLogs {
+  Id           Int       @id(map: "PK__ErrorLog__3214EC074A814EC5") @default(autoincrement())
+  Proc_Name    String?   @db.VarChar(200)
+  T_Parameter1 String?   @db.VarChar(Max)
+  ErrorMessage String?   @db.NVarChar(4000)
+  ErrorDate    DateTime? @default(now(), map: "DF__ErrorLogs__Error__47DBAE45") @db.DateTime
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Import_LCL_Quote {
+  LCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  Quote_Month     Int
+  Quote_Year      Int
+  CBM             Int
+  D_CCD           Decimal?  @db.Decimal(18, 2)
+  D_LTS           Decimal?  @db.Decimal(18, 2)
+  D_THC           Decimal?  @db.Decimal(18, 2)
+  D_BLC           Decimal?  @db.Decimal(18, 2)
+  D_LUS           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_FSC           Decimal?  @db.Decimal(18, 2)
+  S_SSC           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  O_CC            Decimal?  @db.Decimal(18, 2)
+  O_CCF           Decimal?  @db.Decimal(18, 2)
+  O_DOC           Decimal?  @db.Decimal(18, 2)
+  O_CFS           Decimal?  @db.Decimal(18, 2)
+  O_LU            Decimal?  @db.Decimal(18, 2)
+  O_Del           Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @default(now(), map: "DF_Import_LCL_Quote_Created_Date") @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+
+  @@ignore
+}
