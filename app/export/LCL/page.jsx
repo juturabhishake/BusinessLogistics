@@ -20,9 +20,9 @@ import {
 const QuotationTable = () => {
   const [currentDateInfo, setCurrentDateInfo] = useState("");
   const [sections, setSections] = useState({
-    origin: false,
-    seaFreight: false,
-    destination: false,
+    origin: true,
+    seaFreight: true,
+    destination: true,
   });
   const [saveState, setSaveState] = useState("idle");
   const [originData, setOriginData] = useState(

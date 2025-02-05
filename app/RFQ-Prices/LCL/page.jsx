@@ -30,9 +30,9 @@ const locations = [
 const QuotationTable = () => {
   const [currentDateInfo, setCurrentDateInfo] = useState("");
   const [sections, setSections] = useState({
-    destination: false,
-    seaFreight: false,
-    origin: false,
+    destination: true,
+    seaFreight: true,
+    origin: true,
   });
   const [saveState, setSaveState] = useState("idle");
   const [originData, setOriginData] = useState(
