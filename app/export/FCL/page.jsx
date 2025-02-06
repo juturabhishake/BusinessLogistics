@@ -454,6 +454,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">
                       <input
                         type="text"
+                        readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         readOnly
@@ -507,6 +508,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">
                       <input
                         type="text"
+                        readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         readOnly
