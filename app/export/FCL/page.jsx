@@ -457,7 +457,6 @@ const QuotationTable = () => {
                         readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
-                        readOnly
                         onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
                       />
                     </td>
@@ -511,7 +510,6 @@ const QuotationTable = () => {
                         readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
-                        readOnly
                         onChange={(e) => handleSeaFreightChange(index, "remarks", e.target.value)}
                       />
                     </td>
