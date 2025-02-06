@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -104,6 +105,7 @@ const QuotationTable = () => {
 
   const handleInputChange = (section, rowIndex, column, value) => {
     let updatedData;
+  
     if (section === "origin") {
       updatedData = originData.map((row, index) => {
         if (index === rowIndex) {
@@ -129,7 +131,7 @@ const QuotationTable = () => {
       });
       setDestinationData(updatedData);
     }
-
+  
     const newTotals = {
       ...totals,
       [section]: updatedData.reduce(
@@ -146,17 +148,180 @@ const QuotationTable = () => {
       ),
     };
     setTotals(newTotals);
-  };
+  };   
 
-  const handleSave = () => {
+  // const handleSave = () => {
+  //   setSaveState("saving");
+  //   setTimeout(() => {
+  //     setSaveState("saved");
+  //     setTimeout(() => {
+  //       setSaveState("idle");
+  //     }, 5000);
+  //   }, 2000);
+  // };
+  const fetchLCLQuote = async (locCode) => {
+    try {
+      const response = await fetch('/api/get_LCL_QUOTE', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Loc_Code: locCode }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      if (data.result && data.result.length > 0) {
+        const origin = Array(6).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
+        const seaFreight = Array(2).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
+        const destination = Array(6).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
+  
+        data.result.forEach((item) => {
+          const cbmKey = `${item.CBM}CBM`;
+          if (item.CBM <= 6) {
+            origin[0][cbmKey] = item.O_CCD || "0";
+            origin[1][cbmKey] = item.O_LTG || "0";
+            origin[2][cbmKey] = item.O_THC || "0";
+            origin[3][cbmKey] = item.O_BLC || "0";
+            origin[4][cbmKey] = item.O_LUS || "0";
+            origin[5][cbmKey] = item.O_CFS || "0";
+  
+            // if (item.CBM <= 2) {
+              seaFreight[0][cbmKey] = item.S_SeaFre || "0";
+              seaFreight[1][cbmKey] = item.S_FSC || "0";
+            // }
+  
+            destination[0][cbmKey] = item.D_CUC || "0";
+            destination[1][cbmKey] = item.D_CCF || "0";
+            destination[2][cbmKey] = item.D_DOC || "0";
+            destination[3][cbmKey] = item.D_AAI || "0";
+            destination[4][cbmKey] = item.D_LU || "0";
+            destination[5][cbmKey] = item.D_Del || "0";
+          }
+        });
+        setOriginData(origin);
+        setSeaFreightData(seaFreight);
+        setDestinationData(destination);
+  
+        console.log("Updated state data:", { originData, seaFreightData, destinationData });
+      } else {
+        console.log("No LCL Quote data found for the selected location.");
+      }
+    } catch (error) {
+      console.error("Error fetching LCL Quote data:", error);
+      alert(`Error fetching LCL Quote data: ${error.message}`);
+    }
+  };
+  useEffect(() => {
+    const calculateTotals = (data) => {
+      return data.reduce(
+        (acc, row) => {
+          acc["1CBM"] += parseFloat(row["1CBM"] || 0);
+          acc["2CBM"] += parseFloat(row["2CBM"] || 0);
+          acc["3CBM"] += parseFloat(row["3CBM"] || 0);
+          acc["4CBM"] += parseFloat(row["4CBM"] || 0);
+          acc["5CBM"] += parseFloat(row["5CBM"] || 0);
+          acc["6CBM"] += parseFloat(row["6CBM"] || 0);
+          return acc;
+        },
+        { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 }
+      );
+    };
+  
+    setTotals({
+      origin: calculateTotals(originData),
+      seaFreight: calculateTotals(seaFreightData),
+      destination: calculateTotals(destinationData),
+    });
+  }, [originData, seaFreightData, destinationData]);
+  
+  const saveQuote = async (cbm) => {
+    const parseNumber = (value) => parseFloat(value) || 0;
+  
+    const createChargeObject = (charges, field) => charges.reduce((acc, charge, idx) => {
+      acc[field[idx]] = parseNumber(charge[cbm]);
+      return acc;
+    }, {});
+  
+    const quoteData = {
+      Supplier_Code: "GTI",
+      Location_Code: selectedLocation,
+      Quote_Month: new Date().getMonth() + 1,
+      Quote_Year: new Date().getFullYear(),
+      CBM: parseInt(cbm.replace("CBM", "")),
+      O_CCD: parseNumber(originData[0][cbm]),
+      O_LTG: parseNumber(originData[1][cbm]),
+      O_THC: parseNumber(originData[2][cbm]),
+      O_BLC: parseNumber(originData[3][cbm]),
+      O_LUS: parseNumber(originData[4][cbm]),
+      O_CFS: parseNumber(originData[5][cbm]),
+      O_Total_Chg: totals.origin[cbm],
+  
+      S_SeaFre: parseNumber(seaFreightData[0][cbm]),
+      S_FSC: parseNumber(seaFreightData[1][cbm]),
+      S_Total_Chg: totals.seaFreight[cbm]*USD,
+  
+      D_CUC: parseNumber(destinationData[0][cbm]),
+      D_CCF: parseNumber(destinationData[1][cbm]),
+      D_DOC: parseNumber(destinationData[2][cbm]),
+      D_AAI: parseNumber(destinationData[3][cbm]),
+      D_LU: parseNumber(destinationData[4][cbm]),
+      D_Del: parseNumber(destinationData[5][cbm]),
+      D_Total_Chg: totals.destination[cbm]*USD,
+  
+      Total_Ship_Cost: totalShipmentCost[cbm],
+      Created_By: secureLocalStorage.getItem("un") || "Unknown",
+    };
+  
+    try {
+      console.log(`Saving quote for ${cbm}:`, quoteData);
+      const response = await fetch("/api/saveLCLQuote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(quoteData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to save quote for ${cbm}`);
+      }
+  
+      console.log(`Quote for ${cbm} saved successfully.`);
+    } catch (error) {
+      console.error(`Error saving quote for ${cbm}:`, error);
+      alert(`Error saving quote for ${cbm}`);
+    }
+  };
+  const handleSave = async () => {
+    if (!selectedLocation) {
+      alert("Please select a location before saving.");
+      return;
+    }
+  
     setSaveState("saving");
-    setTimeout(() => {
+  
+    try {
+      for (let i = 1; i <= 6; i++) {
+        await saveQuote(`${i}CBM`);
+      }
+  
       setSaveState("saved");
+  
       setTimeout(() => {
         setSaveState("idle");
       }, 5000);
-    }, 2000);
+    } catch (error) {
+      console.error("Error saving quotes:", error);
+      alert("Error saving quotes. Please try again.");
+      setSaveState("idle");
+    }
   };
+  
 
   const toggleSection = (section) => {
     setSections((prev) => ({
@@ -199,6 +364,7 @@ const QuotationTable = () => {
   useEffect(() => {
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
+      fetchLCLQuote(selectedLocation);
     }
   }, [selectedLocation]);
   const totalDestinationCostInINR = {
@@ -319,7 +485,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">INR / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={originData[index][`${i + 1}CBM`]} onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder={item === "CFS AT ACTUAL" ? "At Actual" : ""} /></td>
@@ -353,7 +519,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={seaFreightData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
@@ -387,7 +553,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">EURO / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input type="number" onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={destinationData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>

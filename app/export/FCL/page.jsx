@@ -63,6 +63,7 @@ const QuotationTable = () => {
   const [Commodity, setCommodity] = useState("");
   const [Dest_Port, setDest_Port] = useState("");  
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [currency, setCurrency] = useState("");
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -455,6 +456,7 @@ const QuotationTable = () => {
                         type="text"
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
+                        readOnly
                         onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
                       />
                     </td>
@@ -507,6 +509,7 @@ const QuotationTable = () => {
                         type="text"
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
+                        readOnly
                         onChange={(e) => handleSeaFreightChange(index, "remarks", e.target.value)}
                       />
                     </td>
@@ -557,6 +560,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">
                       <input
                         type="text"
+                        readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}

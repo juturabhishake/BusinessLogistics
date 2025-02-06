@@ -28,7 +28,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ message: "Location code is required" });
         }
         try {
-            const result = await prisma.$queryRaw`EXEC [dbo].[get_FCL_QUOTE] ${Loc_Code}`;
+            const result = await prisma.$queryRaw`EXEC [dbo].[get_LCL_QUOTE] ${Loc_Code}`;
             return res.status(200).json({ result });
         } catch (error) {
             console.error('Error fetching get_FCL_QUOTE:', error);
