@@ -52,7 +52,13 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations');
+        const response = await fetch('/api/get_locations', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ RFQType: 'LCL' }),
+        } );
         const data = await response.json();
         setLocations(data.result);
       } catch (error) {

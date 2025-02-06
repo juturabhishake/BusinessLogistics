@@ -22,9 +22,13 @@ function runMiddleware(req, res, fn) {
 
 export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
-
+  if (req.method === "POST") {
+    const { RFQType } = req.body;
+    if (!RFQType) {
+        return res.status(400).json({ message: "Location code is required" });
+    }
   try {
-    const result = await prisma.$queryRaw`EXEC [dbo].[GET_Locations]`;
+    const result = await prisma.$queryRaw`EXEC [dbo].[GET_Locations_Type] ${RFQType}`;
 
     return res.status(200).json({ result });
   } catch (error) {
@@ -33,4 +37,5 @@ export default async function handler(req, res) {
   } finally {
     await prisma.$disconnect();
   }
+}
 }
