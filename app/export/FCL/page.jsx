@@ -61,6 +61,7 @@ const QuotationTable = () => {
   const [incoterms, setIncoterms] = useState("");
   const [transitDays, setTransitDays] = useState("");
   const [Commodity, setCommodity] = useState("");
+  const [Dest_Port, setDest_Port] = useState("");  
   const [deliveryAddress, setDeliveryAddress] = useState("");
   useEffect(() => {
     const fetchLocations = async () => {
@@ -108,7 +109,8 @@ const QuotationTable = () => {
         "July", "August", "September", "October", "November", "December"
     ];
     
-    const formattedDate = `${monthNames[currentMonth]} ${currentYear} - ${monthNames[currentMonth + 3]} ${currentYear}`;
+    // const formattedDate = `${monthNames[currentMonth]} ${currentYear} - ${monthNames[currentMonth + 3]} ${currentYear}`;
+    const formattedDate = `${monthNames[currentMonth]} ${currentYear}`;
     console.log(formattedDate);
     setCurrentDateInfo(formattedDate);
   }, []);
@@ -320,6 +322,7 @@ const QuotationTable = () => {
         setTransitDays(data.result[0].Transit_Days);
         setCommodity(data.result[0].Commodity);
         setDeliveryAddress(data.result[0].Delivery_Address);
+        setDest_Port(data.result[0].Dest_Port);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -340,8 +343,8 @@ const QuotationTable = () => {
       <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-2 px-3">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
-              <h2 className="text-sm font-bold">Sea Freight RFQ - FCL IMPORT</h2>
-              <p className="text-xs text-gray-100">"RFQ Import rates for Q2 20243 ({currentDateInfo})"</p>
+              <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
+              <p className="text-xs text-gray-100">"RFQ Import rates for {currentDateInfo}"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
@@ -401,9 +404,9 @@ const QuotationTable = () => {
         <div className="card-body p-0 overflow-x-auto pb-3">
           <table className="table-auto border-[var(--primary)] text-center w-full min-w-[800px] text-xs">
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
-              <tr>
+              <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Descriptions</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -588,17 +591,17 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">FX Rate</td>
                 <td className="py-1 px-3 border">USD</td>
-                <td className="py-1 px-3 border">{USD}</td>
+                <td className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td>
                 <td className="py-1 px-3 border">EURO</td>
-                <td className="py-1 px-3 border">{EUR}</td>
+                <td className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">Required Transit Days</td>
                 <td colSpan="4" className="py-1 px-3 border">{transitDays}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Remarks</td>
-                <td colSpan="4" className="py-1 px-3 border">{Commodity}</td>
+                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Destination Port</td>
+                <td colSpan="4" className="py-1 px-3 border">{Dest_Port}</td>
               </tr>
             </tbody>
           </table>

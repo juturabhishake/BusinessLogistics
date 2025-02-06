@@ -61,7 +61,7 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "",
-          label: "RFQ-Prices",
+          label: "Imports",
           icon: SquarePen,
           submenus: [
             {
