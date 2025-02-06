@@ -317,7 +317,7 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.destination &&
-                ["Customs Clearance & Documentation", "Local Transportation From Shipper -port", "Terminal Handling Charges", "Bill of Lading Charges", "Loading/Unloading / SSR", "Other Charges"].map((item, index) => (
+                ["Customs Clearance & Documentation", "Local Transportation From Shipper -port", "Terminal Handling Charges", "Bill of Lading Charges", "Loading/Unloading / SSR"].map((item, index) => (
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item}</td>
