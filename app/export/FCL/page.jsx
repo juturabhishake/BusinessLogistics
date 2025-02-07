@@ -586,26 +586,26 @@ const QuotationTable = () => {
                 <td className="py-1 px-3 border"></td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">INCO Term</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">INCO Term</td>
                 <td colSpan="4" className="py-1 px-3 border">{incoterms}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border  text-start">Delivery Address</td>
+                <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>
                 <td colSpan="4" className="py-1 px-3 border">{deliveryAddress}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">FX Rate</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">FX Rate</td>
                 <td className="py-1 px-3 border">USD</td>
                 <td className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td>
                 <td className="py-1 px-3 border">EURO</td>
                 <td className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Required Transit Days</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
                 <td colSpan="4" className="py-1 px-3 border">{transitDays}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Destination Port</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="4" className="py-1 px-3 border">{Dest_Port}</td>
               </tr>
             </tbody>

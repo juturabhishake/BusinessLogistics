@@ -300,12 +300,12 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">1 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">2 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">3 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">4 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">5 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">6 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">1 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">2 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">3 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">4 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">5 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">6 CBM</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">
