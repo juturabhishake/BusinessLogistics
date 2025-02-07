@@ -428,11 +428,12 @@ const QuotationTable = () => {
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">INCO Term:</td>
-                <td colSpan="7" className="py-1 px-3 border">{incoterms}</td>
+                <td colSpan="7" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Pickup Address (Shipper):</td>
-                <td colSpan="7" className="py-1 px-3 border">{deliveryAddress}</td>
+                <td colSpan="7" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
+
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">FX Rate:</td>

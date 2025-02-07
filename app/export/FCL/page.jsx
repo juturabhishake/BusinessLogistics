@@ -590,8 +590,8 @@ const QuotationTable = () => {
                 <td colSpan="4" className="py-1 px-3 border">{incoterms}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>
-                <td colSpan="4" className="py-1 px-3 border">{deliveryAddress}</td>
+                <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
+                <td colSpan="4" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">FX Rate</td>
