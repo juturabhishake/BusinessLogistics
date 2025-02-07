@@ -51,6 +51,7 @@ const QuotationTable = () => {
   const [Commodity, setCommodity] = useState("");
   const [Dest_Port, setDest_Port] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [currency, setCurrency] = useState("");
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -331,12 +332,12 @@ const QuotationTable = () => {
   };
 
   const totalShipmentCost = {
-    "1CBM": totals.origin["1CBM"] + totals.seaFreight["1CBM"]*USD + totals.destination["1CBM"]*EUR,
-    "2CBM": totals.origin["2CBM"] + totals.seaFreight["2CBM"]*USD + totals.destination["2CBM"]*EUR,
-    "3CBM": totals.origin["3CBM"] + totals.seaFreight["3CBM"]*USD + totals.destination["3CBM"]*EUR,
-    "4CBM": totals.origin["4CBM"] + totals.seaFreight["4CBM"]*USD + totals.destination["4CBM"]*EUR,
-    "5CBM": totals.origin["5CBM"] + totals.seaFreight["5CBM"]*USD + totals.destination["5CBM"]*EUR,
-    "6CBM": totals.origin["6CBM"] + totals.seaFreight["6CBM"]*USD + totals.destination["6CBM"]*EUR,
+    "1CBM": (totals.origin["1CBM"] + totals.seaFreight["1CBM"]*USD + totals.destination["1CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "2CBM": (totals.origin["2CBM"] + totals.seaFreight["2CBM"]*USD + totals.destination["2CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "3CBM": (totals.origin["3CBM"] + totals.seaFreight["3CBM"]*USD + totals.destination["3CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "4CBM": (totals.origin["4CBM"] + totals.seaFreight["4CBM"]*USD + totals.destination["4CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "5CBM": (totals.origin["5CBM"] + totals.seaFreight["5CBM"]*USD + totals.destination["5CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "6CBM": (totals.origin["6CBM"] + totals.seaFreight["6CBM"]*USD + totals.destination["6CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
@@ -354,6 +355,7 @@ const QuotationTable = () => {
         setCommodity(data.result[0].Commodity);
         setDeliveryAddress(data.result[0].Delivery_Address);
         setDest_Port(data.result[0].Dest_Port);
+        setCurrency(data.result[0].Currency);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -367,22 +369,25 @@ const QuotationTable = () => {
       fetchLCLQuote(selectedLocation);
     }
   }, [selectedLocation]);
-  const totalDestinationCostInINR = {
-    "1CBM": totals.destination["1CBM"] * EUR,
-    "2CBM": totals.destination["2CBM"] * EUR,
-    "3CBM": totals.destination["3CBM"] * EUR,
-    "4CBM": totals.destination["4CBM"] * EUR,
-    "5CBM": totals.destination["5CBM"] * EUR,
-    "6CBM": totals.destination["6CBM"] * EUR,
+  
+  const totalDestinationCostInINR = {  
+
+    "1CBM": (totals.destination["1CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "2CBM": (totals.destination["2CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "3CBM": (totals.destination["3CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "4CBM": (totals.destination["4CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "5CBM": (totals.destination["5CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "6CBM": (totals.destination["6CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
   };
+  
 
   const totalSeaFreightCostInINR = {
-    "1CBM": totals.seaFreight["1CBM"] * USD,
-    "2CBM": totals.seaFreight["2CBM"] * USD,
-    "3CBM": totals.seaFreight["3CBM"] * USD,
-    "4CBM": totals.seaFreight["4CBM"] * USD,
-    "5CBM": totals.seaFreight["5CBM"] * USD,
-    "6CBM": totals.seaFreight["6CBM"] * USD,
+    "1CBM": (totals.seaFreight["1CBM"] * USD).toFixed(2),
+    "2CBM": (totals.seaFreight["2CBM"] * USD).toFixed(2),
+    "3CBM": (totals.seaFreight["3CBM"] * USD).toFixed(2),
+    "4CBM": (totals.seaFreight["4CBM"] * USD).toFixed(2),
+    "5CBM": (totals.seaFreight["5CBM"] * USD).toFixed(2),
+    "6CBM": (totals.seaFreight["6CBM"] * USD).toFixed(2),
   };
   return (
     <div className="">
@@ -550,7 +555,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 9}</td>
                     <td className="py-1 px-3 border text-start">{item}</td>
-                    <td className="py-1 px-3 border">EURO / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
                         <input value={destinationData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />

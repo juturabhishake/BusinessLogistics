@@ -17,6 +17,7 @@ model Web_Login {
   Address      String?   @db.VarChar(Max)
   Is_Active    Int?      @default(0, map: "DF_Web_Login_Is_Active")
   Created_Date DateTime? @default(now(), map: "DF_Web_Login_Created_Date") @db.DateTime
+  Vendor_Code  String?   @db.NVarChar(50)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -143,6 +144,7 @@ model Location_Master {
   CreatedBy        String?            @db.VarChar(100)
   UpdatedDate      DateTime?          @db.DateTime
   UpdatedBy        String?            @db.VarChar(100)
+  RFQType          String?            @db.VarChar(10)
   Location_Details Location_Details[]
 
   @@ignore
@@ -189,4 +191,21 @@ model Import_LCL_Quote {
   Updated_By      String?   @db.VarChar(100)
 
   @@ignore
+}
+
+model Vendors {
+  Vendor_Id     Int       @default(autoincrement())
+  Vendor_Code   String    @id(map: "PK_Vendors") @db.VarChar(10)
+  Vendor_Name   String    @db.VarChar(200)
+  Contact_Name  String    @db.VarChar(200)
+  Contact_No    String    @db.VarChar(50)
+  Contact_Email String    @db.VarChar(50)
+  Email_2       String?   @db.VarChar(50)
+  Email_3       String?   @db.VarChar(50)
+  Vendor_Type   String    @db.VarChar(1)
+  IsActive      Int
+  CreatedDate   DateTime? @default(now(), map: "DF_Vendors_CreatedDate") @db.DateTime
+  CreatedBy     String?   @db.VarChar(50)
+  UpdatedDate   DateTime? @db.DateTime
+  UpdatedBy     String?   @db.VarChar(50)
 }

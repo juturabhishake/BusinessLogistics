@@ -73,6 +73,7 @@ export default async function handler(req, res) {
                         ,[Address]
                         ,[Is_Active]
                         ,[Created_Date]
+                        ,[Vendor_Code]
                     FROM [abhi1289_].[dbo].[Web_Login] where email = ${email}`;
                 return res.status(200).json({ message: loginMessage, data: query });
             } else {
