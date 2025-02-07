@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -154,15 +155,172 @@ const QuotationTable = () => {
     };
     setTotals(newTotals);
   };
+  const fetchLCLQuote = async (locCode) => {
+    try {
+      const response = await fetch('/api/get_Import_LCL_QUOTE', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Loc_Code: locCode }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      if (!data.result || !Array.isArray(data.result)) {
+        throw new Error("Invalid API response format");
+      }
+  
+      const origin = Array(6).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
+      const seaFreight = Array(3).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
+      const destination = Array(6).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
+  
+      data.result.forEach((item) => {
+        const cbmKey = `${item.CBM}CBM`;
+        if (item.CBM <= 6) {
+          if (destination[0]) destination[0][cbmKey] = item.D_CCD || "0";
+          if (destination[1]) destination[1][cbmKey] = item.D_LTS || "0";
+          if (destination[2]) destination[2][cbmKey] = item.D_THC || "0";
+          if (destination[3]) destination[3][cbmKey] = item.D_BLC || "0";
+          if (destination[4]) destination[4][cbmKey] = item.D_LUS || "0";
+  
+          if (seaFreight[0]) seaFreight[0][cbmKey] = item.S_SeaFre || "0";
+          if (seaFreight[1]) seaFreight[1][cbmKey] = item.S_FSC || "0";
+          if (seaFreight[2]) seaFreight[2][cbmKey] = item.S_SSC || "0";
+  
+          if (origin[0]) origin[0][cbmKey] = item.O_CC || "0";
+          if (origin[1]) origin[1][cbmKey] = item.O_CCF || "0";
+          if (origin[2]) origin[2][cbmKey] = item.O_DOC || "0";
+          if (origin[3]) origin[3][cbmKey] = item.O_CFS || "0";
+          if (origin[4]) origin[4][cbmKey] = item.O_LU || "0";
+          if (origin[5]) origin[5][cbmKey] = item.O_Del || "0";
+        }
+      });
+  
+      setOriginData(origin);
+      setSeaFreightData(seaFreight);
+      setDestinationData(destination);
+  
+      console.log("Updated state data:", { originData, seaFreightData, destinationData });
+    } catch (error) {
+      console.error("Error fetching LCL Quote data:", error);
+      alert(`Error fetching LCL Quote data: ${error.message}`);
+    }
+  };
+  useEffect(() => {
+    const calculateTotals = (data) => {
+      return data.reduce(
+        (acc, row) => {
+          acc["1CBM"] += parseFloat(row["1CBM"] || 0);
+          acc["2CBM"] += parseFloat(row["2CBM"] || 0);
+          acc["3CBM"] += parseFloat(row["3CBM"] || 0);
+          acc["4CBM"] += parseFloat(row["4CBM"] || 0);
+          acc["5CBM"] += parseFloat(row["5CBM"] || 0);
+          acc["6CBM"] += parseFloat(row["6CBM"] || 0);
+          return acc;
+        },
+        { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 }
+      );
+    };
+  
+    setTotals({
+      origin: calculateTotals(originData),
+      seaFreight: calculateTotals(seaFreightData),
+      destination: calculateTotals(destinationData),
+    });
+  }, [originData, seaFreightData, destinationData]);
+  // const handleSave = () => {
+  //   setSaveState("saving");
+  //   setTimeout(() => {
+  //     setSaveState("saved");
+  //     setTimeout(() => {
+  //       setSaveState("idle");
+  //     }, 5000);
+  //   }, 2000);
+  // };
 
-  const handleSave = () => {
+  const saveQuote = async (cbm) => {
+    const parseNumber = (value) => parseFloat(value) || 0;
+  
+    const quoteData = {
+      Supplier_Code: "GTI",
+      Location_Code: selectedLocation,
+      Quote_Month: new Date().getMonth() + 1,
+      Quote_Year: new Date().getFullYear(),
+      CBM: parseInt(cbm.replace("CBM", "")),
+      D_CCD: parseNumber(destinationData[0][cbm]),
+      D_LTS: parseNumber(destinationData[1][cbm]),
+      D_THC: parseNumber(destinationData[2][cbm]),
+      D_BLC: parseNumber(destinationData[3][cbm]),
+      D_LUS: parseNumber(destinationData[4][cbm]),
+      D_Total_Chg: totals.destination[cbm] * USD,
+  
+      S_SeaFre: parseNumber(seaFreightData[0][cbm]),
+      S_FSC: parseNumber(seaFreightData[1][cbm]),
+      S_SSC: parseNumber(seaFreightData[2][cbm]),
+      S_Total_Chg: totals.seaFreight[cbm] * USD,
+  
+      O_CC: parseNumber(originData[0][cbm]),
+      O_CCF: parseNumber(originData[1][cbm]),
+      O_DOC: parseNumber(originData[2][cbm]),
+      O_CFS: parseNumber(originData[3][cbm]),
+      O_LU: parseNumber(originData[4][cbm]),
+      O_Del: parseNumber(originData[5][cbm]),
+      O_Total_Chg: totals.origin[cbm],
+  
+      Total_Ship_Cost: totalShipmentCost[cbm],
+      Created_By: secureLocalStorage.getItem("un") || "Unknown",
+      Updated_By: secureLocalStorage.getItem("un") || "Unknown",
+    };
+  
+    try {
+      console.log(`Saving quote for ${cbm}:`, quoteData);
+      const response = await fetch("/api/SaveImportLCLQuote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(quoteData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to save quote for ${cbm}`);
+      }
+  
+      console.log(`Quote for ${cbm} saved successfully.`);
+    } catch (error) {
+      console.error(`Error saving quote for ${cbm}:`, error);
+      alert(`Error saving quote for ${cbm}`);
+    }
+  };
+  
+  const handleSave = async () => {
+    if (!selectedLocation) {
+      alert("Please select a location before saving.");
+      return;
+    }
+  
     setSaveState("saving");
-    setTimeout(() => {
+  
+    try {
+      for (let i = 1; i <= 6; i++) {
+        await saveQuote(`${i}CBM`);
+      }
+  
       setSaveState("saved");
+  
       setTimeout(() => {
         setSaveState("idle");
       }, 5000);
-    }, 2000);
+    } catch (error) {
+      console.error("Error saving quotes:", error);
+      alert("Error saving quotes. Please try again.");
+      setSaveState("idle");
+    }
   };
 
   const toggleSection = (section) => {
@@ -203,6 +361,7 @@ const QuotationTable = () => {
   };
   useEffect(() => {
     if (selectedLocation) {
+      fetchLCLQuote(selectedLocation);
       fetchSupplierDetails(selectedLocation);
     }
   }, [selectedLocation]);
@@ -324,7 +483,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={destinationData[index][`${i + 1}CBM`]} onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
@@ -358,7 +517,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={seaFreightData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
@@ -392,7 +551,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">INR / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
-                        <input type="number" onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={originData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
                     <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>

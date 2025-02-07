@@ -590,9 +590,9 @@ const QuotationTable = () => {
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">FX Rate:</td>
                 <td className="py-1 px-3 border">USD</td>
-                <td className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td>
+                <td className="py-1 px-3 border font-bold text-red-500 text-center">{USD}</td>
                 <td className="py-1 px-3 border">EURO</td>
-                <td colSpan="4" className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
+                <td colSpan="4" className="py-1 px-3 border font-bold text-red-500 text-center">{EUR}</td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Required Transit Days:</td>
