@@ -334,7 +334,9 @@ const QuotationTable = () => {
                 ))}
               {sections.destination && (
                 <tr className="border font-bold">
-                  <td colSpan="3" className="py-1 px-3 border">Total Destination Cost in INR</td>
+                  <td className="py-1 px-3 border"></td>
+                  <td  className="py-1 px-3 border">Total Destination Cost</td>
+                  <td className="py-1 px-3 border">INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input value={totalDestinationCostInINR[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
@@ -368,7 +370,9 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border font-bold">
-                  <td colSpan="3" className="py-1 px-3 border">Total Sea Freight Cost in INR</td>
+                   <td className="py-1 px-3 border"></td>
+                   <td className="py-1 px-3 border">Total Sea Freight Cost</td>
+                  <td className="py-1 px-3 border">INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input value={totalSeaFreightCostInINR[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
@@ -402,7 +406,9 @@ const QuotationTable = () => {
                 ))}
               {sections.origin && (
                 <tr className="border font-bold">
-                  <td colSpan="3" className="py-1 px-3 border">Total Origin Cost in INR</td>
+                    <td className="py-1 px-3 border"></td>
+                    <td className="py-1 px-3 border">Total Origin Cost</td>
+                    <td className="py-1 px-3 border">INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input value={totals.origin[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
@@ -425,7 +431,7 @@ const QuotationTable = () => {
                 <td colSpan="7" className="py-1 px-3 border">{incoterms}</td>
               </tr>
               <tr className="border">
-                <td colSpan="3" className="py-1 px-3 border text-start">Delivery Address:</td>
+                <td colSpan="3" className="py-1 px-3 border text-start">Pickup Address (Shipper):</td>
                 <td colSpan="7" className="py-1 px-3 border">{deliveryAddress}</td>
               </tr>
               <tr className="border">

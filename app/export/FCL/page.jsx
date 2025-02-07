@@ -465,8 +465,8 @@ const QuotationTable = () => {
                 ))}
               {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges in INR</td>
-                  <td className="py-1 px-3 border"></td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td className="py-1 px-3 border">INR</td>
                   <td className="py-1 px-3 border">{totalOrigin[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border">{totalOrigin[40].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
@@ -518,8 +518,8 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges in INR</td>
-                  <td className="py-1 px-3 border"></td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
+                  <td className="py-1 px-3 border">INR</td>
                   <td className="py-1 px-3 border">{totalSeaFreight[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border">{totalSeaFreight[40].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
@@ -571,8 +571,8 @@ const QuotationTable = () => {
                 ))}
               {sections.destination && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges in INR</td>
-                  <td className="py-1 px-3 border"></td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
+                  <td className="py-1 px-3 border">INR</td>
                   <td className="py-1 px-3 border">{totalDestination[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border">{totalDestination[40].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
