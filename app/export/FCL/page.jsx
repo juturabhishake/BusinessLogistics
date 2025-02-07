@@ -291,9 +291,9 @@ const QuotationTable = () => {
   };
   const calculateUSDTotal = (charges) => {
     return charges.reduce(
-      (acc, charge) => {
-        acc[20] += parseFloat(charge[20]*USD || 0);
-        acc[40] += parseFloat(charge[40]*USD || 0);
+      (acc, charge) => {       
+        acc[20] += parseFloat(charge[20]*(currency === "EURO" ? EUR : USD) || 0);
+        acc[40] += parseFloat(charge[40]*(currency === "EURO" ? EUR : USD) || 0);
         return acc;
       },
       { 20: 0, 40: 0 }
@@ -305,8 +305,8 @@ const QuotationTable = () => {
   const totalDestination = calculateUSDTotal(destinationCharges);
 
   const totalShipmentCost = {
-    20: totalOrigin[20] + totalSeaFreight[20] + totalDestination[20],
-    40: totalOrigin[40] + totalSeaFreight[40] + totalDestination[40],
+    20: (totalOrigin[20] + totalSeaFreight[20] + totalDestination[20]).toFixed(2),
+    40: (totalOrigin[40] + totalSeaFreight[40] + totalDestination[40]).toFixed(2),
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
@@ -324,6 +324,7 @@ const QuotationTable = () => {
         setCommodity(data.result[0].Commodity);
         setDeliveryAddress(data.result[0].Delivery_Address);
         setDest_Port(data.result[0].Dest_Port);
+        setCurrency(data.result[0].Currency);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -464,10 +465,10 @@ const QuotationTable = () => {
                 ))}
               {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges in INR</td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border">{totalOrigin[20]}</td>
-                  <td className="py-1 px-3 border">{totalOrigin[40]}</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td className="py-1 px-3 border">INR</td>
+                  <td className="py-1 px-3 border">{totalOrigin[20].toFixed(2)}</td>
+                  <td className="py-1 px-3 border">{totalOrigin[40].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -517,10 +518,10 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges in INR</td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border">{totalSeaFreight[20]}</td>
-                  <td className="py-1 px-3 border">{totalSeaFreight[40]}</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
+                  <td className="py-1 px-3 border">INR</td>
+                  <td className="py-1 px-3 border">{totalSeaFreight[20].toFixed(2)}</td>
+                  <td className="py-1 px-3 border">{totalSeaFreight[40].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -538,7 +539,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 11}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">USD / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -570,10 +571,10 @@ const QuotationTable = () => {
                 ))}
               {sections.destination && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges in INR</td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border">{totalDestination[20]}</td>
-                  <td className="py-1 px-3 border">{totalDestination[40]}</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
+                  <td className="py-1 px-3 border">INR</td>
+                  <td className="py-1 px-3 border">{totalDestination[20].toFixed(2)}</td>
+                  <td className="py-1 px-3 border">{totalDestination[40].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -585,26 +586,26 @@ const QuotationTable = () => {
                 <td className="py-1 px-3 border"></td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">INCO Term</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">INCO Term</td>
                 <td colSpan="4" className="py-1 px-3 border">{incoterms}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border  text-start">Delivery Address</td>
-                <td colSpan="4" className="py-1 px-3 border">{deliveryAddress}</td>
+                <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
+                <td colSpan="4" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">FX Rate</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">FX Rate</td>
                 <td className="py-1 px-3 border">USD</td>
                 <td className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td>
                 <td className="py-1 px-3 border">EURO</td>
                 <td className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Required Transit Days</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
                 <td colSpan="4" className="py-1 px-3 border">{transitDays}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Destination Port</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="4" className="py-1 px-3 border">{Dest_Port}</td>
               </tr>
             </tbody>

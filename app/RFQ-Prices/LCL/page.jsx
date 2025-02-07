@@ -60,6 +60,7 @@ const QuotationTable = () => {
   const [transitDays, setTransitDays] = useState("");
   const [Commodity, setCommodity] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [currency, setCurrency] = useState("");
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -68,7 +69,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'IMPORT' }),
+          body: JSON.stringify({ RFQType: 'LCLIMPORT' }),
         } );
         const data = await response.json();
         setLocations(data.result);
@@ -147,7 +148,7 @@ const QuotationTable = () => {
           acc["3CBM"] += parseFloat(row["3CBM"] || 0);
           acc["4CBM"] += parseFloat(row["4CBM"] || 0);
           acc["5CBM"] += parseFloat(row["5CBM"] || 0);
-          acc[" 6CBM"] += parseFloat(row["6CBM"] || 0);
+          acc["6CBM"] += parseFloat(row["6CBM"] || 0);
           return acc;
         },
         { "1CBM": 0, "2CBM": 0, "3CBM": 0, "4CBM": 0, "5CBM": 0, "6CBM": 0 }
@@ -331,12 +332,12 @@ const QuotationTable = () => {
   };
 
   const totalShipmentCost = {
-    "1CBM": totals.origin["1CBM"] + totals.seaFreight["1CBM"]*USD + totals.destination["1CBM"]*USD,
-    "2CBM": totals.origin["2CBM"] + totals.seaFreight["2CBM"]*USD + totals.destination["2CBM"]*USD,
-    "3CBM": totals.origin["3CBM"] + totals.seaFreight["3CBM"]*USD + totals.destination["3CBM"]*USD,
-    "4CBM": totals.origin["4CBM"] + totals.seaFreight["4CBM"]*USD + totals.destination["4CBM"]*USD,
-    "5CBM": totals.origin["5CBM"] + totals.seaFreight["5CBM"]*USD + totals.destination["5CBM"]*USD,
-    "6CBM": totals.origin["6CBM"] + totals.seaFreight["6CBM"]*USD + totals.destination["6CBM"]*USD,
+    "1CBM": (totals.origin["1CBM"] + totals.seaFreight["1CBM"]*USD + totals.destination["1CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "2CBM": (totals.origin["2CBM"] + totals.seaFreight["2CBM"]*USD + totals.destination["2CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "3CBM": (totals.origin["3CBM"] + totals.seaFreight["3CBM"]*USD + totals.destination["3CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "4CBM": (totals.origin["4CBM"] + totals.seaFreight["4CBM"]*USD + totals.destination["4CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "5CBM": (totals.origin["5CBM"] + totals.seaFreight["5CBM"]*USD + totals.destination["5CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
+    "6CBM": (totals.origin["6CBM"] + totals.seaFreight["6CBM"]*USD + totals.destination["6CBM"]*(currency === "EURO" ? EUR : USD)).toFixed(2),
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
@@ -353,6 +354,7 @@ const QuotationTable = () => {
         setTransitDays(data.result[0].Transit_Days);
         setCommodity(data.result[0].Commodity);
         setDeliveryAddress(data.result[0].Delivery_Address);
+        setCurrency(data.result[0].Currency);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -366,21 +368,21 @@ const QuotationTable = () => {
     }
   }, [selectedLocation]);
   const totalDestinationCostInINR = {
-    "1CBM": totals.destination["1CBM"] * USD,
-    "2CBM": totals.destination["2CBM"] * USD,
-    "3CBM": totals.destination["3CBM"] * USD,
-    "4CBM": totals.destination["4CBM"] * USD,
-    "5CBM": totals.destination["5CBM"] * USD,
-    "6CBM": totals.destination["6CBM"] * USD,
+    "1CBM": (totals.destination["1CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "2CBM": (totals.destination["2CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "3CBM": (totals.destination["3CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "4CBM": (totals.destination["4CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "5CBM": (totals.destination["5CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
+    "6CBM": (totals.destination["6CBM"] * (currency === "EURO" ? EUR : USD)).toFixed(2),
   };
 
   const totalSeaFreightCostInINR = {
-    "1CBM": totals.seaFreight["1CBM"] * USD,
-    "2CBM": totals.seaFreight["2CBM"] * USD,
-    "3CBM": totals.seaFreight["3CBM"] * USD,
-    "4CBM": totals.seaFreight["4CBM"] * USD,
-    "5CBM": totals.seaFreight["5CBM"] * USD,
-    "6CBM": totals.seaFreight["6CBM"] * USD,
+    "1CBM": (totals.seaFreight["1CBM"] * USD).toFixed(2),
+    "2CBM": (totals.seaFreight["2CBM"] * USD).toFixed(2),
+    "3CBM": (totals.seaFreight["3CBM"] * USD).toFixed(2),
+    "4CBM": (totals.seaFreight["4CBM"] * USD).toFixed(2),
+    "5CBM": (totals.seaFreight["5CBM"] * USD).toFixed(2),
+    "6CBM": (totals.seaFreight["6CBM"] * USD).toFixed(2),
   };
   return (
     <div className="">
@@ -457,12 +459,12 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">1 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">2 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">3 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">4 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">5 CBM</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)] w-[100px]">6 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">1 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">2 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">3 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">4 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">5 CBM</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] w-[120px]">6 CBM</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">
@@ -480,7 +482,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item}</td>
-                    <td className="py-1 px-3 border">USD / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     {[...Array(6)].map((_, i) => (
                       <td key={i} className="py-1 px-3 border">
                         <input value={destinationData[index][`${i + 1}CBM`]} onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
@@ -491,7 +493,9 @@ const QuotationTable = () => {
                 ))}
               {sections.destination && (
                 <tr className="border font-bold">
-                  <td colSpan="3" className="py-1 px-3 border">Total Destination Cost in INR</td>
+                  <td className="py-1 px-3 border"></td>
+                  <td  className="py-1 px-3 border">Total Destination Cost</td>
+                  <td className="py-1 px-3 border">INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input value={totalDestinationCostInINR[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
@@ -525,7 +529,9 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border font-bold">
-                  <td colSpan="3" className="py-1 px-3 border">Total Sea Freight Cost in INR</td>
+                   <td className="py-1 px-3 border"></td>
+                   <td className="py-1 px-3 border">Total Sea Freight Cost</td>
+                  <td className="py-1 px-3 border">INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input value={totalSeaFreightCostInINR[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
@@ -559,7 +565,9 @@ const QuotationTable = () => {
                 ))}
               {sections.origin && (
                 <tr className="border font-bold">
-                  <td colSpan="3" className="py-1 px-3 border">Total Origin Cost in INR</td>
+                    <td className="py-1 px-3 border"></td>
+                    <td className="py-1 px-3 border">Total Origin Cost</td>
+                    <td className="py-1 px-3 border">INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
                       <input value={totals.origin[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
@@ -579,11 +587,12 @@ const QuotationTable = () => {
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">INCO Term:</td>
-                <td colSpan="7" className="py-1 px-3 border">{incoterms}</td>
+                <td colSpan="7" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr className="border">
-                <td colSpan="3" className="py-1 px-3 border text-start">Delivery Address:</td>
-                <td colSpan="7" className="py-1 px-3 border">{deliveryAddress}</td>
+                <td colSpan="3" className="py-1 px-3 border text-start">Pickup Address (Shipper):</td>
+                <td colSpan="7" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
+
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">FX Rate:</td>
