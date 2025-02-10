@@ -287,15 +287,15 @@ export default function Home() {
                 <div className="mt-4 flex justify-center">
                   <InputOTP maxLength={6} onChange={(value) => setOtp(value)}>
                     <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={0} onPaste={(e) => e.preventDefault()} />
+                      <InputOTPSlot index={1} onPaste={(e) => e.preventDefault()} />
+                      <InputOTPSlot index={2} onPaste={(e) => e.preventDefault()} />
                     </InputOTPGroup>
                     <InputOTPSeparator />
                     <InputOTPGroup>
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
+                      <InputOTPSlot index={3} onPaste={(e) => e.preventDefault()} />
+                      <InputOTPSlot index={4} onPaste={(e) => e.preventDefault()} />
+                      <InputOTPSlot index={5} onPaste={(e) => e.preventDefault()} />
                     </InputOTPGroup>
                   </InputOTP>
                 </div>
