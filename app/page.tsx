@@ -155,7 +155,7 @@ export default function Home() {
           secureLocalStorage.setItem("company", user.Company);
           secureLocalStorage.setItem("address", user.Address);
           secureLocalStorage.setItem("sc", user.Vendor_Code);
-          console.log('vendor code:', user.Vendor_Code);
+          // console.log('vendor code:', user.Vendor_Code);
           setLoginState("success");
           setTimeout(() => {
             window.location.href = "/dashboard";

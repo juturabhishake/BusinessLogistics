@@ -1,6 +1,7 @@
 import {
   Tag,
   Users,
+  LocateFixedIcon,
   Settings,
   Bookmark,
   SquarePen,
@@ -93,6 +94,11 @@ export function getMenuList(pathname: string): Group[] {
           href: "/users",
           label: "Users",
           icon: Users
+        },
+        {
+          href: "/settings/location_settings",
+          label: "Locations Info",
+          icon: LocateFixedIcon
         },
         {
           href: "/account",
