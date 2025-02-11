@@ -469,13 +469,14 @@ const QuotationTable = () => {
                       />
                     </td>
                     <td className="py-1 px-3 border">
-                      <input
+                    {item.remarks}
+                      {/* <input
                         type="text"
                         readOnly={isHalting}
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
-                      />
+                      /> */}
                     </td>
                   </tr>
                   );
@@ -523,13 +524,14 @@ const QuotationTable = () => {
                       />
                     </td>
                     <td className="py-1 px-3 border">
-                      <input
+                      {item.remarks}
+                      {/* <input
                         type="text"
                         readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         onChange={(e) => handleSeaFreightChange(index, "remarks", e.target.value)}
-                      />
+                      /> */}
                     </td>
                   </tr>
                 ))}
@@ -576,13 +578,14 @@ const QuotationTable = () => {
                       />
                     </td>
                     <td className="py-1 px-3 border">
-                      <input
+                    {item.remarks}
+                      {/* <input
                         type="text"
                         readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
-                      />
+                      /> */}
                     </td>
                   </tr>
                 ))}

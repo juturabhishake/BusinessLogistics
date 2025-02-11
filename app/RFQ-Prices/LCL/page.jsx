@@ -258,7 +258,7 @@ const QuotationTable = () => {
       D_THC: parseNumber(destinationData[2][cbm]),
       D_BLC: parseNumber(destinationData[3][cbm]),
       D_LUS: parseNumber(destinationData[4][cbm]),
-      D_Total_Chg: totals.destination[cbm] * USD,
+      D_Total_Chg: totals.destination[cbm] * (currency === "EURO" ? EUR : USD),
   
       S_SeaFre: parseNumber(seaFreightData[0][cbm]),
       S_FSC: parseNumber(seaFreightData[1][cbm]),
@@ -488,7 +488,7 @@ const QuotationTable = () => {
                         <input value={destinationData[index][`${i + 1}CBM`]} onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                    <td className="py-1 px-3 border text-left"></td>
                   </tr>
                 ))}
               {sections.destination && (
@@ -524,7 +524,7 @@ const QuotationTable = () => {
                         <input value={seaFreightData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                  <td className="py-1 px-3 border text-left"></td>
                   </tr>
                 ))}
               {sections.seaFreight && (

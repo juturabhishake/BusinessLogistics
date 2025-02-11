@@ -272,7 +272,7 @@ const QuotationTable = () => {
       D_AAI: parseNumber(destinationData[3][cbm]),
       D_LU: parseNumber(destinationData[4][cbm]),
       D_Del: parseNumber(destinationData[5][cbm]),
-      D_Total_Chg: totals.destination[cbm]*USD,
+      D_Total_Chg: totals.destination[cbm]*(currency === "EURO" ? EUR : USD),
   
       Total_Ship_Cost: totalShipmentCost[cbm],
       Created_By: secureLocalStorage.getItem("un") || "Unknown",
@@ -532,7 +532,7 @@ const QuotationTable = () => {
                         <input value={seaFreightData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
-                    <td className="py-1 px-3 border"><input type="text" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                    <td className="py-1 px-3 border"></td>
                   </tr>
                 ))}
               {sections.seaFreight && (
@@ -545,7 +545,8 @@ const QuotationTable = () => {
                       <input value={totalSeaFreightCostInINR[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                  {/* <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td> */}
+                  <td className="py-1 px-3 border"></td>
                 </tr>
               )}
               <tr
@@ -568,7 +569,8 @@ const QuotationTable = () => {
                         <input value={destinationData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
-                    <td className="py-1 px-3 border"><input type="text" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                    {/* <td className="py-1 px-3 border"><input type="text" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td> */}
+                    <td className="py-1 px-3 border"></td>
                   </tr>
                 ))}
               {sections.destination && (
