@@ -607,7 +607,7 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">INCO Term</td>
-                <td colSpan="4" className="py-1 px-3 border">{incoterms}</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
@@ -622,11 +622,11 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
-                <td colSpan="4" className="py-1 px-3 border">{transitDays}</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{transitDays}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
-                <td colSpan="4" className="py-1 px-3 border">{Dest_Port}</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{Dest_Port}</td>
               </tr>
             </tbody>
           </table>
