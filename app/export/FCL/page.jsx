@@ -300,8 +300,19 @@ const QuotationTable = () => {
     );
   };
 
+  const calculateShipUSDTotal = (charges) => {
+    return charges.reduce(
+      (acc, charge) => {       
+        acc[20] += parseFloat(charge[20]*USD || 0);
+        acc[40] += parseFloat(charge[40]*USD || 0);
+        return acc;
+      },
+      { 20: 0, 40: 0 }
+    );
+  };
+
   const totalOrigin = calculateTotal(originCharges);
-  const totalSeaFreight = calculateUSDTotal(seaFreightCharges);
+  const totalSeaFreight = calculateShipUSDTotal(seaFreightCharges);
   const totalDestination = calculateUSDTotal(destinationCharges);
 
   const totalShipmentCost = {
