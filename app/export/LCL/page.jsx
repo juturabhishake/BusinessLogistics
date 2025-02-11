@@ -272,7 +272,7 @@ const QuotationTable = () => {
       D_AAI: parseNumber(destinationData[3][cbm]),
       D_LU: parseNumber(destinationData[4][cbm]),
       D_Del: parseNumber(destinationData[5][cbm]),
-      D_Total_Chg: totals.destination[cbm]*USD,
+      D_Total_Chg: totals.destination[cbm]*(currency === "EURO" ? EUR : USD),
   
       Total_Ship_Cost: totalShipmentCost[cbm],
       Created_By: secureLocalStorage.getItem("un") || "Unknown",
@@ -483,17 +483,20 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.origin &&
-                ["Customs Clearance & Documentation", "Local Transportation From GTI-Chennai", "Terminal Handling Charges - Origin", "Bill of Lading Charges", "Loading/Unloading / SSR", "CFS AT ACTUAL"].map((item, index) => (
+                ["Customs Clearance & Documentation", "Local Transportation From GTI-Chennai", "Terminal Handling Charges - Origin", "Bill of Lading Charges", "Loading/Unloading / SSR", "CFS Charges"].map((item, index) => (
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item}</td>
                     <td className="py-1 px-3 border">INR / Shipment</td>
-                    {[...Array(6)].map((_, i) => (
+                    {[...Array(6)].map((_, i) => {
+                       const isCFS = item === "CFS Charges";
+                       return (
                       <td key={i} className="py-1 px-3 border">
-                        <input value={originData[index][`${i + 1}CBM`]} onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={originData[index][`${i + 1}CBM`]}  readOnly={isCFS} onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
-                    ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder={item === "CFS AT ACTUAL" ? "At Actual" : ""} /></td>
+                       )
+})}
+                    <td className="py-1 px-3 border text-left">{item === "CFS Charges" ? "AT ACTUAL" : ""}</td>
                   </tr>
                 ))}
               {sections.origin && (
@@ -506,7 +509,7 @@ const QuotationTable = () => {
                       <input value={totals.origin[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                  <td className="py-1 px-3 border"><input  type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
                 </tr>
               )}
               <tr
@@ -529,7 +532,7 @@ const QuotationTable = () => {
                         <input value={seaFreightData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                    <td className="py-1 px-3 border"></td>
                   </tr>
                 ))}
               {sections.seaFreight && (
@@ -542,7 +545,8 @@ const QuotationTable = () => {
                       <input value={totalSeaFreightCostInINR[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                  {/* <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td> */}
+                  <td className="py-1 px-3 border"></td>
                 </tr>
               )}
               <tr
@@ -565,7 +569,8 @@ const QuotationTable = () => {
                         <input value={destinationData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                    {/* <td className="py-1 px-3 border"><input type="text" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td> */}
+                    <td className="py-1 px-3 border"></td>
                   </tr>
                 ))}
               {sections.destination && (
@@ -592,7 +597,7 @@ const QuotationTable = () => {
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">INCO Term:</td>
-                <td colSpan="7" className="py-1 px-3 border">{incoterms}</td>
+                <td colSpan="7" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Delivery Address:</td>                
@@ -601,13 +606,13 @@ const QuotationTable = () => {
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">FX Rate:</td>
                 <td className="py-1 px-3 border">USD</td>
-                <td className="py-1 px-3 border font-bold text-red-500 text-center">{USD}</td>
+                <td className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td>
                 <td className="py-1 px-3 border">EURO</td>
-                <td colSpan="4" className="py-1 px-3 border font-bold text-red-500 text-center">{EUR}</td>
+                <td colSpan="4" className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
               </tr>
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Required Transit Days:</td>
-                <td colSpan="7" className="py-1 px-3 border">{transitDays}</td>
+                <td colSpan="7" className="py-1 px-3 border text-left">{transitDays}</td>
               </tr>
               {/* <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Estimated Transit Days Given by Forwarder:</td>
@@ -615,7 +620,7 @@ const QuotationTable = () => {
               </tr> */}
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Destination Port:</td>
-                <td colSpan="7" className="py-1 px-3 border">{Dest_Port}</td>
+                <td colSpan="7" className="py-1 px-3 border text-left">{Dest_Port}</td>
               </tr>
             </tbody>
           </table>

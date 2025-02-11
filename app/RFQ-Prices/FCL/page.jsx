@@ -32,8 +32,8 @@ const QuotationTable = () => {
     { description: "Local Transportation From GTI-Chennai", 20: "", 40: "", remarks: "Per Container" },
     { description: "Terminal Handling Charges - Origin", 20: "", 40: "", remarks: "Per Container" },
     { description: "Bill of Lading Charges", 20: "", 40: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", 40: "", remarks: "At Actual" },
-    { description: "Halting", 20: "", 40: "", remarks: "INR 2300 Per Day" },
+    { description: "Loading/Unloading / SSR", 20: "", 40: "", remarks: "Per Container" },
+    { description: "Halting", 20: "", 40: "", remarks: "If any" },
   ]);
   
   const [seaFreightCharges, setSeaFreightCharges] = useState([
@@ -45,7 +45,7 @@ const QuotationTable = () => {
   
   const [destinationCharges, setDestinationCharges] = useState([
     { description: "Destination Terminal Handling Charges", 20: "", 40: "", remarks: "Per Container" },
-    { description: "BL Fee", 20: "", 40: "", remarks: "Per Container" },
+    { description: "BL Fee", 20: "", 40: "", remarks: "Per BL" },
     { description: "Delivery by Barge/Road", 20: "", 40: "", remarks: "Per Container" },
     { description: "Delivery Order Fees", 20: "", 40: "", remarks: "Per Container" },
     { description: "Handling Charges", 20: "", 40: "", remarks: "Per Container" },
@@ -300,8 +300,19 @@ const QuotationTable = () => {
     );
   };
 
+  const calculateShipUSDTotal = (charges) => {
+    return charges.reduce(
+      (acc, charge) => {       
+        acc[20] += parseFloat(charge[20]*USD || 0);
+        acc[40] += parseFloat(charge[40]*USD || 0);
+        return acc;
+      },
+      { 20: 0, 40: 0 }
+    );
+  };
+
   const totalOrigin = calculateTotal(originCharges);
-  const totalSeaFreight = calculateUSDTotal(seaFreightCharges);
+  const totalSeaFreight = calculateShipUSDTotal(seaFreightCharges);
   const totalDestination = calculateUSDTotal(destinationCharges);
 
   const totalShipmentCost = {
@@ -408,7 +419,7 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL Import</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -453,13 +464,14 @@ const QuotationTable = () => {
                       />
                     </td>
                     <td className="py-1 px-3 border">
-                      <input
+                      {item.remarks}
+                      {/* <input
                         type="text"
                         readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
-                      />
+                      /> */}
                     </td>
                   </tr>
                 ))}
@@ -506,13 +518,14 @@ const QuotationTable = () => {
                       />
                     </td>
                     <td className="py-1 px-3 border">
-                      <input
+                    {item.remarks}
+                      {/* <input
                         type="text"
                         readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         onChange={(e) => handleSeaFreightChange(index, "remarks", e.target.value)}
-                      />
+                      /> */}
                     </td>
                   </tr>
                 ))}
@@ -535,7 +548,9 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.origin &&
-                originCharges.map((item, index) => (
+                originCharges.map((item, index) => {
+                  const isHalting = item.description === "Halting";
+                  return (
                   <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 11}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
@@ -544,6 +559,7 @@ const QuotationTable = () => {
                       <input
                         type="number"
                         placeholder="0"
+                        readOnly={isHalting}      
                         className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
                         value={item[20]}
                         onChange={(e) => handleOriginChange(index, 20, e.target.value)}
@@ -553,22 +569,18 @@ const QuotationTable = () => {
                       <input
                         type="number"
                         placeholder="0"
+                        readOnly={isHalting}      
                         className="w-full bg-transparent border-none focus:outline-none text-right"
                         value={item[40]}
                         onChange={(e) => handleOriginChange(index, 40, e.target.value)}
                       />
                     </td>
-                    <td className="py-1 px-3 border">
-                      <input
-                        type="text"
-                        readOnly
-                        className="w-full bg-transparent border-none focus:outline-none text-center"
-                        value={item.remarks}
-                        onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
-                      />
+                    <td className="py-1 px-3 border"> {item.remarks}
+                     
                     </td>
                   </tr>
-                ))}
+                  )
+              })}
               {sections.origin && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
@@ -587,7 +599,7 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">INCO Term</td>
-                <td colSpan="4" className="py-1 px-3 border">{incoterms}</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
@@ -602,11 +614,11 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
-                <td colSpan="4" className="py-1 px-3 border">{transitDays}</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{transitDays}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
-                <td colSpan="4" className="py-1 px-3 border">{Dest_Port}</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{Dest_Port}</td>
               </tr>
             </tbody>
           </table>
