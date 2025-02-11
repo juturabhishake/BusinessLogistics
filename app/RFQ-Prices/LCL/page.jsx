@@ -248,7 +248,7 @@ const QuotationTable = () => {
     const parseNumber = (value) => parseFloat(value) || 0;
   
     const quoteData = {
-      Supplier_Code: "GTI",
+      Supplier_Code: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       Location_Code: selectedLocation,
       Quote_Month: new Date().getMonth() + 1,
       Quote_Year: new Date().getFullYear(),

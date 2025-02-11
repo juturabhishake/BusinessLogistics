@@ -203,7 +203,7 @@ const QuotationTable = () => {
       }));
   
     const quoteData = {
-      supplierCode: "GTI",
+      supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),

@@ -209,3 +209,41 @@ model Vendors {
   UpdatedDate   DateTime? @db.DateTime
   UpdatedBy     String?   @db.VarChar(50)
 }
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Import_FCL_Quote {
+  FCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  Quote_Month     Int
+  Quote_Year      Int
+  Cont_Feet       Int
+  O_CCD           Decimal?  @db.Decimal(18, 2)
+  O_LTG           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_BLC           Decimal?  @db.Decimal(18, 2)
+  O_LUS           Decimal?  @db.Decimal(18, 2)
+  O_Halt          Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_ENS           Decimal?  @db.Decimal(18, 2)
+  S_ISPS          Decimal?  @db.Decimal(18, 2)
+  S_ITT           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_DTH           Decimal?  @db.Decimal(18, 2)
+  D_BLF           Decimal?  @db.Decimal(18, 2)
+  D_DBR           Decimal?  @db.Decimal(18, 2)
+  D_DOF           Decimal?  @db.Decimal(18, 2)
+  D_HC            Decimal?  @db.Decimal(18, 2)
+  D_TDO           Decimal?  @db.Decimal(18, 2)
+  D_LOC           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+
+  @@ignore
+}
