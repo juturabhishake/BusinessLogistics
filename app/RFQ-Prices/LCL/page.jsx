@@ -453,7 +453,7 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[240px] text-orange-500">Sea Freight RFQ - LCL IMPORT</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[240px] text-orange-500">Sea Freight RFQ - LCL Import</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[130px]">Currency in</th>
                 <th colSpan="6" className="py-1 px-2 border border-[var(--bgBody)]">{locationName ? locationName.toUpperCase() : "Select Location..."}</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -555,12 +555,15 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">{index + 10}</td>
                     <td className="py-1 px-3 border text-start">{item}</td>
                     <td className="py-1 px-3 border">INR / Shipment</td>
-                    {[...Array(6)].map((_, i) => (
+                    {[...Array(6)].map((_, i) => {
+                    const isCFS = item === "CFS Charges";
+                    return(
                       <td key={i} className="py-1 px-3 border">
-                        <input value={originData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={originData[index][`${i + 1}CBM`]} readOnly={isCFS} type="number" onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
-                    ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                    )
+                    })}
+                  <td className="py-1 px-3 border text-left">{item === "CFS Charges" ? "AT ACTUAL" : ""}</td>
                   </tr>
                 ))}
               {sections.origin && (

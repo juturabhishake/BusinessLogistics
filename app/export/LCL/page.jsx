@@ -483,17 +483,20 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.origin &&
-                ["Customs Clearance & Documentation", "Local Transportation From GTI-Chennai", "Terminal Handling Charges - Origin", "Bill of Lading Charges", "Loading/Unloading / SSR", "CFS AT ACTUAL"].map((item, index) => (
+                ["Customs Clearance & Documentation", "Local Transportation From GTI-Chennai", "Terminal Handling Charges - Origin", "Bill of Lading Charges", "Loading/Unloading / SSR", "CFS Charges"].map((item, index) => (
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item}</td>
                     <td className="py-1 px-3 border">INR / Shipment</td>
-                    {[...Array(6)].map((_, i) => (
+                    {[...Array(6)].map((_, i) => {
+                       const isCFS = item === "CFS Charges";
+                       return (
                       <td key={i} className="py-1 px-3 border">
-                        <input value={originData[index][`${i + 1}CBM`]} onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
+                        <input value={originData[index][`${i + 1}CBM`]}  readOnly={isCFS} onChange={(e) => handleInputChange("origin", index, (i + 1) + "CBM", e.target.value)} type="number" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
-                    ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder={item === "CFS AT ACTUAL" ? "At Actual" : ""} /></td>
+                       )
+})}
+                    <td className="py-1 px-3 border text-left">{item === "CFS Charges" ? "AT ACTUAL" : ""}</td>
                   </tr>
                 ))}
               {sections.origin && (
@@ -506,7 +509,7 @@ const QuotationTable = () => {
                       <input value={totals.origin[(i + 1) + "CBM"]} type="number" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                     </td>
                   ))}
-                  <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                  <td className="py-1 px-3 border"><input  type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
                 </tr>
               )}
               <tr
@@ -529,7 +532,7 @@ const QuotationTable = () => {
                         <input value={seaFreightData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("seaFreight", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                    <td className="py-1 px-3 border"><input type="text" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
                   </tr>
                 ))}
               {sections.seaFreight && (
@@ -565,7 +568,7 @@ const QuotationTable = () => {
                         <input value={destinationData[index][`${i + 1}CBM`]} type="number" onChange={(e) => handleInputChange("destination", index, (i + 1) + "CBM", e.target.value)} className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="0" />
                       </td>
                     ))}
-                    <td className="py-1 px-3 border"><input type="text" className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
+                    <td className="py-1 px-3 border"><input type="text" readOnly className="w-full bg-transparent border-none focus:outline-none text-right" placeholder="" /></td>
                   </tr>
                 ))}
               {sections.destination && (

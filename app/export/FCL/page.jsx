@@ -25,15 +25,15 @@ const QuotationTable = () => {
     seaFreight: true,
     destination: true ,
   });
-  const [saveState, setSaveState] = useState("idle");
+  const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
     { description: "Customs Clearance & Documentation", 20: "", 40: "", remarks: "Per Container" },
     { description: "Local Transportation From GTI-Chennai", 20: "", 40: "", remarks: "Per Container" },
     { description: "Terminal Handling Charges - Origin", 20: "", 40: "", remarks: "Per Container" },
     { description: "Bill of Lading Charges", 20: "", 40: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", 40: "", remarks: "At Actual" },
-    { description: "Halting", 20: "", 40: "", remarks: "INR 2300 Per Day" },
+    { description: "Loading/Unloading / SSR", 20: "", 40: "", remarks: "Per Container" },
+    { description: "Halting", 20: "", 40: "", remarks: "If any" },
   ]);
   
   const [seaFreightCharges, setSeaFreightCharges] = useState([
@@ -45,7 +45,7 @@ const QuotationTable = () => {
   
   const [destinationCharges, setDestinationCharges] = useState([
     { description: "Destination Terminal Handling Charges", 20: "", 40: "", remarks: "Per Container" },
-    { description: "BL Fee", 20: "", 40: "", remarks: "Per Container" },
+    { description: "BL Fee", 20: "", 40: "", remarks: "Per BL" },
     { description: "Delivery by Barge/Road", 20: "", 40: "", remarks: "Per Container" },
     { description: "Delivery Order Fees", 20: "", 40: "", remarks: "Per Container" },
     { description: "Handling Charges", 20: "", 40: "", remarks: "Per Container" },
@@ -428,8 +428,11 @@ const QuotationTable = () => {
                   {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
+            
               {sections.origin &&
-                originCharges.map((item, index) => (
+                originCharges.map((item, index) => {
+                  const isHalting = item.description === "Halting";
+                  return (
                   <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
@@ -437,7 +440,8 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
-                        placeholder="0"
+                        placeholder="0" 
+                        readOnly={isHalting}                      
                         className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
                         value={item[20]}
                         onChange={(e) => handleOriginChange(index, 20, e.target.value)}
@@ -447,6 +451,7 @@ const QuotationTable = () => {
                       <input
                         type="number"
                         placeholder="0"
+                        readOnly={isHalting}
                         className="w-full bg-transparent border-none focus:outline-none text-right"
                         value={item[40]}
                         onChange={(e) => handleOriginChange(index, 40, e.target.value)}
@@ -455,14 +460,15 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">
                       <input
                         type="text"
-                        readOnly
+                        readOnly={isHalting}
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
                         onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
                       />
                     </td>
                   </tr>
-                ))}
+                  );
+})}
               {sections.origin && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
