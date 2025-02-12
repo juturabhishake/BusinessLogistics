@@ -34,7 +34,7 @@
   tbody td {
     padding: 12px; 
     text-align: left; 
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
   }
   
   tbody tr:nth-child(odd) {
