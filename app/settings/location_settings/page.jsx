@@ -529,7 +529,7 @@ const DataTable = () => {
             onClick={() => setIsAddModalOpen(false)}
           >
             <div
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[85vh] overflow-hidden"
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[84vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
@@ -552,7 +552,6 @@ const DataTable = () => {
                       />
                     </div>
                   ))}
-                  {/* Currency Dropdown */}
                   <div className="col-span-1">
                     <label className="block text-sm font-semibold">Currency</label>
                     <select
@@ -565,7 +564,6 @@ const DataTable = () => {
                       ))}
                     </select>
                   </div>
-                  {/* RFQ Type Dropdown */}
                   <div className="col-span-1">
                     <label className="block text-sm font-semibold">RFQ Type</label>
                     <select
