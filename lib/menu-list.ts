@@ -91,8 +91,8 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "Settings",
       menus: [
         {
-          href: "/users",
-          label: "Users",
+          href: "/settings/vendors",
+          label: "Vendors",
           icon: Users
         },
         // {

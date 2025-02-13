@@ -13,19 +13,17 @@ const LOCMaster = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
-    Loc_Details_ID: "",
-    Location_Code: "",
-    Location: "",
-    Delivery_Address: "",
-    Commodity: "",
-    Incoterms: "",
-    Transit_Days: "",
-    Dest_Port: "",
-    Free_Days: "",
-    Pref_Vessel: "",
-    Pref_Service: "",
-    Pref_Liners: "",
-    Avg_Cont_Per_Mnth: "",   
+    Vendor_Id: "",
+    Vendor_Code: "",
+    Vendor_Name: "",
+    Contact_Name: "",
+    Contact_No: "",
+    Contact_Email: "",
+    Email_2: "",
+    Email_3: "",
+    Vendor_Type: "",
+    IsActive: "",     
+    Status:"",
   });
   const [saveState, setSaveState] = useState("idle");
   const [deleteState, setDeleteState] = useState({});
@@ -35,7 +33,7 @@ const LOCMaster = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/get_location_details");
+        const response = await fetch("/api/get_vendors");
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -52,15 +50,14 @@ const LOCMaster = () => {
   }, []);
 
   const columnKeyMap = {
-    ID: "Loc_Details_ID",
-    Location_Code: "Location_Code",
-    Location: "Location",
-    Customer_Name: "Customer_Name",
-    Delivery_Address: "Delivery_Address",    
-    Incoterms: "Incoterms",
-    Transit_Days: "Transit_Days",
-    Dest_Port: "Dest_Port", 
-
+    ID: "Vendor_Id",   
+    Vendor_Name: "Vendor_Name",
+    Contact_Name: "Contact_Name",
+    Contact_No: "Contact_No",    
+    Email: "Contact_Email",    
+    "Email 2": "Email_2", 
+    "Email 3": "Email_3",    
+    Active:"Status",
   };
 
   const handleSort = (column) => {
@@ -111,21 +108,16 @@ const LOCMaster = () => {
   const handleEdit = (row) => {
     setEditRow(row);
     setFormData({
-      Loc_Details_ID: row.Loc_Details_ID,
-      Location_Code: row.Location_Code,
-      Customer_Name: row.Customer_Name,
-      Delivery_Address: row.Delivery_Address,
-      Commodity: row.Commodity,
-      HSN_Code: row.HSN_Code,
-      Incoterms: row.Incoterms,
-      Transit_Days: row.Transit_Days,
-      Dest_Port: row.Dest_Port,
-      Free_Days: row.Free_Days,
-      Pref_Vessel: row.Pref_Vessel,
-      Pref_Service: row.Pref_Service,
-      Pref_Liners: row.Pref_Liners,
-      Avg_Cont_Per_Mnth: row.Avg_Cont_Per_Mnth,    
-     
+        Vendor_Id: row.Vendor_Id,
+        Vendor_Code: row.Vendor_Code,
+        Vendor_Name: row.Vendor_Name,
+        Contact_Name: row.Contact_Name,
+        Contact_No: row.Contact_No,
+        Contact_Email: row.Contact_Email,
+        Email_2: row.Email_2,
+        Email_3: row.Email_3,
+        Vendor_Type: row.Vendor_Type,
+        IsActive: row.IsActive,     
       UpdatedBy: secureLocalStorage.getItem("un"),      
     });
     setIsModalOpen(true);
@@ -135,25 +127,21 @@ const LOCMaster = () => {
     setSaveState("saving");
 
     try {
-      const response = await fetch("/api/update_loc_details", {
+      const response = await fetch("/api/update_vendors", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({          
-          Loc_Details_ID: formData.Loc_Details_ID,         
-          Customer_Name: formData.Customer_Name,
-          Delivery_Address: formData.Delivery_Address,
-          Commodity: formData.Commodity,
-          HSN_Code: formData.HSN_Code,
-          Incoterms: formData.Incoterms,
-          Transit_Days: formData.Transit_Days,
-          Dest_Port: formData.Dest_Port,
-          Free_Days: formData.Free_Days,
-          Pref_Vessel: formData.Pref_Vessel,
-          Pref_Service: formData.Pref_Service,
-          Pref_Liners: formData.Pref_Liners,
-          Avg_Cont_Per_Mnth: formData.Avg_Cont_Per_Mnth,      
+        body: JSON.stringify({                
+          Vendor_Id: formData.Vendor_Id,         
+          Vendor_Name: formData.Vendor_Name,
+          Contact_Name: formData.Contact_Name,
+          Contact_No: formData.Contact_No,
+          Contact_Email: formData.Contact_Email,
+          Email_2: formData.Email_2,
+          Email_3: formData.Email_3,
+          Vendor_Type: formData.Vendor_Type,
+          IsActive: formData.IsActive,        
           UpdatedBy: secureLocalStorage.getItem("un"), 
         }),
       });
@@ -166,7 +154,7 @@ const LOCMaster = () => {
 
       setData((prevData) =>
         prevData.map((row) =>
-          row.Loc_Details_ID === editRow.Loc_Details_ID ? { ...row, ...formData } : row
+          row.Vendor_Id === editRow.Vendor_Id ? { ...row, ...formData } : row
         )
       );
 
@@ -184,8 +172,8 @@ const LOCMaster = () => {
     }
   };
 
-  const handleDelete = async (Loc_Details_ID) => {
-    setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "deleting" }));
+  const handleDelete = async (Vendor_Id) => {
+    setDeleteState((prev) => ({ ...prev, [Vendor_Id]: "deleting" }));
 
     try {
       const response = await fetch("/api/delete_location", {
@@ -193,7 +181,7 @@ const LOCMaster = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Loc_Details_ID }),
+        body: JSON.stringify({ Vendor_Id }),
       });
 
       const result = await response.json();
@@ -202,17 +190,17 @@ const LOCMaster = () => {
         throw new Error(result.error || "Failed to delete location");
       }
 
-      setData((prevData) => prevData.filter((row) => row.Loc_Details_ID !== Loc_Details_ID));
+      setData((prevData) => prevData.filter((row) => row.Vendor_Id !== Vendor_Id));
 
-      setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "success" }));
+      setDeleteState((prev) => ({ ...prev, [Vendor_Id]: "success" }));
       setTimeout(() => {
-        setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "idle" }));
+        setDeleteState((prev) => ({ ...prev, [Vendor_Id]: "idle" }));
       }, 3000);
     } catch (error) {
       console.error("Delete failed:", error.message);
-      setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "error" }));
+      setDeleteState((prev) => ({ ...prev, [Vendor_Id]: "error" }));
       setTimeout(() => {
-        setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "idle" }));
+        setDeleteState((prev) => ({ ...prev, [Vendor_Id]: "idle" }));
       }, 3000);
     }
   };
@@ -223,7 +211,7 @@ const LOCMaster = () => {
         <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-3 px-3">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
-              <h2 className="text-sm font-bold">Admin Settings / <span className="text-xs text-gray-100">Location Details</span></h2>
+              <h2 className="text-sm font-bold">Admin Settings / <span className="text-xs text-gray-100">Vendors</span></h2>
             </div>
           </div>
         </div>
@@ -280,14 +268,13 @@ const LOCMaster = () => {
                         )}
                       </th>
                     ))}
-                    
+                   
                   </tr>
                 </thead>
                 <tbody style={{ fontSize: "12px" }}>
                   {paginatedData.length > 0 ? (
                     paginatedData.map((item) => (
-                      <tr key={item.Loc_Details_ID} className="border hover:bg-muted">
-                         
+                      <tr key={item.Vendor_Id} className="border hover:bg-muted">
                          <td className="px-4 py-2 border">
                           <button onClick={() => handleEdit(item)} className="mr-2 text-blue-500">
                             <FaEdit />
@@ -296,16 +283,14 @@ const LOCMaster = () => {
                             <FaTrash />
                           </button> */}
                         </td>
-                        <td className="px-4 py-2 border">{item.Loc_Details_ID}</td>
-                        <td className="px-4 py-2 border">{item.Location_Code}</td>
-                        <td className="px-4 py-2 border">{item.Location}</td>
-                        <td className="px-4 py-2 border"style={{ minWidth: "200px", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.Customer_Name}</td>
-                        <td className="px-4 py-2 border" style={{ minWidth: "500px", maxWidth: "500px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {item.Delivery_Address}
-                        </td>     
-                        <td className="px-4 py-2 border">{item.Incoterms}</td>
-                        <td className="px-4 py-2 border">{item.Transit_Days}</td>
-                        <td className="px-4 py-2 border">{item.Dest_Port}</td>
+                        <td className="px-4 py-2 border">{item.Vendor_Id}</td>                       
+                        <td className="px-4 py-2 border">{item.Vendor_Name}</td>
+                        <td className="px-4 py-2 border">{item.Contact_Name}</td>
+                        <td className="px-4 py-2 border">{item.Contact_No}  </td>     
+                        <td className="px-4 py-2 border">{item.Contact_Email}</td>
+                        <td className="px-4 py-2 border">{item.Email_2}</td>
+                        <td className="px-4 py-2 border">{item.Email_3}</td>                       
+                        <td className="px-4 py-2 border">{item.Status}</td>
                        
                       </tr>
                     ))
@@ -383,10 +368,10 @@ const LOCMaster = () => {
             className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg  md:w-[60%] lg:w-[40%]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-bold mb-4">Update Location Details</h2>
+            <h2 className="text-lg font-bold mb-4">Update Vendor Details</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold">Location ID</label>
+                <label className="block text-sm font-semibold">Vendor ID</label>
                 {/* <input
                   type="text"
                   readOnly
@@ -395,11 +380,11 @@ const LOCMaster = () => {
                   onChange={(e) => setFormData({ ...formData, Location_Id: e.target.value })}
                 /> */}
                  <label className="w-full p-2 border rounded block">
-                  {formData.Loc_Details_ID}
+                  {formData.Vendor_Id}
                 </label>
               </div>
               <div>
-                <label className="block text-sm font-semibold">Location Code</label>
+                <label className="block text-sm font-semibold">Vendor Name</label>
                 {/* <input
                   type="text"
                   readOnly
@@ -409,128 +394,71 @@ const LOCMaster = () => {
                 /> */}
 
               <label className="w-full p-2 border rounded block">
-                  {formData.Location_Code}
+                  {formData.Vendor_Name}
                 </label>
               </div>
               <div>
-                <label className="block text-sm font-semibold">Customer Name</label>
+                <label className="block text-sm font-semibold">Contact Name</label>
                 <input
                   type="text"
                   className="w-full p-2 border rounded"
-                  value={formData.Customer_Name}
-                  onChange={(e) => setFormData({ ...formData, Customer_Name: e.target.value })}
-                />
-              </div>
-              <div  className="col-span-2">
-                <label className="block text-sm font-semibold">Delivery Address</label>
-                <textarea
-                  type="text"                 
-                  className="w-full p-2 border rounded"
-                  value={formData.Delivery_Address}
-                  onChange={(e) => setFormData({ ...formData, Delivery_Address: e.target.value })}
+                  value={formData.Contact_Name}
+                  onChange={(e) => setFormData({ ...formData, Contact_Name: e.target.value })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold">Commodity</label>
+                <label className="block text-sm font-semibold">Contact No.</label>
                 <input
                   type="text"
                   className="w-full p-2 border rounded"
-                  value={formData.Commodity}
-                  onChange={(e) => setFormData({ ...formData, Commodity: e.target.value })}
+                  value={formData.Contact_No}
+                  onChange={(e) => setFormData({ ...formData, Contact_No: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">Email</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded"
+                  value={formData.Contact_Email}
+                  onChange={(e) => setFormData({ ...formData, Contact_Email: e.target.value })}
                 />                  
 
               </div>
              
             
               <div>
-                <label className="block text-sm font-semibold">HSN Code</label>
+                <label className="block text-sm font-semibold">Email 2</label>
                 <input
                   type="text"
                   className="w-full p-2 border rounded"
-                  value={formData.HSN_Code}
-                  onChange={(e) => setFormData({ ...formData, HSN_Code: e.target.value })}
+                  value={formData.Email_2}
+                  onChange={(e) => setFormData({ ...formData, Email_2: e.target.value })}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold">Incoterms</label>
+                <label className="block text-sm font-semibold">Email 3</label>
                 <input
                   type="text"
                   className="w-full p-2 border rounded"
-                  value={formData.Incoterms}
-                  onChange={(e) => setFormData({ ...formData, Incoterms: e.target.value })}
+                  value={formData.Email_3}
+                  onChange={(e) => setFormData({ ...formData, Email_3: e.target.value })}
                 />
               </div>
 
              
 
               <div>
-                <label className="block text-sm font-semibold">Transit Days</label>
+                <label className="block text-sm font-semibold">Status</label>
                 <input
-                  type="number"
+                  type="checkbox"
                   className="w-full p-2 border rounded"
-                  value={formData.Transit_Days}
-                  onChange={(e) => setFormData({ ...formData, Transit_Days: e.target.value })}
+                  checked={formData.IsActive}
+                  onChange={(e) => setFormData({ ...formData, IsActive: e.target.checked })}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-semibold">Free Days</label>
-                <input
-                  type="number"
-                  className="w-full p-2 border rounded"
-                  value={formData.Free_Days}
-                  onChange={(e) => setFormData({ ...formData, Free_Days: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Dest. Port</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Dest_Port}
-                  onChange={(e) => setFormData({ ...formData, Dest_Port: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold">Pref. Vessel</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Pref_Vessel}
-                  onChange={(e) => setFormData({ ...formData, Pref_Vessel: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold">Pref. Service</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Pref_Service}
-                  onChange={(e) => setFormData({ ...formData, Pref_Service: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold">Pref. Liners:</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Pref_Liners}
-                  onChange={(e) => setFormData({ ...formData, Pref_Liners: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Avg Cont./Month:</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Avg_Cont_Per_Mnth}
-                  onChange={(e) => setFormData({ ...formData, Avg_Cont_Per_Mnth: e.target.value })}
-                />
-              </div>
-              
+             
             </div>
             <div className="flex justify-end mt-4">
               <button

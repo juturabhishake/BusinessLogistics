@@ -10,7 +10,7 @@ const DataTable = () => {
   const [originalData, setOriginalData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [searchQuery, setSearchQuery] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
     Location_Id: "",
@@ -196,7 +196,7 @@ const DataTable = () => {
         <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-3 px-3">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
-              <h2 className="text-sm font-bold">Admin Settings / <span className="text-xs text-gray-100">Location Settings</span></h2>
+              <h2 className="text-sm font-bold">Admin Settings / <span className="text-xs text-gray-100">Location Master</span></h2>
             </div>
           </div>
         </div>
