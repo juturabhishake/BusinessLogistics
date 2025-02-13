@@ -24,6 +24,7 @@ const DataTable = () => {
   const [deleteState, setDeleteState] = useState({});
   const rfqtypes = ["FCL", "LCL", "BOTH", "FCLIMPORT", "LCLIMPORT"];
   const currtypes = ["USD", "EURO"];
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -189,15 +190,74 @@ const DataTable = () => {
       }, 3000);
     }
   };
-
+  const handleAddNewLocation = async () => {
+    setSaveState("saving");
+  
+    try {
+      const response = await fetch("/api/add_new_location", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Location_Code: formData.Location_Code,
+          Location: formData.Location,
+          Country: formData.Country,
+          Currency: formData.Currency,
+          RFQType: formData.RFQType,
+          CreatedBy: secureLocalStorage.getItem("un"),
+        }),
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to add location");
+      }
+  
+      setData((prevData) => [
+        ...prevData,
+        { ...formData, Location_Code: result.newLocationCode },
+      ]);
+  
+      setIsAddModalOpen(false);
+      fetchData();
+      window.location.reload();
+      setSaveState("success");
+  
+      setTimeout(() => {
+        setSaveState("idle");
+      }, 3000);
+    } catch (error) {
+      console.error("Add failed:", error.message);
+      setSaveState("error");
+  
+      setTimeout(() => {
+        setSaveState("idle");
+      }, 3000);
+    }
+  };
+  
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]">
-        <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-3 px-3">
+        <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-1 px-3">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
-            <div className="flex flex-col">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center w-full p-0 rounded-t-lg">
+            <div>
               <h2 className="text-sm font-bold">Admin Settings / <span className="text-xs text-gray-100">Location Master</span></h2>
             </div>
+            <div className="flex mt-2 lg:mt-0 w-full lg:w-auto justify-start">
+              <button className="p-2 rounded-lg font-semibold 
+                bg-gray-500 text-white hover:bg-gray-600 
+                dark:bg-gray-600 dark:hover:bg-gray-400 transition-all duration-300"
+                style={{fontSize:"10px"}}
+                onClick={() => setIsAddModalOpen(true)}
+                >
+                + Add New Location
+              </button>
+            </div>
+          </div>
           </div>
         </div>
         <div className="card-body p-0 overflow-x-auto pb-3">
@@ -235,7 +295,13 @@ const DataTable = () => {
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full overf border rounded-lg bg-card text-foreground" style={{ fontSize: "13px", padding: "1px" }}>
+              <table className="min-w-full overf border rounded-lg bg-card text-foreground" 
+              style={{ 
+                fontSize: "13px", 
+                padding: "1px",
+                whiteSpace: "nowrap", 
+                overflow: "hidden",   
+                textOverflow: "ellipsis", }}>
                 <thead className="bg-muted sticky top-0 z-10">
                   <tr>
                     {Object.keys(columnKeyMap).map((key) => (
@@ -457,6 +523,91 @@ const DataTable = () => {
           </div>
         </div>
       )}
+      {isAddModalOpen && (
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            onClick={() => setIsAddModalOpen(false)}
+          >
+            <div
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[85vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
+                <h2 className="text-lg font-bold">Add New Location</h2>
+              </div>
+              <div className="p-6 overflow-y-auto h-[calc(80vh-100px)]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { label: "Location Code", key: "Location_Code" },
+                    { label: "Location", key: "Location" },
+                    { label: "Country", key: "Country" },
+                  ].map((item, index) => (
+                    <div key={index} className="col-span-1">
+                      <label className="block text-sm font-semibold">{item.label}</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded"
+                        value={formData[item.key]}
+                        onChange={(e) => setFormData({ ...formData, [item.key]: e.target.value })}
+                      />
+                    </div>
+                  ))}
+                  {/* Currency Dropdown */}
+                  <div className="col-span-1">
+                    <label className="block text-sm font-semibold">Currency</label>
+                    <select
+                      className="w-full p-2 border rounded"
+                      value={formData.Currency}
+                      onChange={(e) => setFormData({ ...formData, Currency: e.target.value })}
+                    >
+                      {currtypes.map((code) => (
+                        <option key={code} value={code}>{code}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* RFQ Type Dropdown */}
+                  <div className="col-span-1">
+                    <label className="block text-sm font-semibold">RFQ Type</label>
+                    <select
+                      className="w-full p-2 border rounded"
+                      value={formData.RFQType}
+                      onChange={(e) => setFormData({ ...formData, RFQType: e.target.value })}
+                    >
+                      {rfqtypes.map((code) => (
+                        <option key={code} value={code}>{code}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
+                <button
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddNewLocation}
+                  className={`px-4 py-2 rounded flex items-center justify-center 
+                  ${saveState === "success" ? "bg-green-500 text-white" : 
+                  saveState === "error" ? "bg-red-500 text-white" : 
+                  "bg-blue-500 text-white"}`}
+                >
+                  {saveState === "saving" ? (
+                    <div className="animate-spin w-5 h-5 border-4 border-white border-t-transparent rounded-full"></div>
+                  ) : saveState === "success" ? (
+                    <span className="text-lg">✔</span>
+                  ) : saveState === "error" ? (
+                    <span className="text-lg">❌</span>
+                  ) : (
+                    "Save"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };

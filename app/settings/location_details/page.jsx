@@ -269,6 +269,10 @@ const LOCMaster = () => {
                     {Object.keys(columnKeyMap).map((key) => (
                       <th
                         key={key}
+                        style={{
+                          whiteSpace: "nowrap", 
+                          overflow: "hidden",   
+                          textOverflow: "ellipsis",}}
                         onClick={() => handleSort(key)}
                         className="cursor-pointer px-4 py-2 border text-left"
                       >
@@ -283,7 +287,11 @@ const LOCMaster = () => {
                     
                   </tr>
                 </thead>
-                <tbody style={{ fontSize: "12px" }}>
+                <tbody style={{ 
+                  fontSize: "12px",
+                  whiteSpace: "nowrap", 
+                  overflow: "hidden",   
+                  textOverflow: "ellipsis", }}>
                   {paginatedData.length > 0 ? (
                     paginatedData.map((item) => (
                       <tr key={item.Loc_Details_ID} className="border hover:bg-muted">
@@ -380,159 +388,61 @@ const LOCMaster = () => {
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg  md:w-[60%] lg:w-[40%]"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[85vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-bold mb-4">Update Location Details</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold">Location ID</label>
-                {/* <input
-                  type="text"
-                  readOnly
-                  className="w-full p-2 border rounded"
-                  value={formData.Location_Id}
-                  onChange={(e) => setFormData({ ...formData, Location_Id: e.target.value })}
-                /> */}
-                 <label className="w-full p-2 border rounded block">
-                  {formData.Loc_Details_ID}
-                </label>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Location Code</label>
-                {/* <input
-                  type="text"
-                  readOnly
-                  className="w-full p-2 border rounded"
-                  value={formData.Location_Code}
-                  onChange={(e) => setFormData({ ...formData, Location_Code: e.target.value })}
-                /> */}
-
-              <label className="w-full p-2 border rounded block">
-                  {formData.Location_Code}
-                </label>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Customer Name</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  value={formData.Customer_Name}
-                  onChange={(e) => setFormData({ ...formData, Customer_Name: e.target.value })}
-                />
-              </div>
-              <div  className="col-span-2">
-                <label className="block text-sm font-semibold">Delivery Address</label>
-                <textarea
-                  type="text"                 
-                  className="w-full p-2 border rounded"
-                  value={formData.Delivery_Address}
-                  onChange={(e) => setFormData({ ...formData, Delivery_Address: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Commodity</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  value={formData.Commodity}
-                  onChange={(e) => setFormData({ ...formData, Commodity: e.target.value })}
-                />                  
-
-              </div>
-             
-            
-              <div>
-                <label className="block text-sm font-semibold">HSN Code</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  value={formData.HSN_Code}
-                  onChange={(e) => setFormData({ ...formData, HSN_Code: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold">Incoterms</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  value={formData.Incoterms}
-                  onChange={(e) => setFormData({ ...formData, Incoterms: e.target.value })}
-                />
-              </div>
-
-             
-
-              <div>
-                <label className="block text-sm font-semibold">Transit Days</label>
-                <input
-                  type="number"
-                  className="w-full p-2 border rounded"
-                  value={formData.Transit_Days}
-                  onChange={(e) => setFormData({ ...formData, Transit_Days: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Free Days</label>
-                <input
-                  type="number"
-                  className="w-full p-2 border rounded"
-                  value={formData.Free_Days}
-                  onChange={(e) => setFormData({ ...formData, Free_Days: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Dest. Port</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Dest_Port}
-                  onChange={(e) => setFormData({ ...formData, Dest_Port: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold">Pref. Vessel</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Pref_Vessel}
-                  onChange={(e) => setFormData({ ...formData, Pref_Vessel: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold">Pref. Service</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Pref_Service}
-                  onChange={(e) => setFormData({ ...formData, Pref_Service: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold">Pref. Liners:</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Pref_Liners}
-                  onChange={(e) => setFormData({ ...formData, Pref_Liners: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Avg Cont./Month:</label>
-                <input
-                  type="text"                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Avg_Cont_Per_Mnth}
-                  onChange={(e) => setFormData({ ...formData, Avg_Cont_Per_Mnth: e.target.value })}
-                />
-              </div>
-              
+            <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
+              <h2 className="text-lg font-bold">Update Location Details</h2>
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="p-6 overflow-y-auto h-[calc(80vh-100px)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <label className="block text-sm font-semibold">Location ID</label>
+                  <label className="w-full p-2 border rounded block bg-gray-100 dark:bg-gray-700">
+                    {formData.Loc_Details_ID}
+                  </label>
+              </div>
+              <div className="col-span-1">
+                <label className="block text-sm font-semibold">Location Code</label>
+                <label className="w-full p-2 border rounded block bg-gray-100 dark:bg-gray-700">
+                    {formData.Location_Code}
+                </label>
+              </div>
+                {[
+                  { label: "Customer Name", key: "Customer_Name" },
+                  { label: "Delivery Address", key: "Delivery_Address", type: "textarea" },
+                  { label: "Commodity", key: "Commodity" },
+                  { label: "HSN Code", key: "HSN_Code" },
+                  { label: "Incoterms", key: "Incoterms" },
+                  { label: "Transit Days", key: "Transit_Days", type: "number" },
+                  { label: "Free Days", key: "Free_Days", type: "number" },
+                  { label: "Dest. Port", key: "Dest_Port" },
+                  { label: "Pref. Vessel", key: "Pref_Vessel" },
+                  { label: "Pref. Service", key: "Pref_Service" },
+                  { label: "Pref. Liners", key: "Pref_Liners" },
+                  { label: "Avg Cont./Month", key: "Avg_Cont_Per_Mnth" },
+                ].map((item, index) => (
+                  <div key={index} className="col-span-1">
+                    <label className="block text-sm font-semibold">{item.label}</label>
+                    {item.type === "textarea" ? (
+                      <textarea
+                        className="w-full p-2 border rounded"
+                        value={formData[item.key]}
+                        onChange={(e) => setFormData({ ...formData, [item.key]: e.target.value })}
+                      />
+                    ) : (
+                      <input
+                        type={item.type || "text"}
+                        className="w-full p-2 border rounded"
+                        value={formData[item.key]}
+                        onChange={(e) => setFormData({ ...formData, [item.key]: e.target.value })}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
@@ -560,6 +470,7 @@ const LOCMaster = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };
