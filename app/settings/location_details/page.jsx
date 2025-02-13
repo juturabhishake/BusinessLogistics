@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { FaSearch, FaEdit, FaTrash } from "react-icons/fa";
 import secureLocalStorage from "react-secure-storage";
 
-const DataTable = () => {
+const LOCMaster = () => {
   const [data, setData] = useState([]);
   const [editRow, setEditRow] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,12 +13,19 @@ const DataTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
-    Location_Id: "",
+    Loc_Details_ID: "",
     Location_Code: "",
     Location: "",
-    Country: "",
-    Currency: "",
-    RFQType: "",
+    Delivery_Address: "",
+    Commodity: "",
+    Incoterms: "",
+    Transit_Days: "",
+    Dest_Port: "",
+    Free_Days: "",
+    Pref_Vessel: "",
+    Pref_Service: "",
+    Pref_Liners: "",
+    Avg_Cont_Per_Mnth: "",   
   });
   const [saveState, setSaveState] = useState("idle");
   const [deleteState, setDeleteState] = useState({});
@@ -28,7 +35,7 @@ const DataTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/get_location_master");
+        const response = await fetch("/api/get_location_details");
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -45,12 +52,15 @@ const DataTable = () => {
   }, []);
 
   const columnKeyMap = {
-    ID: "Location_Id",
-    "Location Code": "Location_Code",
+    ID: "Loc_Details_ID",
+    Location_Code: "Location_Code",
     Location: "Location",
-    Country: "Country",
-    Currency: "Currency",
-    "RFQ Type": "RFQType",
+    Customer_Name: "Customer_Name",
+    Delivery_Address: "Delivery_Address",    
+    Commodity: "Commodity",
+    HSN_Code: "HSN_Code",
+    Dest_Port: "Dest_Port", 
+
   };
 
   const handleSort = (column) => {
@@ -101,13 +111,22 @@ const DataTable = () => {
   const handleEdit = (row) => {
     setEditRow(row);
     setFormData({
-      Location_Id: row.Location_Id,
+      Loc_Details_ID: row.Loc_Details_ID,
       Location_Code: row.Location_Code,
-      Location: row.Location,
-      Country: row.Country,
-      Currency: row.Currency,
-      UpdatedBy: secureLocalStorage.getItem("un"),
-      RFQType: row.RFQType,
+      Customer_Name: row.Customer_Name,
+      Delivery_Address: row.Delivery_Address,
+      Commodity: row.Commodity,
+      HSN_Code: row.HSN_Code,
+      Incoterms: row.Incoterms,
+      Transit_Days: row.Transit_Days,
+      Dest_Port: row.Dest_Port,
+      Free_Days: row.Free_Days,
+      Pref_Vessel: row.Pref_Vessel,
+      Pref_Service: row.Pref_Service,
+      Pref_Liners: row.Pref_Liners,
+      Avg_Cont_Per_Mnth: row.Avg_Cont_Per_Mnth,    
+     
+      UpdatedBy: secureLocalStorage.getItem("un"),      
     });
     setIsModalOpen(true);
   };
@@ -116,18 +135,26 @@ const DataTable = () => {
     setSaveState("saving");
 
     try {
-      const response = await fetch("/api/update_location", {
+      const response = await fetch("/api/update_loc_details", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          Location_Id: formData.Location_Id,
-          Location: formData.Location,
-          Country: formData.Country,
-          Currency: formData.Currency,
-          RFQType: formData.RFQType,
-          UpdatedBy: secureLocalStorage.getItem("un"),
+        body: JSON.stringify({          
+          Loc_Details_ID: formData.Loc_Details_ID,         
+          Customer_Name: formData.Customer_Name,
+          Delivery_Address: formData.Delivery_Address,
+          Commodity: formData.Commodity,
+          HSN_Code: formData.HSN_Code,
+          Incoterms: formData.Incoterms,
+          Transit_Days: formData.Transit_Days,
+          Dest_Port: formData.Dest_Port,
+          Free_Days: formData.Free_Days,
+          Pref_Vessel: formData.Pref_Vessel,
+          Pref_Service: formData.Pref_Service,
+          Pref_Liners: formData.Pref_Liners,
+          Avg_Cont_Per_Mnth: formData.Avg_Cont_Per_Mnth,      
+          UpdatedBy: secureLocalStorage.getItem("un"), 
         }),
       });
 
@@ -139,7 +166,7 @@ const DataTable = () => {
 
       setData((prevData) =>
         prevData.map((row) =>
-          row.Location_Id === editRow.Location_Id ? { ...row, ...formData } : row
+          row.Loc_Details_ID === editRow.Loc_Details_ID ? { ...row, ...formData } : row
         )
       );
 
@@ -157,8 +184,8 @@ const DataTable = () => {
     }
   };
 
-  const handleDelete = async (Location_Id) => {
-    setDeleteState((prev) => ({ ...prev, [Location_Id]: "deleting" }));
+  const handleDelete = async (Loc_Details_ID) => {
+    setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "deleting" }));
 
     try {
       const response = await fetch("/api/delete_location", {
@@ -166,7 +193,7 @@ const DataTable = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Location_Id }),
+        body: JSON.stringify({ Loc_Details_ID }),
       });
 
       const result = await response.json();
@@ -175,17 +202,17 @@ const DataTable = () => {
         throw new Error(result.error || "Failed to delete location");
       }
 
-      setData((prevData) => prevData.filter((row) => row.Location_Id !== Location_Id));
+      setData((prevData) => prevData.filter((row) => row.Loc_Details_ID !== Loc_Details_ID));
 
-      setDeleteState((prev) => ({ ...prev, [Location_Id]: "success" }));
+      setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "success" }));
       setTimeout(() => {
-        setDeleteState((prev) => ({ ...prev, [Location_Id]: "idle" }));
+        setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "idle" }));
       }, 3000);
     } catch (error) {
       console.error("Delete failed:", error.message);
-      setDeleteState((prev) => ({ ...prev, [Location_Id]: "error" }));
+      setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "error" }));
       setTimeout(() => {
-        setDeleteState((prev) => ({ ...prev, [Location_Id]: "idle" }));
+        setDeleteState((prev) => ({ ...prev, [Loc_Details_ID]: "idle" }));
       }, 3000);
     }
   };
@@ -235,7 +262,7 @@ const DataTable = () => {
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full overf border rounded-lg bg-card text-foreground" style={{ fontSize: "13px", padding: "1px" }}>
+              <table className="min-w-full overf border rounded-lg bg-card text-foreground" style={{ tableLayout: "fixed" ,fontSize: "13px", padding: "1px" }}>
                 <thead className="bg-muted sticky top-0 z-10">
                   <tr>
                     {Object.keys(columnKeyMap).map((key) => (
@@ -258,13 +285,18 @@ const DataTable = () => {
                 <tbody style={{ fontSize: "12px" }}>
                   {paginatedData.length > 0 ? (
                     paginatedData.map((item) => (
-                      <tr key={item.Location_Id} className="border hover:bg-muted">
-                        <td className="px-4 py-2 border">{item.Location_Id}</td>
+                      <tr key={item.Loc_Details_ID} className="border hover:bg-muted">
+                        <td className="px-4 py-2 border">{item.Loc_Details_ID}</td>
                         <td className="px-4 py-2 border">{item.Location_Code}</td>
                         <td className="px-4 py-2 border">{item.Location}</td>
-                        <td className="px-4 py-2 border">{item.Country}</td>
-                        <td className="px-4 py-2 border">{item.Currency}</td>
-                        <td className="px-4 py-2 border">{item.RFQType}</td>
+                        <td className="px-4 py-2 border"style={{ minWidth: "200px", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.Customer_Name}</td>
+                        <td className="px-4 py-2 border" style={{ minWidth: "500px", maxWidth: "500px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {item.Delivery_Address}
+                        </td>     
+                        <td className="px-4 py-2 border">{item.Incoterms}</td>
+                        <td className="px-4 py-2 border">{item.Transit_Days}</td>
+                        <td className="px-4 py-2 border">{item.Dest_Port}</td>
+                        
                         <td className="px-4 py-2 border">
                           <button onClick={() => handleEdit(item)} className="mr-2 text-blue-500">
                             <FaEdit />
@@ -346,10 +378,10 @@ const DataTable = () => {
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-[90%] max-w-md"
+            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg  md:w-[50%] lg:w-[30%]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-bold mb-4">Edit Location</h2>
+            <h2 className="text-lg font-bold mb-4">Update Location Details</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold">Location ID</label>
@@ -361,7 +393,7 @@ const DataTable = () => {
                   onChange={(e) => setFormData({ ...formData, Location_Id: e.target.value })}
                 /> */}
                  <label className="w-full p-2 border rounded block">
-                  {formData.Location_Id}
+                  {formData.Loc_Details_ID}
                 </label>
               </div>
               <div>
@@ -379,55 +411,124 @@ const DataTable = () => {
                 </label>
               </div>
               <div>
-                <label className="block text-sm font-semibold">Location</label>
+                <label className="block text-sm font-semibold">Customer Name</label>
                 <input
                   type="text"
                   className="w-full p-2 border rounded"
-                  value={formData.Location}
-                  onChange={(e) => setFormData({ ...formData, Location: e.target.value })}
+                  value={formData.Customer_Name}
+                  onChange={(e) => setFormData({ ...formData, Customer_Name: e.target.value })}
+                />
+              </div>
+              <div  className="col-span-2">
+                <label className="block text-sm font-semibold">Delivery Address</label>
+                <textarea
+                  type="text"                 
+                  className="w-full p-2 border rounded"
+                  value={formData.Delivery_Address}
+                  onChange={(e) => setFormData({ ...formData, Delivery_Address: e.target.value })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold">Country</label>
+                <label className="block text-sm font-semibold">Commodity</label>
                 <input
                   type="text"
                   className="w-full p-2 border rounded"
-                  value={formData.Country}
-                  onChange={(e) => setFormData({ ...formData, Country: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold">Currency</label>
-                {/* <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  value={formData.Currency}
-                  onChange={(e) => setFormData({ ...formData, Currency: e.target.value })}
-                /> */}
-                  <select                  
-                  className="w-full p-2 border rounded"
-                  value={formData.Currency}
-                  onChange={(e) => setFormData({ ...formData, Currency: e.target.value })}
-                  >
-                 
-                  {currtypes.map(code => (
-                    <option key={code} value={code}>{code}</option>
-                  ))}
-                </select>
+                  value={formData.Commodity}
+                  onChange={(e) => setFormData({ ...formData, Commodity: e.target.value })}
+                />                  
 
               </div>
+             
+            
               <div>
-                <label className="block text-sm font-semibold">RFQ Type</label>
-                 <select                  
+                <label className="block text-sm font-semibold">HSN Code</label>
+                <input
+                  type="text"
                   className="w-full p-2 border rounded"
-                  value={formData.RFQType}
-                  onChange={(e) => setFormData({ ...formData, RFQType: e.target.value })}
-                  >                 
-                  {rfqtypes.map(code => (
-                    <option key={code} value={code}>{code}</option>
-                  ))}
-                </select>
+                  value={formData.HSN_Code}
+                  onChange={(e) => setFormData({ ...formData, HSN_Code: e.target.value })}
+                />
               </div>
+
+              <div>
+                <label className="block text-sm font-semibold">Incoterms</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded"
+                  value={formData.Incoterms}
+                  onChange={(e) => setFormData({ ...formData, Incoterms: e.target.value })}
+                />
+              </div>
+
+             
+
+              <div>
+                <label className="block text-sm font-semibold">Transit Days</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border rounded"
+                  value={formData.Transit_Days}
+                  onChange={(e) => setFormData({ ...formData, Transit_Days: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">Free Days</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border rounded"
+                  value={formData.Free_Days}
+                  onChange={(e) => setFormData({ ...formData, Free_Days: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">Dest. Port</label>
+                <input
+                  type="text"                  
+                  className="w-full p-2 border rounded"
+                  value={formData.Dest_Port}
+                  onChange={(e) => setFormData({ ...formData, Dest_Port: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold">Pref. Vessel</label>
+                <input
+                  type="text"                  
+                  className="w-full p-2 border rounded"
+                  value={formData.Pref_Vessel}
+                  onChange={(e) => setFormData({ ...formData, Pref_Vessel: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold">Pref. Service</label>
+                <input
+                  type="text"                  
+                  className="w-full p-2 border rounded"
+                  value={formData.Pref_Service}
+                  onChange={(e) => setFormData({ ...formData, Pref_Service: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold">Pref. Liners:</label>
+                <input
+                  type="text"                  
+                  className="w-full p-2 border rounded"
+                  value={formData.Pref_Liners}
+                  onChange={(e) => setFormData({ ...formData, Pref_Liners: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold">Avg Cont./Month:</label>
+                <input
+                  type="text"                  
+                  className="w-full p-2 border rounded"
+                  value={formData.Avg_Cont_Per_Mnth}
+                  onChange={(e) => setFormData({ ...formData, Avg_Cont_Per_Mnth: e.target.value })}
+                />
+              </div>
+              
             </div>
             <div className="flex justify-end mt-4">
               <button
@@ -461,4 +562,4 @@ const DataTable = () => {
   );
 };
 
-export default DataTable;
+export default LOCMaster;

@@ -95,10 +95,25 @@ export function getMenuList(pathname: string): Group[] {
           label: "Users",
           icon: Users
         },
+        // {
+        //   href: "/settings/location_settings",
+        //   label: "Locations Info",
+        //   icon: LocateFixedIcon
+        // },
         {
-          href: "/settings/location_settings",
-          label: "Locations Info",
-          icon: LocateFixedIcon
+          href: "",
+          label: "Locations",
+          icon: LocateFixedIcon,
+          submenus: [
+            {
+              href: "/settings/location_settings",
+              label: "Location Master"
+            },
+            {
+              href: "/settings/location_details",
+              label: "Location Details"
+            }
+          ]
         },
         {
           href: "/account",
