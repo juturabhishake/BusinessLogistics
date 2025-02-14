@@ -6,6 +6,7 @@ import secureLocalStorage from "react-secure-storage";
 const LOCMaster = () => {
   const [data, setData] = useState([]);
   const [editRow, setEditRow] = useState(null);
+  const [addRow, setaddRow] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [originalData, setOriginalData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -25,10 +26,25 @@ const LOCMaster = () => {
     IsActive: "",     
     Status:"",
   });
+
+  const [AddformData, setAddformData] = useState({  
+    Vendor_Id: "",
+    Vendor_Code: "", 
+    Vendor_Name: "",
+    Contact_Name: "",
+    Contact_No: "",
+    Contact_Email: "",
+    Email_2: "",
+    Email_3: "",
+    Vendor_Type: "",
+    IsActive: "",    
+    
+  });
   const [saveState, setSaveState] = useState("idle");
   const [deleteState, setDeleteState] = useState({});
   const rfqtypes = ["FCL", "LCL", "BOTH", "FCLIMPORT", "LCLIMPORT"];
   const currtypes = ["USD", "EURO"];
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +74,10 @@ const LOCMaster = () => {
     "Email 2": "Email_2", 
     "Email 3": "Email_3",    
     Active:"Status",
+  };
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleSort = (column) => {
@@ -121,6 +141,22 @@ const LOCMaster = () => {
       UpdatedBy: secureLocalStorage.getItem("un"),      
     });
     setIsModalOpen(true);
+  };
+
+  const handleAdd = (row) => {
+    setaddRow(row);
+    setAddformData({      
+        Vendor_Id: row.Vendor_Id,
+        Vendor_Code: row.Vendor_Code,
+        Vendor_Name: row.Vendor_Name,
+        Contact_Name: row.Contact_Name,
+        Contact_No: row.Contact_No,
+        Contact_Email: row.Contact_Email,
+        Email_2: row.Email_2,
+        Email_3: row.Email_3,         
+        AddformData: secureLocalStorage.getItem("un"),      
+    });
+    setIsAddModalOpen(true);
   };
 
   const handleSave = async () => {
@@ -204,7 +240,54 @@ const LOCMaster = () => {
       }, 3000);
     }
   };
-
+  const handleAddNewLocation = async () => {
+    setSaveState("saving");
+  
+    try {
+      const response = await fetch("/api/save_vendors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            Vendor_Name: AddformData.Vendor_Name,
+            Contact_Name: AddformData.Contact_Name,
+            Contact_No: AddformData.Contact_No,
+            Contact_Email: AddformData.Contact_Email,
+            Email_2: AddformData.Email_2,
+            Email_3: AddformData.Email_3,
+          CreatedBy: secureLocalStorage.getItem("un"),
+        }),
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to add location");
+      }
+  
+      setData((prevData) => [
+        ...prevData,
+        { ...AddformData, Vendor_Id: result.Vendor_Id },
+      ]);
+      setTimeout(() => {
+        setSaveState("idle");
+      }, 3000);
+      setIsAddModalOpen(false);
+      fetchData();
+      window.location.reload();
+      setSaveState("success");
+  
+    
+    } catch (error) {
+      console.error("Add failed:", error.message);
+      setSaveState("error");
+  
+      setTimeout(() => {
+        setSaveState("idle");
+      }, 3000);
+    }
+  };
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]">
@@ -212,6 +295,16 @@ const LOCMaster = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Admin Settings / <span className="text-xs text-gray-100">Vendors</span></h2>
+            </div>
+            <div className="flex mt-2 lg:mt-0 w-full lg:w-auto justify-start">
+              <button className="p-2 rounded-lg font-semibold 
+                bg-gray-500 text-white hover:bg-gray-600 
+                dark:bg-gray-600 dark:hover:bg-gray-400 transition-all duration-300"
+                style={{fontSize:"10px"}}
+                onClick={() => setIsAddModalOpen(true)}
+                >
+                + Add New Vendor
+              </button>
             </div>
           </div>
         </div>
@@ -365,11 +458,15 @@ const LOCMaster = () => {
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg  md:w-[60%] lg:w-[40%]"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[54vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-bold mb-4">Update Vendor Details</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
+
+            <h2 className="text-lg font-bold">Update Vendor Details</h2>
+            </div>
+            <div className="p-6 overflow-y-auto h-[calc(50vh-100px)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold">Vendor ID</label>
                 {/* <input
@@ -458,9 +555,9 @@ const LOCMaster = () => {
                   onChange={(e) => setFormData({ ...formData, IsActive: e.target.checked })}
                 />
               </div>
-             
+             </div>
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
@@ -488,6 +585,96 @@ const LOCMaster = () => {
           </div>
         </div>
       )}
+      {isAddModalOpen && (
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            onClick={() => setIsAddModalOpen(false)}
+          >
+            <div
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[54vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
+                <h2 className="text-lg font-bold">Add New Vendor</h2>
+              </div>
+              <div className="p-6 overflow-y-auto h-[calc(50vh-100px)]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { label: "Vendor Name", key: "Vendor_Name" },
+                    { label: "Contact Name", key: "Contact_Name" },
+                    { label: "Contact Number", key: "Contact_No" },
+                    
+                  ].map((item, index) => (
+                    <div key={index} className="col-span-1">
+                      <label>{item.label}</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded"
+                        value={AddformData[item.key]}
+                        onChange={(e) => setAddformData({ ...AddformData, [item.key]: e.target.value })}
+                      />
+                    </div>
+                  ))}
+               
+               <div className="col-span-1">
+                <label className="block text-sm font-semibold">Email</label>
+                <input
+                  type="text"
+                   className="w-full p-2 border rounded"
+                  value={AddformData.Contact_Email}
+                  onChange={(e) => setAddformData({ ...AddformData, Contact_Email: e.target.value })}
+                />                 
+              </div>
+              <div className="col-span-1">
+                <label className="block text-sm font-semibold">Email 2</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded"
+                  value={AddformData.Email_2}
+                  onChange={(e) => setAddformData({ ...AddformData, Email_2: e.target.value })}
+                />                
+              </div>
+              <div className="col-span-1">
+                <label className="block text-sm font-semibold">Email 3</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded"
+                  value={AddformData.Email_3}
+                  onChange={(e) => setAddformData({ ...AddformData, Email_3: e.target.value })}
+                />
+              </div>
+                </div>
+               
+              
+              </div>
+              <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
+                <button
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddNewLocation}
+                  className={`px-4 py-2 rounded flex items-center justify-center 
+                  ${saveState === "success" ? "bg-green-500 text-white" : 
+                  saveState === "error" ? "bg-red-500 text-white" : 
+                  "bg-blue-500 text-white"}`}
+                >
+                  {saveState === "saving" ? (
+                    <div className="animate-spin w-5 h-5 border-4 border-white border-t-transparent rounded-full"></div>
+                  ) : saveState === "success" ? (
+                    <span className="text-lg">✔</span>
+                  ) : saveState === "error" ? (
+                    <span className="text-lg">❌</span>
+                  ) : (
+                    "Save"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };

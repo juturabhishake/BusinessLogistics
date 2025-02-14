@@ -199,8 +199,7 @@ const DataTable = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          Location_Code: formData.Location_Code,
+        body: JSON.stringify({       
           Location: formData.Location,
           Country: formData.Country,
           Currency: formData.Currency,
@@ -412,11 +411,15 @@ const DataTable = () => {
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-[90%] max-w-md"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[54vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-bold mb-4">Edit Location</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+             <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
+
+                <h2 className="text-lg font-bold">Edit Location Details</h2>
+              </div>
+              <div className="p-6 overflow-y-auto h-[calc(50vh-100px)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold">Location ID</label>
                 {/* <input
@@ -494,8 +497,9 @@ const DataTable = () => {
                   ))}
                 </select>
               </div>
+              </div>
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
@@ -529,16 +533,15 @@ const DataTable = () => {
             onClick={() => setIsAddModalOpen(false)}
           >
             <div
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[84vh] overflow-hidden"
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[54vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
                 <h2 className="text-lg font-bold">Add New Location</h2>
               </div>
-              <div className="p-6 overflow-y-auto h-[calc(80vh-100px)]">
+              <div className="p-6 overflow-y-auto h-[calc(50vh-100px)]">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    { label: "Location Code", key: "Location_Code" },
+                  {[                   
                     { label: "Location", key: "Location" },
                     { label: "Country", key: "Country" },
                   ].map((item, index) => (

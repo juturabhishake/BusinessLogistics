@@ -23,22 +23,24 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const {  Location, Country, Currency, RFQType, CreatedBy } = req.body;
+  const { Vendor_Name, Contact_Name, Contact_No, Contact_Email, Email_2,Email_3, CreatedBy } = req.body;
 
   try {
     console.log("Inserting new location:", req.body);
 
     const result = await prisma.$queryRaw`
-      EXEC Insert_Location_Master       
-        @Location = ${Location}, 
-        @Country = ${Country}, 
-        @Currency = ${Currency}, 
-        @RFQType = ${RFQType},
+      EXEC Save_Vendor_Details 
+        @Vendor_Name = ${Vendor_Name}, 
+        @Contact_Name = ${Contact_Name}, 
+        @Contact_No = ${Contact_No}, 
+        @Contact_Email = ${Contact_Email}, 
+        @Email_2 = ${Email_2},
+        @Email_3 = ${Email_3},
         @CreatedBy = ${CreatedBy}`;
 
     const message = JSON.stringify(result);
 
-    if (message.includes("Location_Code already exists")) {
+    if (message.includes("Vendor_Name already exists")) {
       return res.status(400).json({ error: "Location code already exists. Please use a unique Location Code." });
     }
 
@@ -46,6 +48,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("Database error:", error.message);
-    res.status(500).json({ error: "Failed to insert location", details: error.message });
+    res.status(500).json({ error: "Failed to Vendor", details: error.message });
   }
 }
