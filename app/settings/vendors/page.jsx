@@ -343,7 +343,14 @@ const LOCMaster = () => {
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full overf border rounded-lg bg-card text-foreground" style={{ tableLayout: "fixed" ,fontSize: "13px", padding: "1px" }}>
+              <table className="min-w-full overf border rounded-lg bg-card text-foreground" 
+                style={{ 
+                  tableLayout: "fixed" ,
+                  fontSize: "13px", 
+                  padding: "1px",
+                  whiteSpace: "nowrap", 
+                  overflow: "hidden",   
+                  textOverflow: "ellipsis", }}>
                 <thead className="bg-muted sticky top-0 z-10">
                   <tr>
                   <th className="px-4 py-2 border text-left">Actions</th>
@@ -543,9 +550,6 @@ const LOCMaster = () => {
                   onChange={(e) => setFormData({ ...formData, Email_3: e.target.value })}
                 />
               </div>
-
-             
-
               <div>
                 <label className="block text-sm font-semibold">Status</label>
                 <input

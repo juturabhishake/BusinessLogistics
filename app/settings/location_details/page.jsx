@@ -31,6 +31,25 @@ const LOCMaster = () => {
   const [deleteState, setDeleteState] = useState({});
   const rfqtypes = ["FCL", "LCL", "BOTH", "FCLIMPORT", "LCLIMPORT"];
   const currtypes = ["USD", "EURO"];
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [locationCodes, setLocationCodes] = useState([]);
+
+  useEffect(() => {
+    const fetchLocationCodes = async () => {
+      try {
+        const response = await fetch("/api/getLocCodes");
+        if (!response.ok) {
+          throw new Error("Failed to fetch location codes");
+        }
+        const data = await response.json();
+        setLocationCodes(data.sort());
+      } catch (error) {
+        console.error("Error fetching location codes:", error);
+      }
+    };
+  
+    fetchLocationCodes();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -216,15 +235,78 @@ const LOCMaster = () => {
       }, 3000);
     }
   };
-
+  const handleAddNewLocation = async () => {
+    setSaveState("saving");
+  
+    try {
+      const response = await fetch("/api/add_Location_Details", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Location_Code: formData.Location_Code,
+          Customer_Name: formData.Customer_Name,
+          Delivery_Address: formData.Delivery_Address,
+          Commodity: formData.Commodity,
+          HSN_Code: formData.HSN_Code,
+          Incoterms: formData.Incoterms,
+          Transit_Days: formData.Transit_Days,
+          Dest_Port: formData.Dest_Port,
+          Free_Days: formData.Free_Days,
+          Pref_Vessel: formData.Pref_Vessel,
+          Pref_Service: formData.Pref_Service,
+          Pref_Liners: formData.Pref_Liners,
+          Avg_Cont_Per_Mnth: formData.Avg_Cont_Per_Mnth,
+          Created_By: secureLocalStorage.getItem("un"),
+        }),
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to insert location details");
+      }
+  
+      setData((prevData) => [...prevData, { ...formData }]);
+  
+      setIsAddModalOpen(false);
+      setSaveState("success");
+  
+      setTimeout(() => {
+        setSaveState("idle");
+      }, 3000);
+      window.location.reload();
+    } catch (error) {
+      console.error("Insert failed:", error.message);
+      setSaveState("error");
+  
+      setTimeout(() => {
+        setSaveState("idle");
+      }, 3000);
+    }
+  };
+  
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]">
         <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-3 px-3">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
-            <div className="flex flex-col">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center w-full p-0 rounded-t-lg">
+            <div>
               <h2 className="text-sm font-bold">Admin Settings / <span className="text-xs text-gray-100">Location Details</span></h2>
             </div>
+            <div className="flex mt-2 lg:mt-0 w-full lg:w-auto justify-start">
+              <button className="p-2 rounded-lg font-semibold 
+                bg-gray-500 text-white hover:bg-gray-600 
+                dark:bg-gray-600 dark:hover:bg-gray-400 transition-all duration-300"
+                style={{fontSize:"10px"}}
+                onClick={() => setIsAddModalOpen(true)}
+                >
+                + Add Location Details
+              </button>
+            </div>
+          </div>
           </div>
         </div>
         <div className="card-body p-0 overflow-x-auto pb-3">
@@ -470,7 +552,99 @@ const LOCMaster = () => {
           </div>
         </div>
       )}
-
+      {isAddModalOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          onClick={() => setIsAddModalOpen(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[79vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">     
+        <h2 className="text-lg font-bold">Add New Location</h2>
+            </div>
+            <div className="p-6 overflow-y-auto h-[calc(75vh-100px)]">      
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {locationCodes.length > 0 ? (
+            <div className="col-span-1">
+              <label className="block text-sm font-semibold">Location Code</label>
+              <select
+                className="w-full p-2 border rounded"
+                value={formData.Location_Code || ""}
+                onChange={(e) => setFormData({ ...formData, Location_Code: e.target.value })}
+              >
+                <option value="">Select Location Code</option>
+                {locationCodes.sort().map((code, index) => (
+                  <option key={index} value={code}>{code}</option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="col-span-1">Loading location codes...</div>
+          )}
+          {[
+            { label: "Location", key: "Location" },
+            { label: "Customer Name", key: "Customer_Name" },
+            { label: "Delivery Address", key: "Delivery_Address", type: "textarea" },
+            { label: "Commodity", key: "Commodity" },
+            { label: "Incoterms", key: "Incoterms" },
+            { label: "Transit Days", key: "Transit_Days", type: "number" },
+            { label: "Dest. Port", key: "Dest_Port" },
+            { label: "Free Days", key: "Free_Days", type: "number" },
+            { label: "Pref. Vessel", key: "Pref_Vessel" },
+            { label: "Pref. Service", key: "Pref_Service" },
+            { label: "Pref. Liners", key: "Pref_Liners" },
+            { label: "Avg Cont./Month", key: "Avg_Cont_Per_Mnth" },
+          ].map((item, index) => (
+            <div key={index} className="col-span-1">
+              <label className="block text-sm font-semibold">{item.label}</label>
+              {item.type === "textarea" ? (
+                <textarea
+                  className="w-full p-2 border rounded"
+                  value={formData[item.key] || ""}
+                  onChange={(e) => setFormData({ ...formData, [item.key]: e.target.value })}
+                />
+              ) : (
+                <input
+                  type={item.type || "text"}
+                  className="w-full p-2 border rounded"
+                  value={formData[item.key] || ""}
+                  onChange={(e) => setFormData({ ...formData, [item.key]: e.target.value })}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+        </div>
+          <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
+              <button     
+                onClick={() => setIsAddModalOpen(false)}
+                className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddNewLocation}
+                className={`px-4 py-2 rounded flex items-center justify-center 
+                ${saveState === "success" ? "bg-green-500 text-white" : 
+                saveState === "error" ? "bg-red-500 text-white" : 
+                "bg-blue-500 text-white"}`}
+              >
+                {saveState === "saving" ? (
+                  <div className="animate-spin w-5 h-5 border-4 border-white border-t-transparent rounded-full"></div>
+                    ) : saveState === "success" ? (
+                  <span className="text-lg">✔</span>
+                    ) : saveState === "error" ? (
+                  <span className="text-lg">❌</span>
+                    ) : (
+                  "Save"
+                    )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
