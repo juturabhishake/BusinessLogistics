@@ -18,7 +18,7 @@ import './page.css';
 
 const Page = () => {
   const { theme } = useTheme();
-  const isDarkMode = theme === "dark";
+  const isDarkMode = theme === secureLocalStorage.getItem("theme") || theme === "dark";
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [activeTab, setActiveTab] = useState("visualization");
   const [activeSubTab, setActiveSubTab] = useState("exportFCL");
@@ -119,7 +119,7 @@ const Page = () => {
     <div className="grid grid-cols-1 gap-6">
       <div className="flex flex-wrap items-center justify-between mb-4 space-y-4 lg:space-y-0">
         {/* <h2 className="text-lg font-bold px-2">Hi {String(secureLocalStorage.getItem("un"))} !! </h2> */}
-        <div>
+        <div className="items-center">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="visualization">Visualization View</TabsTrigger>
