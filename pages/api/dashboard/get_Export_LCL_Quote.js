@@ -23,16 +23,36 @@ function runMiddleware(req, res, fn) {
 export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
 
-  try {
-    const result = await prisma.$queryRaw`select * from LCL_Quote WHERE Quote_Month = MONTH(GETDATE()) AND Quote_Year = YEAR(GETDATE())`;
-    console.log('Location codes:', result);
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
 
-    // const locationCodes = result.map((item) => item.Location_Code);
+  try {
+    const { quote_month, quote_year, sc } = req.body;
+
+    // Validate inputs
+    if (!quote_month || !quote_year || !sc) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    let result;
+    if (sc === "admin") {
+      result = await prisma.$queryRaw`
+        SELECT * FROM LCL_Quote
+        WHERE Quote_Month = ${Number(quote_month)} 
+        AND Quote_Year = ${Number(quote_year)}`;
+    } else {
+      result = await prisma.$queryRaw`
+        SELECT * FROM LCL_Quote
+        WHERE Quote_Month = ${Number(quote_month)} 
+        AND Quote_Year = ${Number(quote_year)} 
+        AND Supplier_Code = ${String(sc)}`;
+    }
 
     return res.status(200).json(result);
   } catch (error) {
-    console.error('Error fetching location codes:', error);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Error fetching LCL quotes:', error);
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   } finally {
     await prisma.$disconnect();
   }

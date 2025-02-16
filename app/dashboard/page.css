@@ -1,0 +1,13 @@
+.table {
+    transition: all 0.3s ease;
+  }
+  
+  .table tr {
+    transition: background-color 0.3s ease;
+  }
+  
+  .table tr:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Change this to your desired hover color */
+  }
+
+  
