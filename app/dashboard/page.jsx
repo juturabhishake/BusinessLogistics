@@ -171,7 +171,7 @@ const Page = () => {
                 </CardHeader>
                 <CardContent>
                   {chart.data.length > 0 ? (
-                    <ChartContainer config={chartConfig}>
+                    <ChartContainer config={chartConfig}  className="aspect-auto h-[250px] w-full"> 
                       <AreaChart data={chart.data} margin={{ left: 12, right: 12 }} height={150}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="Location_Code" tickLine={false} axisLine={false} tickMargin={8} />

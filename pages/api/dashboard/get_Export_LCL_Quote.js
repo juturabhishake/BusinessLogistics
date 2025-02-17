@@ -51,7 +51,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json(result);
   } catch (error) {
-    console.error('Error fetching LCL quotes:', error);
+    console.error('Error fetching EXPORT LCL quotes:', error);
     return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   } finally {
     await prisma.$disconnect();
