@@ -171,20 +171,20 @@ const Page = () => {
                 </CardHeader>
                 <CardContent>
                   {chart.data.length > 0 ? (
-                    <ChartContainer config={chartConfig}  className="aspect-auto h-[250px] w-full"> 
-                      <BarChart accessibilityLayer  data={chart.data} >
+                    <ChartContainer config={chartConfig}  className="aspect-auto h-[200px] w-full"> 
+                      <BarChart accessibilityLayer  data={chart.data} barSize={30} barGap={8} >
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="Location" tickLine={false} axisLine={false} tickMargin={8} interval={0} />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
                         {Object.keys(chart.data[0] || {})
                         .filter((k) => k !== "Location")
                         .map((key, idx) => (
-                          <Bar
+                          <Bar radius={4} 
                             key={idx}
                             dataKey={key}
                             type="natural"
                             fill={`hsl(var(--chart-${idx + 1}))`}
-                            fillOpacity={0.4}
+                            // fillOpacity={0.4}
                             stroke={`hsl(var(--chart-${idx + 1}))`}
                                                
                           />
