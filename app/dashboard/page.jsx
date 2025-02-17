@@ -171,26 +171,54 @@ const Page = () => {
                 </CardHeader>
                 <CardContent>
                   {chart.data.length > 0 ? (
-                    <ChartContainer config={chartConfig}  className="aspect-auto h-[200px] w-full"> 
-                      <BarChart accessibilityLayer  data={chart.data} barSize={30} barGap={8} >
+                    <div className="overflow-x-auto w-full">
+                    <ChartContainer 
+                      config={chartConfig} 
+                      className={`min-w-[${Math.max(chart.data.length * 100, 400)}px] h-[200px]`} 
+                    >
+                      <BarChart
+                        width={Math.max(chart.data.length * 100, 400)}
+                        height={200}
+                        accessibilityLayer
+                        data={chart.data}
+                        barSize={30}
+                        barGap={8}
+                      >
                         <CartesianGrid vertical={false} />
-                        <XAxis dataKey="Location" tickLine={false} axisLine={false} tickMargin={8} interval={0} />
+                        <XAxis
+                          dataKey="Location"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          interval={0}
+                          minTickGap={10}
+                        />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
                         {Object.keys(chart.data[0] || {})
-                        .filter((k) => k !== "Location")
-                        .map((key, idx) => (
-                          <Bar radius={4} 
-                            key={idx}
-                            dataKey={key}
-                            type="natural"
-                            fill={`hsl(var(--chart-${idx + 1}))`}
-                            // fillOpacity={0.4}
-                            stroke={`hsl(var(--chart-${idx + 1}))`}
-                                               
-                          />
-                        ))}
+                          .filter((k) => k !== "Location")
+                          .map((key, idx) => {
+                            const colors = [                        
+                              "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FFD700", "#00CED1",
+                              "#FF4500", "#ADFF2F", "#8A2BE2", "#FF6347"
+                            ]; 
+                          
+                            const barColor = colors[idx % colors.length]; 
+                          
+                            return (
+                              <Bar
+                                key={idx}
+                                dataKey={key}
+                                type="natural"
+                                fill={barColor}
+                                stroke={barColor}
+                                radius={4}
+                              />
+                            );
+                          })}
+
                       </BarChart>
                     </ChartContainer>
+                  </div>
                   ) : (
                     <div>No data available for this chart.</div>
                   )}

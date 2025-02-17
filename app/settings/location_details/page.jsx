@@ -194,6 +194,8 @@ const LOCMaster = () => {
         setSaveState("idle");
         setIsModalOpen(false);
       }, 3000);
+      fetchData();
+      // window.location.reload();
     } catch (error) {
       console.error("Update failed:", error.message);
       setSaveState("error");
@@ -276,6 +278,7 @@ const LOCMaster = () => {
       setTimeout(() => {
         setSaveState("idle");
       }, 3000);
+      fetchData();
       window.location.reload();
     } catch (error) {
       console.error("Insert failed:", error.message);
@@ -301,7 +304,25 @@ const LOCMaster = () => {
                 bg-gray-500 text-white hover:bg-gray-600 
                 dark:bg-gray-600 dark:hover:bg-gray-400 transition-all duration-300"
                 style={{fontSize:"10px"}}
-                onClick={() => setIsAddModalOpen(true)}
+                onClick={() => {
+                  setFormData({
+                    Loc_Details_ID: "",
+                    Location_Code: "",
+                    Location: "",
+                    Customer_Name: "",
+                    Delivery_Address: "",
+                    Commodity: "",
+                    Incoterms: "",
+                    Transit_Days: "",
+                    Dest_Port: "",
+                    Free_Days: "",
+                    Pref_Vessel: "",
+                    Pref_Service: "",
+                    Pref_Liners: "",
+                    Avg_Cont_Per_Mnth: "",
+                  });
+                  setIsAddModalOpen(true);
+                }}
                 >
                 + Add Location Details
               </button>

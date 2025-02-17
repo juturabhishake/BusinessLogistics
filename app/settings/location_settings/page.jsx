@@ -17,8 +17,8 @@ const DataTable = () => {
     Location_Code: "",
     Location: "",
     Country: "",
-    Currency: "",
-    RFQType: "",
+    Currency: "USD",
+    RFQType: "FCL",
   });
   const [saveState, setSaveState] = useState("idle");
   const [deleteState, setDeleteState] = useState({});
@@ -149,6 +149,8 @@ const DataTable = () => {
         setSaveState("idle");
         setIsModalOpen(false);
       }, 3000);
+      fetchData();
+      // window.location.reload();
     } catch (error) {
       console.error("Update failed:", error.message);
       setSaveState("error");
@@ -220,13 +222,13 @@ const DataTable = () => {
       ]);
   
       setIsAddModalOpen(false);
-      fetchData();
-      window.location.reload();
       setSaveState("success");
   
       setTimeout(() => {
         setSaveState("idle");
       }, 3000);
+      fetchData();
+      window.location.reload();
     } catch (error) {
       console.error("Add failed:", error.message);
       setSaveState("error");
@@ -251,7 +253,17 @@ const DataTable = () => {
                 bg-gray-500 text-white hover:bg-gray-600 
                 dark:bg-gray-600 dark:hover:bg-gray-400 transition-all duration-300"
                 style={{fontSize:"10px"}}
-                onClick={() => setIsAddModalOpen(true)}
+                onClick={() => {
+                  setFormData({
+                    Location_Id: "",
+                    Location_Code: "",
+                    Location: "",
+                    Country: "",
+                    Currency: "",
+                    RFQType: "",
+                  });
+                  setIsAddModalOpen(true);
+                }}                
                 >
                 + Add New Location
               </button>
@@ -562,6 +574,7 @@ const DataTable = () => {
                       value={formData.Currency}
                       onChange={(e) => setFormData({ ...formData, Currency: e.target.value })}
                     >
+                      <option key="" value="">Select</option>
                       {currtypes.map((code) => (
                         <option key={code} value={code}>{code}</option>
                       ))}
@@ -574,6 +587,7 @@ const DataTable = () => {
                       value={formData.RFQType}
                       onChange={(e) => setFormData({ ...formData, RFQType: e.target.value })}
                     >
+                      <option key="" value="">Select</option>
                       {rfqtypes.map((code) => (
                         <option key={code} value={code}>{code}</option>
                       ))}
