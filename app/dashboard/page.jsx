@@ -317,7 +317,6 @@ const Table = ({ data }) => {
         </div>
       </div>
 
-      {/* Scrollable container for the table */}
       <div className="overflow-x-auto">
         <table className="min-w-full border rounded-lg bg-card text-foreground" 
           style={{ 
