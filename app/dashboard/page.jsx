@@ -5,7 +5,7 @@ import secureLocalStorage from "react-secure-storage";
 import { handleLogin } from "@/lib/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AreaChart, CartesianGrid, XAxis, Area } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useTheme } from "next-themes";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -52,9 +52,9 @@ const Page = () => {
       const sc = secureLocalStorage.getItem("sc");
       if (!sc || !selectedDate) return;
 
-      const quote_month = selectedDate.month() + 1;
+      const quote_month = selectedDate.month()+1;
       const quote_year = selectedDate.year();
-
+   
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,12 +65,12 @@ const Page = () => {
       const groupedData = {};
 
       data.forEach((curr) => {
-        const location = curr.Location_Code;
+        const location = curr.Location;
         const cbmKey = `${curr.CBM || curr.Cont_Feet}${curr.CBM ? "cbm" : "ft"}`;
-        const totalCost = curr.Total_Ship_Cost;
+        const totalCost =  Number(curr.Total_Ship_Cost);        
 
         if (!groupedData[location]) {
-          groupedData[location] = { Location_Code: location };
+          groupedData[location] = { Location: location };
         }
 
         if (curr.Type === "LCL") {
@@ -172,24 +172,24 @@ const Page = () => {
                 <CardContent>
                   {chart.data.length > 0 ? (
                     <ChartContainer config={chartConfig}  className="aspect-auto h-[250px] w-full"> 
-                      <AreaChart data={chart.data} margin={{ left: 12, right: 12 }} height={150}>
+                      <BarChart accessibilityLayer  data={chart.data} >
                         <CartesianGrid vertical={false} />
-                        <XAxis dataKey="Location_Code" tickLine={false} axisLine={false} tickMargin={8} />
+                        <XAxis dataKey="Location" tickLine={false} axisLine={false} tickMargin={8} interval={0} />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
                         {Object.keys(chart.data[0] || {})
-                        .filter((k) => k !== "Location_Code")
+                        .filter((k) => k !== "Location")
                         .map((key, idx) => (
-                          <Area
+                          <Bar
                             key={idx}
                             dataKey={key}
                             type="natural"
                             fill={`hsl(var(--chart-${idx + 1}))`}
                             fillOpacity={0.4}
                             stroke={`hsl(var(--chart-${idx + 1}))`}
-                            stackId="a"
+                                               
                           />
                         ))}
-                      </AreaChart>
+                      </BarChart>
                     </ChartContainer>
                   ) : (
                     <div>No data available for this chart.</div>

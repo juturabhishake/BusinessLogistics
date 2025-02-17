@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  try {
+  
     const { quote_month, quote_year, sc } = req.body;
 
     // Validate inputs
@@ -35,25 +35,22 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    let result;
-    if (sc === "admin") {
-      result = await prisma.$queryRaw`
-        SELECT * FROM LCL_Quote
-        WHERE Quote_Month = ${Number(quote_month)} 
-        AND Quote_Year = ${Number(quote_year)}`;
-    } else {
-      result = await prisma.$queryRaw`
-        SELECT * FROM LCL_Quote
-        WHERE Quote_Month = ${Number(quote_month)} 
-        AND Quote_Year = ${Number(quote_year)} 
-        AND Supplier_Code = ${String(sc)}`;
-    }
-
-    return res.status(200).json(result);
-  } catch (error) {
-    console.error('Error fetching EXPORT LCL quotes:', error);
-    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
-  } finally {
-    await prisma.$disconnect();
+    if (req.method === "POST") {
+      const { sc } = req.body;
+      if (!sc) {
+          return res.status(400).json({ message: "Location code is required" });
+      }
+      try {
+          const result = await prisma.$queryRaw`EXEC [dbo].[Get_LCL_Quote_Dashboard] ${quote_month}, ${quote_year}, ${sc}`;
+          // console.log('FCL Data:', result);        
+          return res.status(200).json(result);
+      } catch (error) {
+          console.error('Error fetching get_FCL_QUOTE:', error);
+          return res.status(500).json({ message: 'Internal Server Error' });
+      } finally {
+          await prisma.$disconnect();
+      }
+  } else {
+      return res.status(405).json({ message: "Method not allowed" });
   }
 }

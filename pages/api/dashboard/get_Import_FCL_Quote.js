@@ -34,22 +34,24 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    let query;
-    if (sc === "admin") {
-      query = prisma.$queryRaw`
-        SELECT * FROM Import_FCL_Quote
-        WHERE Quote_Month = ${quote_month} 
-        AND Quote_Year = ${quote_year}`;
-    } else {
-      query = prisma.$queryRaw`
-        SELECT * FROM Import_FCL_Quote
-        WHERE Quote_Month = ${quote_month} 
-        AND Quote_Year = ${quote_year} 
-        AND Supplier_Code = ${sc}`;
-    }
-
-    const result = await query;
-    return res.status(200).json(result);
+    if (req.method === "POST") {
+      const { sc } = req.body;
+      if (!sc) {
+          return res.status(400).json({ message: "Location code is required" });
+      }
+      try {
+          const result = await prisma.$queryRaw`EXEC [dbo].[Get_Import_FCL_Quote_Dashboard] ${quote_month}, ${quote_year}, ${sc}`;
+          // console.log('FCL Data:', result);        
+          return res.status(200).json(result);
+      } catch (error) {
+          console.error('Error fetching Get_Import_FCL_Quote_Dashboard:', error);
+          return res.status(500).json({ message: 'Internal Server Error' });
+      } finally {
+          await prisma.$disconnect();
+      }
+  } else {
+      return res.status(405).json({ message: "Method not allowed" });
+  }   
   } catch (error) {
     console.error('Error fetching IMPORT FCL quotes:', error);
     return res.status(500).json({ message: 'Internal Server Error' });
