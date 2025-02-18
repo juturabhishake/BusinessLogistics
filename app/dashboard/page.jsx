@@ -134,6 +134,8 @@ const Page = () => {
                 </span>
               }
               views={["year", "month"]}
+              openTo="month" 
+              //  format="MMM YYYY"
               value={selectedDate}
               className="w-60"
               sx={{
