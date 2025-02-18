@@ -75,6 +75,7 @@ export default async function handler(req, res) {
                         ,[Created_Date]
                         ,[Vendor_Code]
                     FROM [dbo].[Web_Login] where email = ${email}`;
+                    console.log("login data : ", query)
                 return res.status(200).json({ message: loginMessage, data: query });
             } else {
                 return res.status(401).json({ message: loginMessage });

@@ -20,6 +20,19 @@ const LOCMaster = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const { theme } = useTheme();
   const isDarkMode = theme === secureLocalStorage.getItem("theme") || theme === "dark";
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let flag = false
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    flag = (check_sc === 'admin')
+    console.log("is admin : ", isAdmin, flag, check_sc)
+    if(!flag) {
+      // secureLocalStorage.clear();
+      window.location.href = "/";
+    }
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {

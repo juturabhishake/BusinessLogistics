@@ -176,7 +176,7 @@ const Page = () => {
                     <div className="overflow-x-auto w-full">
                     <ChartContainer 
                       config={chartConfig} 
-                      className={`min-w-[500px] w-full h-[200px]`} 
+                      className={`min-w-[700px] w-full h-[200px]`} 
                     >
                       <BarChart                      
                         height={200}

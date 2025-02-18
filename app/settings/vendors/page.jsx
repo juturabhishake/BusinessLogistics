@@ -45,6 +45,19 @@ const LOCMaster = () => {
   const rfqtypes = ["FCL", "LCL", "BOTH", "FCLIMPORT", "LCLIMPORT"];
   const currtypes = ["USD", "EURO"];
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let flag = false
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    flag = (check_sc === 'admin')
+    console.log("is admin : ", isAdmin, flag, check_sc)
+    if(!flag) {
+      // secureLocalStorage.clear();
+      window.location.href = "/";
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -160,8 +173,11 @@ const LOCMaster = () => {
   };
 
   const handleSave = async () => {
+    if(formData.Vendor_Id==="" || formData.Vendor_Name==="" || formData.Contact_Name==="" || formData.Contact_No==="" || formData.Contact_Email==="" || formData.Email_2==="" || formData.Email_3==="" || formData.IsActive===""){
+      alert("required all inputs");
+      return
+    }
     setSaveState("saving");
-
     try {
       const response = await fetch("/api/update_vendors", {
         method: "POST",
@@ -241,8 +257,11 @@ const LOCMaster = () => {
     }
   };
   const handleAddNewLocation = async () => {
+    if(AddformData.Vendor_Name==="" || AddformData.Contact_Name==="" || AddformData.Contact_No==="" || AddformData.Contact_Email==="" || AddformData.Email_2==="" || AddformData.Email_3===""){ 
+      alert("required all fields!!!")
+      return
+    }
     setSaveState("saving");
-  
     try {
       const response = await fetch("/api/save_vendors", {
         method: "POST",

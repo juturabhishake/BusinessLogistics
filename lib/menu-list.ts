@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import {
   Tag,
   Users,
@@ -8,6 +9,8 @@ import {
   LayoutGrid,
   LucideIcon
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import secureLocalStorage from "react-secure-storage";
 
 type Submenu = {
   href: string;
@@ -29,103 +32,94 @@ type Group = {
 };
 
 export function getMenuList(pathname: string): Group[] {
-  return [
-    {
-      groupLabel: "",
-      menus: [
-        {
-          href: "/dashboard",
-          label: "Dashboard",
-          icon: LayoutGrid,
-          active: pathname === "/dashboard",
-          submenus: []
-        }
-      ]
-    },
-    {
-      groupLabel: "Contents",
-      menus: [
-        {
-          href: "",
-          label: "Exports",
-          icon: SquarePen,
-          submenus: [
+  const [menuList, setMenuList] = useState<Group[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    const sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(sc === "admin");
+  }, []);
+
+  useEffect(() => {
+    const generatedMenuList: Group[] = [
+      {
+        groupLabel: "",
+        menus: [
+          {
+            href: "/dashboard",
+            label: "Dashboard",
+            icon: LayoutGrid,
+            active: pathname === "/dashboard",
+            submenus: [],
+          }
+        ]
+      },
+      !isAdmin ? {
+        groupLabel: "Contents",
+        menus: [
+          {
+            href: "",
+            label: "Exports",
+            icon: SquarePen,
+            submenus: [
+              { href: "/export/FCL", label: "FCL" },
+              { href: "/export/LCL", label: "LCL" }
+            ],
+          },
+          {
+            href: "",
+            label: "Imports",
+            icon: SquarePen,
+            submenus: [
+              { href: "/RFQ-Prices/FCL", label: "FCL" },
+              { href: "/RFQ-Prices/LCL", label: "LCL" }
+            ],
+          },
+          {
+            href: "/categories",
+            label: "Categories",
+            icon: Bookmark
+          },
+          {
+            href: "/tags",
+            label: "Tags",
+            icon: Tag
+          }
+        ]
+      } : null,
+      isAdmin ? 
+      {
+          groupLabel: "Admin config",
+          menus: [
             {
-              href: "/export/FCL",
-              label: "FCL"
+              href: "/settings/dashboarda",
+              label: "Dashboard",
+              icon: LayoutGrid
             },
             {
-              href: "/export/LCL",
-              label: "LCL"
-            }
-          ]
-        },
-        {
-          href: "",
-          label: "Imports",
-          icon: SquarePen,
-          submenus: [
-            {
-              href: "/RFQ-Prices/FCL",
-              label: "FCL"
+              href: "/settings/vendors",
+              label: "Vendors",
+              icon: Users
             },
             {
-              href: "/RFQ-Prices/LCL",
-              label: "LCL"
-            }
-          ]
-        },
-        {
-          href: "/categories",
-          label: "Categories",
-          icon: Bookmark
-        },
-        {
-          href: "/tags",
-          label: "Tags",
-          icon: Tag
-        }
-      ]
-    },
-    {
-      groupLabel: "Settings",
-      menus: [
-        {
-          href: "/settings/dashboarda",
-          label: "Dashboard",
-          icon: LayoutGrid
-        },
-        {
-          href: "/settings/vendors",
-          label: "Vendors",
-          icon: Users
-        },
-        // {
-        //   href: "/settings/location_settings",
-        //   label: "Locations Info",
-        //   icon: LocateFixedIcon
-        // },
-        {
-          href: "",
-          label: "Locations",
-          icon: LocateFixedIcon,
-          submenus: [
-            {
-              href: "/settings/location_settings",
-              label: "Location Master"
+              href: "",
+              label: "Locations",
+              icon: LocateFixedIcon,
+              submenus: [
+                { href: "/settings/location_settings", label: "Location Master" },
+                { href: "/settings/location_details", label: "Location Details" }
+              ]
             },
             {
-              href: "/settings/location_details",
-              label: "Location Details"
+              href: "/account",
+              label: "Account",
+              icon: Settings
             }
           ]
-        },
-        {
-          href: "/account",
-          label: "Account",
-          icon: Settings
-        }
-      ]
-    }
-  ];
+        } : null,
+    ].filter(Boolean) as Group[]; 
+
+    setMenuList(generatedMenuList);
+  }, [isAdmin, pathname]);
+
+  return menuList;
 }

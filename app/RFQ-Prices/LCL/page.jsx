@@ -61,6 +61,19 @@ const QuotationTable = () => {
   const [Commodity, setCommodity] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [currency, setCurrency] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let flag = false
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    flag = (check_sc === 'admin')
+    console.log("is admin : ", isAdmin, flag, check_sc)
+    if(flag) {
+      // secureLocalStorage.clear();
+      window.location.href = "/";
+    }
+  }, []);
   useEffect(() => {
     const fetchLocations = async () => {
       try {

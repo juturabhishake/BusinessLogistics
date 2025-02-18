@@ -25,6 +25,19 @@ const DataTable = () => {
   const rfqtypes = ["FCL", "LCL", "BOTH", "FCLIMPORT", "LCLIMPORT"];
   const currtypes = ["USD", "EURO"];
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let flag = false
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    flag = (check_sc === 'admin')
+    console.log("is admin : ", isAdmin, flag, check_sc)
+    if(!flag) {
+      // secureLocalStorage.clear();
+      window.location.href = "/";
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,8 +127,11 @@ const DataTable = () => {
   };
 
   const handleSave = async () => {
+    if(formData.Location === "" || formData.Country === "" || formData.Currency === "" || formData.RFQType === "") {
+      alert("required all inputs!!!");
+      return
+    }
     setSaveState("saving");
-
     try {
       const response = await fetch("/api/update_location", {
         method: "POST",
@@ -193,8 +209,11 @@ const DataTable = () => {
     }
   };
   const handleAddNewLocation = async () => {
+    if(formData.Location === "" || formData.Country === "" || formData.Currency === "" || formData.RFQType === "") {   
+      alert("required all inputs");
+      return
+    }
     setSaveState("saving");
-  
     try {
       const response = await fetch("/api/add_new_location", {
         method: "POST",

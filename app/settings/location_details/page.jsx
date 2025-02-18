@@ -33,21 +33,34 @@ const LOCMaster = () => {
   const currtypes = ["USD", "EURO"];
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [locationCodes, setLocationCodes] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let flag = false
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    flag = (check_sc === 'admin')
+    console.log("is admin : ", isAdmin, flag, check_sc)
+    if(!flag) {
+      // secureLocalStorage.clear();
+      window.location.href = "/";
+    }
+  }, []);
 
   useEffect(() => {
     const fetchLocationCodes = async () => {
       try {
-        const response = await fetch("/api/getLocCodes");
+        const response = await fetch("/api/getLocations_and_codes"); 
         if (!response.ok) {
           throw new Error("Failed to fetch location codes");
         }
         const data = await response.json();
-        setLocationCodes(data.sort());
+        setLocationCodes(data.sort((a, b) => a.Location.localeCompare(b.Location))); 
       } catch (error) {
         console.error("Error fetching location codes:", error);
       }
     };
-  
+
     fetchLocationCodes();
   }, []);
 
@@ -151,8 +164,11 @@ const LOCMaster = () => {
   };
 
   const handleSave = async () => {
+    if(!formData.Customer_Name || !formData.Delivery_Address || !formData.Commodity || !formData.Incoterms || !formData.Transit_Days || !formData.Dest_Port || !formData.Free_Days || !formData.Pref_Vessel || !formData.Pref_Service || !formData.Pref_Liners || !formData.Avg_Cont_Per_Mnth) {
+      alert("required all fields!!!");
+      return
+    }
     setSaveState("saving");
-
     try {
       const response = await fetch("/api/update_loc_details", {
         method: "POST",
@@ -238,8 +254,11 @@ const LOCMaster = () => {
     }
   };
   const handleAddNewLocation = async () => {
+    if(!formData.Location_Code || !formData.Customer_Name || !formData.Delivery_Address || !formData.Commodity || !formData.Incoterms || !formData.Transit_Days || !formData.Dest_Port || !formData.Free_Days || !formData.Pref_Vessel || !formData.Pref_Service || !formData.Pref_Liners || !formData.Avg_Cont_Per_Mnth) {
+      alert("required all fields");
+      return;
+    }
     setSaveState("saving");
-  
     try {
       const response = await fetch("/api/add_Location_Details", {
         method: "POST",
@@ -589,18 +608,28 @@ const LOCMaster = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {locationCodes.length > 0 ? (
             <div className="col-span-1">
-              <label className="block text-sm font-semibold">Location Code</label>
-              <select
-                className="w-full p-2 border rounded"
-                value={formData.Location_Code || ""}
-                onChange={(e) => setFormData({ ...formData, Location_Code: e.target.value })}
-              >
-                <option value="">Select Location Code</option>
-                {locationCodes.sort().map((code, index) => (
-                  <option key={index} value={code}>{code}</option>
-                ))}
-              </select>
-            </div>
+            <label className="block text-sm font-semibold">Location</label>
+            <select
+              className="w-full p-2 border rounded"
+              value={formData.Location_Code || ""}
+              onChange={(e) => {
+                const selectedLocation = locationCodes.find(loc => loc.Location_Code === e.target.value);
+                setFormData({
+                  ...formData,
+                  Location_Code: selectedLocation?.Location_Code || "",
+                  // Location: selectedLocation?.Location || "",
+                });
+              }}
+            > 
+              <option value="">Select Location</option>
+              {locationCodes.map((loc, index) => (
+                <option key={index} value={loc.Location_Code}>
+                  {loc.Location}
+                </option>
+              ))}
+            </select>
+          </div>
+          
           ) : (
             <div className="col-span-1">Loading location codes...</div>
           )}
