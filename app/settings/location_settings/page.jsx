@@ -574,7 +574,7 @@ const DataTable = () => {
                       value={formData.Currency}
                       onChange={(e) => setFormData({ ...formData, Currency: e.target.value })}
                     >
-                      <option key="" value="">Select</option>
+                      {/* <option key="" value="">Select</option> */}
                       {currtypes.map((code) => (
                         <option key={code} value={code}>{code}</option>
                       ))}
@@ -587,7 +587,7 @@ const DataTable = () => {
                       value={formData.RFQType}
                       onChange={(e) => setFormData({ ...formData, RFQType: e.target.value })}
                     >
-                      <option key="" value="">Select</option>
+                      {/* <option key="" value="">Select</option> */}
                       {rfqtypes.map((code) => (
                         <option key={code} value={code}>{code}</option>
                       ))}

@@ -174,10 +174,9 @@ const Page = () => {
                     <div className="overflow-x-auto w-full">
                     <ChartContainer 
                       config={chartConfig} 
-                      className={`min-w-[${Math.max(chart.data.length * 100, 400)}px] h-[200px]`} 
+                      className={`min-w-[500px] w-full h-[200px]`} 
                     >
-                      <BarChart
-                        width={Math.max(chart.data.length * 100, 400)}
+                      <BarChart                      
                         height={200}
                         accessibilityLayer
                         data={chart.data}
@@ -198,8 +197,8 @@ const Page = () => {
                           .filter((k) => k !== "Location")
                           .map((key, idx) => {
                             const colors = [                        
-                              "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FFD700", "#00CED1",
-                              "#FF4500", "#ADFF2F", "#8A2BE2", "#FF6347"
+                              "#e76e51", "#2a9d90", "#f6a262",  "#76b5c5", "#e7c468","#154c79",
+                              "#FF4500", "#eab676", "#eeeee4", "#FF6347"
                             ]; 
                           
                             const barColor = colors[idx % colors.length]; 
