@@ -158,7 +158,11 @@ export default function Home() {
           // console.log('vendor code:', user.Vendor_Code);
           setLoginState("success");
           setTimeout(() => {
-            window.location.href = "/dashboard";
+            if (user.Vendor_Code === 'admin') {
+              window.location.href = "/settings/dashboarda";
+            } else {
+              window.location.href = "/dashboard";
+            }
           }, 1500);
         } else {
           setLoginState("failure");

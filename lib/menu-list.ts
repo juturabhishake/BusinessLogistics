@@ -41,6 +41,7 @@ export function getMenuList(pathname: string): Group[] {
 
   useEffect(() => {
     const generatedMenuList: Group[] = [
+      !isAdmin ? 
       {
         groupLabel: "",
         menus: [
@@ -52,7 +53,7 @@ export function getMenuList(pathname: string): Group[] {
             submenus: [],
           }
         ]
-      },
+      }: null,
       !isAdmin ? {
         groupLabel: "Contents",
         menus: [

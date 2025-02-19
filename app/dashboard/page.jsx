@@ -26,6 +26,19 @@ const Page = () => {
   const [importFCLChartData, setImportFCLChartData] = useState([]);
   const [exportLCLChartData, setExportLCLChartData] = useState([]);
   const [importLCLChartData, setImportLCLChartData] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let flag = false
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    flag = (check_sc === 'admin')
+    console.log("is admin : ", isAdmin, flag, check_sc)
+    if(flag) {
+      // secureLocalStorage.clear();
+      window.location.href = "/";
+    }
+  }, []);
 
   useEffect(() => {
     const checkLogin = async () => {

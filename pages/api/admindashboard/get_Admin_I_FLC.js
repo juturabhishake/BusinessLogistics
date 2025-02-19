@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     
       try {
         console.log('Dashboard Data:', quote_month); 
-          const result = await prisma.$queryRaw`EXEC [dbo].[Get_Admin_FCL_Dashboard] ${quote_month}, ${quote_year}, ${sc}, ${username}`;
+          const result = await prisma.$queryRaw`EXEC [dbo].[Get_Admin_Import_FCL_Dashboard] ${quote_month}, ${quote_year}, ${sc}, ${username}`;
            console.log('Dashboard Data:', result);        
           return res.status(200).json(result);
       } catch (error) {
