@@ -9,9 +9,9 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { FaSearch, FaSortUp, FaSortDown, FaSort, FaFileExcel, FaFilePdf } from "react-icons/fa";
-import * as XLSX from "xlsx"; // For Excel export
-import jsPDF from "jspdf"; // For PDF export
-import "jspdf-autotable"; // For PDF table generation
+import * as XLSX from "xlsx"; 
+import jsPDF from "jspdf";
+import "jspdf-autotable"; 
 
 const Page = () => {
   const { theme } = useTheme();
@@ -51,7 +51,7 @@ const Page = () => {
       });
 
       const data = await response.json();
-      setData(data); // Set the data directly
+      setData(data); 
       console.log("API Data:", data);
     } catch (error) {
       console.error("Error fetching data:", error);

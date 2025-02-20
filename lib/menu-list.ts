@@ -7,7 +7,8 @@ import {
   Bookmark,
   SquarePen,
   LayoutGrid,
-  LucideIcon
+  LucideIcon,
+  Database,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
@@ -100,6 +101,15 @@ export function getMenuList(pathname: string): Group[] {
               href: "/settings/vendors",
               label: "Vendors",
               icon: Users
+            },
+            {
+              href: "",
+              label: "Prints",
+              icon: Database,
+              submenus: [
+                { href: "/settings/print/FCL", label: "FCL" },
+                { href: "/settings/print/LCL", label: "LCL" }
+              ]
             },
             {
               href: "",
