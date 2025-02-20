@@ -170,21 +170,110 @@ const DataTable = ({ data }) => {
     );
   });
 
+  // const exportToExcel = () => {
+  //   const worksheet = XLSX.utils.json_to_sheet(filteredData);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+  //   XLSX.writeFile(workbook, "data.xlsx");
+  // };
+
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-    XLSX.writeFile(workbook, "data.xlsx");
+    const ws = XLSX.utils.json_to_sheet(filteredData);
+    
+    // Apply header styles
+    const headerStyle = { font: { bold: true }, fill: { fgColor: { rgb: "FFFF00" } } };
+    const borderStyle = { border: { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } } };
+
+    // Get column keys
+    const columns = Object.keys(filteredData[0] || {});
+
+    // Apply styles to headers
+    columns.forEach((key, index) => {
+      const cellRef = XLSX.utils.encode_cell({ r: 0, c: index });
+      if (!ws[cellRef]) ws[cellRef] = {};
+      ws[cellRef].s = headerStyle;
+    });
+
+    // Apply borders and adjust column width
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+        if (cell) cell.s = borderStyle;
+      }
+    }
+
+    // Auto fit column width
+    ws["!cols"] = columns.map(() => ({ wch: 20 }));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Quote Data");
+    XLSX.writeFile(wb, "data.xlsx");
   };
 
-  const exportToPDF = () => {
-    const doc = new jsPDF();
+  const exportToPDF = () => {   
+    const doc = new jsPDF({ orientation: "landscape" });
+
+   
+    const addHeader = (doc) => {
+      doc.setFontSize(10);
+      doc.text(`Export FCL Quote for the Month:`, 5, 5);
+  };
+   
+  const addFooter = (doc) => {
+    const pageWidth = doc.internal.pageSize.width;
+    const footerText = "Greentech Industries (India) Pvt. Ltd.";
+    const textWidth = doc.getTextWidth(footerText);
+    const xPosition = (pageWidth - textWidth) / 2; // Center align footer
+    const yPosition = doc.internal.pageSize.height - 8; // Bottom margin
+    doc.text(footerText, xPosition, yPosition);
+};
+
+    const headers = Object.keys(filteredData[0] || {}).map(key => key.toUpperCase());
+
+    // Numeric columns that should be right-aligned
+    const numericColumns = ["TOTAL_SHIPMENT_COST", "ORIGIN_CHARGES", "SEAFREIGHT_CHARGES", "DESTINATION_CHARGES"];
+
+    // Get the index of numeric columns
+    const numericColumnIndexes = headers
+      .map((header, index) => numericColumns.includes(header.replace(/\s+/g, "_")) ? index : -1)
+      .filter(index => index !== -1);
+
+      const formatNumber = (num) => {
+        return typeof num === "number" ? num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : num;
+      };
+    
+      const formattedBody = filteredData.map(row => 
+        Object.values(row).map((value, index) => numericColumnIndexes.includes(index) ? formatNumber(value) : value)
+      );
+
     doc.autoTable({
-      head: [Object.keys(filteredData[0] || {}).map(key => key.toUpperCase())],
-      body: filteredData.map(row => Object.values(row)),
+      head: [headers],
+      body: formattedBody,
+      startY: 8, // Reduced top margin
+      margin: { top: 8, left: 5, right: 5 },
+      styles: { fontSize: 9},
+      headStyles: { 
+        fillColor: [204, 229, 252], 
+        textColor: [0, 0, 0], 
+        // fontStyle: "bold", 
+        lineWidth: 0.1, // Ensure header grid lines
+        lineColor: [0, 0, 0] // Black border for the header
+      },
+      columnStyles: numericColumnIndexes.reduce((acc, index) => {
+        acc[index] = { halign: "right" }; 
+        return acc;
+      }, {}),
+      theme: "grid",
+      didDrawPage: (data) => {
+        addHeader(doc);
+        addFooter(doc);
+    },
     });
     doc.save("data.pdf");
   };
+
+ 
 
   return (
     <div className="bg-card p-4 rounded-lg shadow-lg">
@@ -238,19 +327,33 @@ const DataTable = ({ data }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((row, i) => (
-                <tr key={i} className="border hover:bg-muted">
-                  {Object.values(row).map((value, j) => (
-                    <td key={j} className="px-4 py-2 border">{String(value)}</td>
-                  ))}
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={sortedData.length > 0 ? Object.keys(sortedData[0]).length : 1} className="text-center py-4">No matching records found.</td>
+          {filteredData.length > 0 ? (
+            filteredData.map((item, index) => (
+              <tr key={index} className="border hover:bg-muted">
+                {Object.keys(item).map((key) => (
+                  <td key={key} className="px-4 py-2 border">
+                    {/* Format currency fields */}
+                    {["Total_Shipment_Cost", "Origin_Charges", "Seafreight_Charges", "Destination_Charges"].includes(key) ? (
+                      <div style={{ textAlign: "right" }}>
+                        {parseFloat(item[key]).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </div>
+                    ) : (
+                      String(item[key]) // Convert all values to strings for safety
+                    )}
+                  </td>
+                ))}
               </tr>
-            )}
+            ))
+          ) : (
+            <tr>
+              <td colSpan={filteredData.length > 0 ? Object.keys(filteredData[0]).length : 1} className="text-center py-4">
+                No results found.
+              </td>
+            </tr>
+          )}
           </tbody>
         </table>
       </div>
