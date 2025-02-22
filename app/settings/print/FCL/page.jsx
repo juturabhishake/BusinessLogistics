@@ -2,9 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import secureLocalStorage from "react-secure-storage";
-import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -24,6 +22,10 @@ import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
+const cn = (...classes) => {
+  return classes.filter(Boolean).join(' ');
+};
+
 const QuotationTable = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === secureLocalStorage.getItem("theme") || "dark";
@@ -33,7 +35,7 @@ const QuotationTable = () => {
     seaFreight: true,
     destination: true,
   });
-  
+
   const [originCharges, setOriginCharges] = useState([
     { description: "Customs Clearance & Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
     { description: "Local Transportation From GTI-Chennai", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
@@ -42,14 +44,14 @@ const QuotationTable = () => {
     { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
     { description: "Halting", remarks: "If any", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
   ]);
-  
+
   const [seaFreightCharges, setSeaFreightCharges] = useState([
     { description: "Sea Freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
     { description: "ENS", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
     { description: "ISPS", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
-    { description: "IT Transmission", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
+    { description: "Seal Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
   ]);
-  
+
   const [destinationCharges, setDestinationCharges] = useState([
     { description: "Destination Terminal Handling Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
     { description: "BL Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
@@ -59,7 +61,9 @@ const QuotationTable = () => {
     { description: "T1 Doc", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
     { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" },
   ]);
-  
+
+  const [suppliers, setSuppliers] = useState(["", "", "", "", "", ""]);
+
   const [open, setOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
@@ -137,6 +141,29 @@ const QuotationTable = () => {
     setCurrentDateInfo(formattedDate);
   }, []);
 
+  const fetchSupplierDetails = async (locCode) => {
+    try {
+      const response = await fetch('/api/GET_Supplier_LOC_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Loc_Code: locCode }),
+      });
+      const data = await response.json();
+      if (data.result && data.result.length > 0) {
+        setIncoterms(data.result[0].Incoterms);
+        setTransitDays(data.result[0].Transit_Days);
+        setCommodity(data.result[0].Commodity);
+        setDeliveryAddress(data.result[0].Delivery_Address);
+        setDest_Port(data.result[0].Dest_Port);
+        setCurrency(data.result[0].Currency);
+      }
+    } catch (error) {
+      console.error("Error fetching supplier details:", error);
+    }
+  };
+
   const fetchQuotationData = async (locationCode, month, year, contFeet) => {
     try {
       const response = await fetch("/api/prints/ExportFCL", {
@@ -157,29 +184,160 @@ const QuotationTable = () => {
       const data = await response.json();
 
       if (data && data.length > 0) {
-        const fclData = data[0];
+        const updatedOriginCharges = [...originCharges];
+        const updatedSeaFreightCharges = [...seaFreightCharges];
+        const updatedDestinationCharges = [...destinationCharges];
 
-        originCharges.forEach((charge, index) => {
-          charge.sc1 = fclData[`O_CCD_${contFeet}`] || "";
-          charge.sc2 = fclData[`O_LTG_${contFeet}`] || "";
-          charge.sc3 = fclData[`O_THC_${contFeet}`] || "";
-          charge.sc4 = fclData[`O_BLC_${contFeet}`] || "";
-          charge.sc5 = fclData[`O_LUS_${contFeet}`] || "";
-          charge.sc6 = fclData[`O_Halt_${contFeet}`] || "";
-        });
+        if (contFeet === 20) {
+          setSuppliers([
+            data[0].Supplier_1,
+            data[1].Supplier_2,
+            data[2].Supplier_3,
+            "",
+            "",
+            "",
+          ]);
+          updatedOriginCharges[0].sc1 = data.find(item => item.Attribute === "O_CCD").Supplier_1 || "";
+          updatedOriginCharges[1].sc1 = data.find(item => item.Attribute === "O_LTG").Supplier_1 || "";
+          updatedOriginCharges[2].sc1 = data.find(item => item.Attribute === "O_THC").Supplier_1 || "";
+          updatedOriginCharges[3].sc1 = data.find(item => item.Attribute === "O_BLC").Supplier_1 || "";
+          updatedOriginCharges[4].sc1 = data.find(item => item.Attribute === "O_LUS").Supplier_1 || "";
+          updatedOriginCharges[5].sc1 = data.find(item => item.Attribute === "O_Halt").Supplier_1 || "";
 
-        seaFreightCharges.forEach((charge, index) => {
-          charge.sc1 = fclData[`S_SeaFre_${contFeet}`] || "";
-          charge.sc2 = fclData[`S_Total_Chg_${contFeet}`] || "";
-        });
+          
+          updatedSeaFreightCharges[0].sc1 = data.find(item => item.Attribute === "S_SeaFre").Supplier_1 || "";
+          updatedSeaFreightCharges[1].sc1 = data.find(item => item.Attribute === "S_ENS").Supplier_1 || "";
+          updatedSeaFreightCharges[2].sc1 = data.find(item => item.Attribute === "S_ISPS").Supplier_1 || "";
+          updatedSeaFreightCharges[3].sc1 = data.find(item => item.Attribute === "S_ITT").Supplier_1 || "";
 
-        destinationCharges.forEach((charge, index) => {
-          charge.sc1 = fclData[`D_Total_Chg_${contFeet}`] || "";
-        });
+          updatedDestinationCharges[0].sc1 = data.find(item => item.Attribute === "D_DTH").Supplier_1 || "";
+          updatedDestinationCharges[1].sc1 = data.find(item => item.Attribute === "D_BLF").Supplier_1 || "";
+          updatedDestinationCharges[2].sc1 = data.find(item => item.Attribute === "D_DBR").Supplier_1 || "";
+          updatedDestinationCharges[3].sc1 = data.find(item => item.Attribute === "D_DOF").Supplier_1 || "";
+          updatedDestinationCharges[4].sc1 = data.find(item => item.Attribute === "D_HC").Supplier_1 || "";
+          updatedDestinationCharges[5].sc1 = data.find(item => item.Attribute === "D_TDO").Supplier_1 || "";
+          updatedDestinationCharges[6].sc1 = data.find(item => item.Attribute === "D_LOC").Supplier_1 || "";
 
-        setOriginCharges([...originCharges]);
-        setSeaFreightCharges([...seaFreightCharges]);
-        setDestinationCharges([...destinationCharges]);
+          updatedOriginCharges[0].sc2 = data.find(item => item.Attribute === "O_CCD").Supplier_2 || "";
+          updatedOriginCharges[1].sc2 = data.find(item => item.Attribute === "O_LTG").Supplier_2 || "";
+          updatedOriginCharges[2].sc2 = data.find(item => item.Attribute === "O_THC").Supplier_2 || "";
+          updatedOriginCharges[3].sc2 = data.find(item => item.Attribute === "O_BLC").Supplier_2 || "";
+          updatedOriginCharges[4].sc2 = data.find(item => item.Attribute === "O_LUS").Supplier_2 || "";
+          updatedOriginCharges[5].sc2 = data.find(item => item.Attribute === "O_Halt").Supplier_2 || "";
+
+          
+          updatedSeaFreightCharges[0].sc2 = data.find(item => item.Attribute === "S_SeaFre").Supplier_2 || "";
+          updatedSeaFreightCharges[1].sc2 = data.find(item => item.Attribute === "S_ENS").Supplier_2 || "";
+          updatedSeaFreightCharges[2].sc2 = data.find(item => item.Attribute === "S_ISPS").Supplier_2 || "";
+          updatedSeaFreightCharges[3].sc2 = data.find(item => item.Attribute === "S_ITT").Supplier_2 || "";
+
+          updatedDestinationCharges[0].sc2 = data.find(item => item.Attribute === "D_DTH").Supplier_2 || "";
+          updatedDestinationCharges[1].sc2 = data.find(item => item.Attribute === "D_BLF").Supplier_2 || "";
+          updatedDestinationCharges[2].sc2 = data.find(item => item.Attribute === "D_DBR").Supplier_2 || "";
+          updatedDestinationCharges[3].sc2 = data.find(item => item.Attribute === "D_DOF").Supplier_2 || "";
+          updatedDestinationCharges[4].sc2 = data.find(item => item.Attribute === "D_HC").Supplier_2 || "";
+          updatedDestinationCharges[5].sc2 = data.find(item => item.Attribute === "D_TDO").Supplier_2 || "";
+          updatedDestinationCharges[6].sc2 = data.find(item => item.Attribute === "D_LOC").Supplier_2 || "";
+
+          updatedOriginCharges[0].sc3 = data.find(item => item.Attribute === "O_CCD").Supplier_3 || "";
+          updatedOriginCharges[1].sc3 = data.find(item => item.Attribute === "O_LTG").Supplier_3 || "";
+          updatedOriginCharges[2].sc3 = data.find(item => item.Attribute === "O_THC").Supplier_3 || "";
+          updatedOriginCharges[3].sc3 = data.find(item => item.Attribute === "O_BLC").Supplier_3 || "";
+          updatedOriginCharges[4].sc3 = data.find(item => item.Attribute === "O_LUS").Supplier_3 || "";
+          updatedOriginCharges[5].sc3 = data.find(item => item.Attribute === "O_Halt").Supplier_3 || "";
+
+          
+          updatedSeaFreightCharges[0].sc3 = data.find(item => item.Attribute === "S_SeaFre").Supplier_3 || "";
+          updatedSeaFreightCharges[1].sc3 = data.find(item => item.Attribute === "S_ENS").Supplier_3 || "";
+          updatedSeaFreightCharges[2].sc3 = data.find(item => item.Attribute === "S_ISPS").Supplier_3 || "";
+          updatedSeaFreightCharges[3].sc3 = data.find(item => item.Attribute === "S_ITT").Supplier_3 || "";
+
+          updatedDestinationCharges[0].sc3 = data.find(item => item.Attribute === "D_DTH").Supplier_3 || "";
+          updatedDestinationCharges[1].sc3 = data.find(item => item.Attribute === "D_BLF").Supplier_3 || "";
+          updatedDestinationCharges[2].sc3 = data.find(item => item.Attribute === "D_DBR").Supplier_3 || "";
+          updatedDestinationCharges[3].sc3 = data.find(item => item.Attribute === "D_DOF").Supplier_3 || "";
+          updatedDestinationCharges[4].sc3 = data.find(item => item.Attribute === "D_HC").Supplier_3 || "";
+          updatedDestinationCharges[5].sc3 = data.find(item => item.Attribute === "D_TDO").Supplier_3 || "";
+          updatedDestinationCharges[6].sc3 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
+
+
+        } else if (contFeet === 40) {
+          setSuppliers((prev) => [
+            prev[0],
+            prev[1],
+            prev[2],
+            data[0].Supplier_4,
+            data[1].Supplier_5,
+            data[2].Supplier_6,
+          ]);
+          updatedOriginCharges[0].sc4 = data.find(item => item.Attribute === "O_CCD").Supplier_1 || "";
+          updatedOriginCharges[1].sc4 = data.find(item => item.Attribute === "O_LTG").Supplier_1 || "";
+          updatedOriginCharges[2].sc4 = data.find(item => item.Attribute === "O_THC").Supplier_1 || "";
+          updatedOriginCharges[3].sc4 = data.find(item => item.Attribute === "O_BLC").Supplier_1 || "";
+          updatedOriginCharges[4].sc4 = data.find(item => item.Attribute === "O_LUS").Supplier_1 || "";
+          updatedOriginCharges[5].sc4 = data.find(item => item.Attribute === "O_Halt").Supplier_1 || "";
+
+          
+          updatedSeaFreightCharges[0].sc4 = data.find(item => item.Attribute === "S_SeaFre").Supplier_1 || "";
+          updatedSeaFreightCharges[1].sc4 = data.find(item => item.Attribute === "S_ENS").Supplier_1 || "";
+          updatedSeaFreightCharges[2].sc4 = data.find(item => item.Attribute === "S_ISPS").Supplier_1 || "";
+          updatedSeaFreightCharges[3].sc4 = data.find(item => item.Attribute === "S_ITT").Supplier_1 || "";
+
+          updatedDestinationCharges[0].sc4 = data.find(item => item.Attribute === "D_DTH").Supplier_1 || "";
+          updatedDestinationCharges[1].sc4 = data.find(item => item.Attribute === "D_BLF").Supplier_1 || "";
+          updatedDestinationCharges[2].sc4 = data.find(item => item.Attribute === "D_DBR").Supplier_1 || "";
+          updatedDestinationCharges[3].sc4 = data.find(item => item.Attribute === "D_DOF").Supplier_1 || "";
+          updatedDestinationCharges[4].sc4 = data.find(item => item.Attribute === "D_HC").Supplier_1 || "";
+          updatedDestinationCharges[5].sc4 = data.find(item => item.Attribute === "D_TDO").Supplier_1 || "";
+          updatedDestinationCharges[6].sc4 = data.find(item => item.Attribute === "D_LOC").Supplier_1 || "";
+
+          updatedOriginCharges[0].sc5 = data.find(item => item.Attribute === "O_CCD").Supplier_2 || "";
+          updatedOriginCharges[1].sc5 = data.find(item => item.Attribute === "O_LTG").Supplier_2 || "";
+          updatedOriginCharges[2].sc5 = data.find(item => item.Attribute === "O_THC").Supplier_2 || "";
+          updatedOriginCharges[3].sc5 = data.find(item => item.Attribute === "O_BLC").Supplier_2 || "";
+          updatedOriginCharges[4].sc5 = data.find(item => item.Attribute === "O_LUS").Supplier_2 || "";
+          updatedOriginCharges[5].sc5 = data.find(item => item.Attribute === "O_Halt").Supplier_2 || "";
+
+          
+          updatedSeaFreightCharges[0].sc5 = data.find(item => item.Attribute === "S_SeaFre").Supplier_2 || "";
+          updatedSeaFreightCharges[1].sc5 = data.find(item => item.Attribute === "S_ENS").Supplier_2 || "";
+          updatedSeaFreightCharges[2].sc5 = data.find(item => item.Attribute === "S_ISPS").Supplier_2 || "";
+          updatedSeaFreightCharges[3].sc5 = data.find(item => item.Attribute === "S_ITT").Supplier_2 || "";
+
+          updatedDestinationCharges[0].sc5 = data.find(item => item.Attribute === "D_DTH").Supplier_2 || "";
+          updatedDestinationCharges[1].sc5 = data.find(item => item.Attribute === "D_BLF").Supplier_2 || "";
+          updatedDestinationCharges[2].sc5 = data.find(item => item.Attribute === "D_DBR").Supplier_2 || "";
+          updatedDestinationCharges[3].sc5 = data.find(item => item.Attribute === "D_DOF").Supplier_2 || "";
+          updatedDestinationCharges[4].sc5 = data.find(item => item.Attribute === "D_HC").Supplier_2 || "";
+          updatedDestinationCharges[5].sc5 = data.find(item => item.Attribute === "D_TDO").Supplier_2 || "";
+          updatedDestinationCharges[6].sc5 = data.find(item => item.Attribute === "D_LOC").Supplier_2 || "";
+
+          updatedOriginCharges[0].sc6 = data.find(item => item.Attribute === "O_CCD").Supplier_3 || "";
+          updatedOriginCharges[1].sc6 = data.find(item => item.Attribute === "O_LTG").Supplier_3 || "";
+          updatedOriginCharges[2].sc6 = data.find(item => item.Attribute === "O_THC").Supplier_3 || "";
+          updatedOriginCharges[3].sc6 = data.find(item => item.Attribute === "O_BLC").Supplier_3 || "";
+          updatedOriginCharges[4].sc6 = data.find(item => item.Attribute === "O_LUS").Supplier_3 || "";
+          updatedOriginCharges[5].sc6 = data.find(item => item.Attribute === "O_Halt").Supplier_3 || "";
+
+          
+          updatedSeaFreightCharges[0].sc6 = data.find(item => item.Attribute === "S_SeaFre").Supplier_3 || "";
+          updatedSeaFreightCharges[1].sc6 = data.find(item => item.Attribute === "S_ENS").Supplier_3 || "";
+          updatedSeaFreightCharges[2].sc6 = data.find(item => item.Attribute === "S_ISPS").Supplier_3 || "";
+          updatedSeaFreightCharges[3].sc6 = data.find(item => item.Attribute === "S_ITT").Supplier_3 || "";
+
+          updatedDestinationCharges[0].sc6 = data.find(item => item.Attribute === "D_DTH").Supplier_3 || "";
+          updatedDestinationCharges[1].sc6 = data.find(item => item.Attribute === "D_BLF").Supplier_3 || "";
+          updatedDestinationCharges[2].sc6 = data.find(item => item.Attribute === "D_DBR").Supplier_3 || "";
+          updatedDestinationCharges[3].sc6 = data.find(item => item.Attribute === "D_DOF").Supplier_3 || "";
+          updatedDestinationCharges[4].sc6 = data.find(item => item.Attribute === "D_HC").Supplier_3 || "";
+          updatedDestinationCharges[5].sc6 = data.find(item => item.Attribute === "D_TDO").Supplier_3 || "";
+          updatedDestinationCharges[6].sc6 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
+
+        }
+
+        setOriginCharges(updatedOriginCharges);
+        setSeaFreightCharges(updatedSeaFreightCharges);
+        setDestinationCharges(updatedDestinationCharges);
       } else {
         setOriginCharges(originCharges.map((item) => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
         setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, sc1: "", sc2: "" })));
@@ -192,6 +350,7 @@ const QuotationTable = () => {
 
   useEffect(() => {
     if (selectedLocation) {
+      fetchSupplierDetails(selectedLocation);
       const month = selectedDate.month() + 1;
       const year = selectedDate.year();
       fetchQuotationData(selectedLocation, month, year, 20); 
@@ -210,7 +369,7 @@ const QuotationTable = () => {
     return charges.reduce(
       (acc, charge) => {
         acc[20] += parseFloat(charge.sc1 || 0);
-        acc[40] += parseFloat(charge.sc2 || 0);
+        acc[40] += parseFloat(charge.sc4 || 0);
         return acc;
       },
       { 20: 0, 40: 0 }
@@ -352,7 +511,7 @@ const QuotationTable = () => {
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border"></td>
+                  <td className="py-1 px-3 border">{totalOrigin[20]}</td>
                   <td className="py-1 px-3 border"></td>
                   <td className="py-1 px-3 border"></td>
                   <td className="py-1 px-3 border"></td>
@@ -389,7 +548,7 @@ const QuotationTable = () => {
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border"></td>
+                  <td className="py-1 px-3 border">{totalSeaFreight[20]}</td>
                   <td className="py-1 px-3 border"></td>
                   <td className="py-1 px-3 border"></td>
                   <td className="py-1 px-3 border"></td>
@@ -426,7 +585,7 @@ const QuotationTable = () => {
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border"></td>
+                  <td className="py-1 px-3 border">{totalDestination[20]}</td>
                   <td className="py-1 px-3 border"></td>
                   <td className="py-1 px-3 border"></td>
                   <td className="py-1 px-3 border"></td>
@@ -438,7 +597,7 @@ const QuotationTable = () => {
               <tr className="border">
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">Total Shipment Cost in INR (A + B + C)</td>
                 <td className="py-1 px-3 border"></td>
-                <td className="py-1 px-3 border"></td>
+                <td className="py-1 px-3 border">{totalShipmentCost[20]}</td>
                 <td className="py-1 px-3 border"></td>
                 <td className="py-1 px-3 border"></td>
                 <td className="py-1 px-3 border"></td>
@@ -468,6 +627,10 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="8" className="py-1 px-3 border text-left">{Dest_Port}</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
+                <td colSpan="8" className="py-1 px-3 border text-left">remarks...</td>
               </tr>
             </tbody>
           </table>

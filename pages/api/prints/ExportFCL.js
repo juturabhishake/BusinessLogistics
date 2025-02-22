@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     
       try {
         console.log('Dashboard Data:', quote_month); 
-          const result = await prisma.$queryRaw`exec [GET_ExportFCL_Print] ${quote_month}, ${quote_year}, ${sc}, ${username}, ${loc_code}, ${cont_ft}`;
+          const result = await prisma.$queryRaw`exec [GET_ExportFCL_Print_1] ${quote_month}, ${quote_year}, ${sc}, ${username}, ${loc_code}, ${cont_ft}`;
            console.log('Dashboard Data:', result);        
           return res.status(200).json(result);
       } catch (error) {
