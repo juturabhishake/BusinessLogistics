@@ -78,6 +78,10 @@ const QuotationTable = () => {
   const [currency, setCurrency] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedDate, setSelectedDate] = useState(dayjs()); 
+  const [totalA, setTotalA] = useState(["", "", "", "", "", ""]);
+  const [totalB, setTotalB] = useState(["", "", "", "", "", ""]);
+  const [totalC, setTotalC] = useState(["", "", "", "", "", ""]);
+  const [total, setTotal] = useState(["", "", "", "", "", ""]);
 
   useEffect(() => {
     const check_sc = secureLocalStorage.getItem("sc");
@@ -190,9 +194,9 @@ const QuotationTable = () => {
 
         if (contFeet === 20) {
           setSuppliers([
-            data[0].Supplier_1,
-            data[1].Supplier_2,
-            data[2].Supplier_3,
+            data.find(item => item.Attribute === "Vendor_Name").Supplier_1,
+            data.find(item => item.Attribute === "Vendor_Name").Supplier_2,
+            data.find(item => item.Attribute === "Vendor_Name").Supplier_3,,
             "",
             "",
             "",
@@ -260,16 +264,49 @@ const QuotationTable = () => {
           updatedDestinationCharges[5].sc3 = data.find(item => item.Attribute === "D_TDO").Supplier_3 || "";
           updatedDestinationCharges[6].sc3 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
 
+          setTotalA([
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_1 || "",
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_2 || "",
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || "",
+            "",
+            "",
+            ""
+          ])
+          setTotalB([
+            data.find(item => item.Attribute === "S_Total_Chg").Supplier_1 || "",
+            data.find(item => item.Attribute === "S_Total_Chg").Supplier_2 || "",
+            data.find(item => item.Attribute === "S_Total_Chg").Supplier_3 || "",
+            "",
+            "",
+            ""
+          ])
+          setTotalC([
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_1 || "",
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_2 || "",
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || "",
+            "",
+            "",
+            ""
+          ])
+          setTotal([
+            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_1 || "",
+            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_2 || "",
+            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || "",
+            "",
+            "",
+            ""
+          ])
 
         } else if (contFeet === 40) {
           setSuppliers((prev) => [
             prev[0],
             prev[1],
             prev[2],
-            data[0].Supplier_4,
-            data[1].Supplier_5,
-            data[2].Supplier_6,
+            data.find(item => item.Attribute === "Vendor_Name").Supplier_1,
+            data.find(item => item.Attribute === "Vendor_Name").Supplier_2,
+            data.find(item => item.Attribute === "Vendor_Name").Supplier_3,
           ]);
+          
           updatedOriginCharges[0].sc4 = data.find(item => item.Attribute === "O_CCD").Supplier_1 || "";
           updatedOriginCharges[1].sc4 = data.find(item => item.Attribute === "O_LTG").Supplier_1 || "";
           updatedOriginCharges[2].sc4 = data.find(item => item.Attribute === "O_THC").Supplier_1 || "";
@@ -333,6 +370,38 @@ const QuotationTable = () => {
           updatedDestinationCharges[5].sc6 = data.find(item => item.Attribute === "D_TDO").Supplier_3 || "";
           updatedDestinationCharges[6].sc6 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
 
+          setTotalA([
+            prev[0],
+            prev[1],
+            prev[2],
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_1 || "",
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_2 || "",
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || "",
+          ])
+          setTotalB([
+            prev[0],
+            prev[1],
+            prev[2],
+            data.find(item => item.Attribute === "S_Total_Chg").Supplier_1 || "",
+            data.find(item => item.Attribute === "S_Total_Chg").Supplier_2 || "",
+            data.find(item => item.Attribute === "S_Total_Chg").Supplier_3 || "",
+          ])
+          setTotalC([
+            prev[0],
+            prev[1],
+            prev[2],
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_1 || "",
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_2 || "",
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || "",
+          ])
+          setTotal([
+            prev[0],
+            prev[1],
+            prev[2],
+            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_1 || "",
+            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_2 || "",
+            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || "",
+          ])
         }
 
         setOriginCharges(updatedOriginCharges);
@@ -474,12 +543,12 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">sc 1</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">sc 2</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">sc 3</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">sc 4</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">sc 5</th>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">sc 6</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{suppliers[0] || "Supplier 1"}</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{suppliers[1] || "Supplier 2"}</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{suppliers[2] || "Supplier 3"}</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{suppliers[3] || "Supplier 4"}</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{suppliers[4] || "Supplier 5"}</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{suppliers[5] || "Supplier 6"}</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">
@@ -511,12 +580,12 @@ const QuotationTable = () => {
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border">{totalOrigin[20]}</td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
+                  <td className="py-1 px-3 border">{totalA[0] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[1] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[2] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[3] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[4] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[5] || ""}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -548,12 +617,12 @@ const QuotationTable = () => {
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border">{totalSeaFreight[20]}</td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
+                  <td className="py-1 px-3 border">{totalB[0] || ""}</td>
+                  <td className="py-1 px-3 border">{totalB[1] || ""}</td>
+                  <td className="py-1 px-3 border">{totalB[2] || ""}</td>
+                  <td className="py-1 px-3 border">{totalB[3] || ""}</td>
+                  <td className="py-1 px-3 border">{totalB[4] || ""}</td>
+                  <td className="py-1 px-3 border">{totalB[5] || ""}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -585,24 +654,24 @@ const QuotationTable = () => {
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border">{totalDestination[20]}</td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
-                  <td className="py-1 px-3 border"></td>
+                  <td className="py-1 px-3 border">{totalC[0] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[1] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[2] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[3] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[4] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[5] || ""}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
               <tr className="border">
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">Total Shipment Cost in INR (A + B + C)</td>
                 <td className="py-1 px-3 border"></td>
-                <td className="py-1 px-3 border">{totalShipmentCost[20]}</td>
-                <td className="py-1 px-3 border"></td>
-                <td className="py-1 px-3 border"></td>
-                <td className="py-1 px-3 border"></td>
-                <td className="py-1 px-3 border"></td>
-                <td className="py-1 px-3 border"></td>
+                <td className="py-1 px-3 border">{total[0] || ""}</td>
+                <td className="py-1 px-3 border">{total[1] || ""}</td>
+                <td className="py-1 px-3 border">{total[2] || ""}</td>
+                <td className="py-1 px-3 border">{total[3] || ""}</td>
+                <td className="py-1 px-3 border">{total[4] || ""}</td>
+                <td className="py-1 px-3 border">{total[5] || ""}</td>
                 <td className="py-1 px-3 border"></td>
               </tr>
               <tr>
