@@ -370,7 +370,7 @@ const QuotationTable = () => {
           updatedDestinationCharges[5].sc6 = data.find(item => item.Attribute === "D_TDO").Supplier_3 || "";
           updatedDestinationCharges[6].sc6 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
 
-          setTotalA([
+          setTotalA((prev) =>[
             prev[0],
             prev[1],
             prev[2],
@@ -378,7 +378,7 @@ const QuotationTable = () => {
             data.find(item => item.Attribute === "O_Total_Chg").Supplier_2 || "",
             data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || "",
           ])
-          setTotalB([
+          setTotalB((prev) =>[
             prev[0],
             prev[1],
             prev[2],
@@ -386,7 +386,7 @@ const QuotationTable = () => {
             data.find(item => item.Attribute === "S_Total_Chg").Supplier_2 || "",
             data.find(item => item.Attribute === "S_Total_Chg").Supplier_3 || "",
           ])
-          setTotalC([
+          setTotalC((prev) =>[
             prev[0],
             prev[1],
             prev[2],
@@ -394,7 +394,7 @@ const QuotationTable = () => {
             data.find(item => item.Attribute === "D_Total_Chg").Supplier_2 || "",
             data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || "",
           ])
-          setTotal([
+          setTotal((prev) =>[
             prev[0],
             prev[1],
             prev[2],
@@ -461,7 +461,7 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-2">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparative Statement of quotations</h2>
-              <p className="text-xs text-gray-100">"RFQ Import rates for {currentDateInfo}"</p>
+              <p className="text-xs text-gray-100">"Export Print FCL rates for {currentDateInfo}"</p>
               <p className="text-xs text-gray-100">Quote for GTI to {locationName || "{select location}"} shipment</p>
             </div>
             <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
@@ -516,6 +516,7 @@ const QuotationTable = () => {
                         "& .MuiInputBase-root": {
                           color: isDarkMode ? "#ffffff" : "#000000",
                           borderRadius: "8px",
+                          fontSize:"14px"
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
                           borderColor: isDarkMode ? "#A0AEC0" : "#CBD5E0",
@@ -532,7 +533,13 @@ const QuotationTable = () => {
           </div>
         </div>
         <div className="card-body p-0 overflow-x-auto pb-3">
-          <table className="table-auto border-[var(--primary)] text-center w-full min-w-[800px] text-xs">
+          <table className="table-auto border-[var(--primary)] text-center w-full min-w-[800px] text-xs"
+          style={{ 
+                fontSize: "13px", 
+                padding: "1px",
+                whiteSpace: "nowrap", 
+                overflow: "hidden",   
+                }}>
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
             <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
@@ -699,7 +706,7 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
-                <td colSpan="8" className="py-1 px-3 border text-left">remarks...</td>
+                <td colSpan="8" className="py-1 px-3 border text-left"></td>
               </tr>
             </tbody>
           </table>
