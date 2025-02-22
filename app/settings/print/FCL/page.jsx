@@ -208,7 +208,6 @@ const QuotationTable = () => {
           updatedOriginCharges[4].sc1 = data.find(item => item.Attribute === "O_LUS").Supplier_1 || "";
           updatedOriginCharges[5].sc1 = data.find(item => item.Attribute === "O_Halt").Supplier_1 || "";
 
-          
           updatedSeaFreightCharges[0].sc1 = data.find(item => item.Attribute === "S_SeaFre").Supplier_1 || "";
           updatedSeaFreightCharges[1].sc1 = data.find(item => item.Attribute === "S_ENS").Supplier_1 || "";
           updatedSeaFreightCharges[2].sc1 = data.find(item => item.Attribute === "S_ISPS").Supplier_1 || "";
@@ -419,9 +418,18 @@ const QuotationTable = () => {
 
   useEffect(() => {
     if (selectedLocation) {
+      setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
+      setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
+      setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
+      setSuppliers(["", "", "", "", "", ""]);
+      setTotalA(["", "", "", "", "", ""]);
+      setTotalB(["", "", "", "", "", ""]);
+      setTotalC(["", "", "", "", "", ""]);
+      setTotal(["", "", "", "", "", ""]);
       fetchSupplierDetails(selectedLocation);
       const month = selectedDate.month() + 1;
       const year = selectedDate.year();
+      
       fetchQuotationData(selectedLocation, month, year, 20); 
       fetchQuotationData(selectedLocation, month, year, 40); 
     }
