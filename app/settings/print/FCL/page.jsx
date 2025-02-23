@@ -499,9 +499,25 @@ const QuotationTable = () => {
       doc.text(footerText, xPosition, yPosition);
     };
   
-    const headers = ["S.No", "Sea Freight RFQ - FCL", "Currency in", 
-      "20 ft Supplier 1", "20 ft Supplier 2", "20 ft Supplier 3", 
-      "40 ft Supplier 1", "40 ft Supplier 2", "40 ft Supplier 3", "Remarks"];
+    const getShortForm = (name) => {
+      if (!name) return "N/A";
+      return name.split(" ").map(word => word.charAt(0).toUpperCase()).join("");
+    };
+  
+    const shortSuppliers = suppliers.map(getShortForm);
+  
+    const headers = [
+      "S.No",
+      "Sea Freight RFQ - FCL",
+      "Currency in",
+      `${shortSuppliers[0]} (20ft)`,
+      `${shortSuppliers[1]} (20ft)`,
+      `${shortSuppliers[2]} (20ft)`,
+      `${shortSuppliers[3]} (40ft)`,
+      `${shortSuppliers[4]} (40ft)`,
+      `${shortSuppliers[5]} (40ft)`,
+      "Remarks"
+    ];
   
     const body = [];
   
@@ -571,14 +587,14 @@ const QuotationTable = () => {
     doc.text("Supplier Details:", 10, doc.lastAutoTable.finalY + 10);
     doc.autoTable({
       startY: doc.lastAutoTable.finalY + 15,
-      head: [["Supplier No.", "Supplier Name"]],
+      head: [["Supplier No.", "Supplier Short Code", "Full Supplier Name"]],
       body: [
-        ["1", suppliers[0] || "N/A"],
-        ["2", suppliers[1] || "N/A"],
-        ["3", suppliers[2] || "N/A"],
-        ["4", suppliers[3] || "N/A"],
-        ["5", suppliers[4] || "N/A"],
-        ["6", suppliers[5] || "N/A"],
+        ["1", shortSuppliers[0] || "N/A", suppliers[0] || "N/A"],
+        ["2", shortSuppliers[1] || "N/A", suppliers[1] || "N/A"],
+        ["3", shortSuppliers[2] || "N/A", suppliers[2] || "N/A"],
+        ["4", shortSuppliers[3] || "N/A", suppliers[3] || "N/A"],
+        ["5", shortSuppliers[4] || "N/A", suppliers[4] || "N/A"],
+        ["6", shortSuppliers[5] || "N/A", suppliers[5] || "N/A"],
       ],
       styles: { fontSize: 9 },
       theme: "grid",
@@ -586,6 +602,7 @@ const QuotationTable = () => {
   
     doc.save("quotation_table.pdf");
   };
+  
   
 
   return (
