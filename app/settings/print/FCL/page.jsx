@@ -1,8 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import secureLocalStorage from "react-secure-storage";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -21,6 +21,9 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import "jspdf-autotable"; 
 
 const cn = (...classes) => {
   return classes.filter(Boolean).join(' ');
@@ -82,6 +85,8 @@ const QuotationTable = () => {
   const [totalB, setTotalB] = useState(["", "", "", "", "", ""]);
   const [totalC, setTotalC] = useState(["", "", "", "", "", ""]);
   const [total, setTotal] = useState(["", "", "", "", "", ""]);
+
+  const tableRef = useRef();
 
   useEffect(() => {
     const check_sc = secureLocalStorage.getItem("sc");
@@ -477,10 +482,115 @@ const QuotationTable = () => {
     20: (totalOrigin[20] + totalSeaFreight[20] + totalDestination[20]).toFixed(2),
     40: (totalOrigin[40] + totalSeaFreight[40] + totalDestination[40]).toFixed(2),
   };
+  const downloadPDF = () => {
+    const doc = new jsPDF({ orientation: "landscape" });
+  
+    const addHeader = (doc) => {
+      doc.setFontSize(12);
+      doc.text(`Export FCL Quote for the Month: ${currentDateInfo}`, 10, 10);
+    };
+  
+    const addFooter = (doc) => {
+      const pageWidth = doc.internal.pageSize.width;
+      const footerText = "Greentech Industries (India) Pvt. Ltd.";
+      const textWidth = doc.getTextWidth(footerText);
+      const xPosition = (pageWidth - textWidth) / 2;
+      const yPosition = doc.internal.pageSize.height - 8;
+      doc.text(footerText, xPosition, yPosition);
+    };
+  
+    const headers = ["S.No", "Sea Freight RFQ - FCL", "Currency in", 
+      "20 ft Supplier 1", "20 ft Supplier 2", "20 ft Supplier 3", 
+      "40 ft Supplier 1", "40 ft Supplier 2", "40 ft Supplier 3", "Remarks"];
+  
+    const body = [];
+  
+    const addChargesToBody = (charges, currency, startIndex) => {
+      charges.forEach((charge, index) => {
+        body.push([
+          startIndex + index + 1,
+          charge.description,
+          `${currency} / Shipment`,
+          charge.sc1 || "0.00",
+          charge.sc2 || "0.00",
+          charge.sc3 || "0.00",
+          charge.sc4 || "0.00",
+          charge.sc5 || "0.00",
+          charge.sc6 || "0.00",
+          charge.remarks,
+        ]);
+      });
+      return startIndex + charges.length;
+    };
+  
+    let startIndex = 0;
+    startIndex = addChargesToBody(originCharges, "INR", startIndex);
+    startIndex = addChargesToBody(seaFreightCharges, "USD", startIndex);
+    startIndex = addChargesToBody(destinationCharges, currency, startIndex);
+  
+    body.push(["", "Total Origin Charges", "INR", totalA[0] || "0.00", totalA[1] || "0.00", totalA[2] || "0.00",
+      totalA[3] || "0.00", totalA[4] || "0.00", totalA[5] || "0.00", ""]);
+    body.push(["", "Total Sea Freight Charges", "USD", totalB[0] || "0.00", totalB[1] || "0.00", totalB[2] || "0.00",
+      totalB[3] || "0.00", totalB[4] || "0.00", totalB[5] || "0.00", ""]);
+    body.push(["", "Total Destination Charges", currency, totalC[0] || "0.00", totalC[1] || "0.00", totalC[2] || "0.00",
+      totalC[3] || "0.00", totalC[4] || "0.00", totalC[5] || "0.00", ""]);
+    body.push(["", "Total Shipment Cost (A + B + C)", "INR", total[0] || "0.00", total[1] || "0.00", total[2] || "0.00",
+      total[3] || "0.00", total[4] || "0.00", total[5] || "0.00", ""]);
+  
+    doc.autoTable({
+      head: [headers],
+      body: body,
+      startY: 20,
+      margin: { top: 10, left: 5, right: 5 },
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [204, 229, 252], textColor: [0, 0, 0] },
+      theme: "grid",
+      didDrawPage: () => {
+        addHeader(doc);
+        addFooter(doc);
+      },
+    });
+  
+    doc.setFontSize(10);
+    doc.text("Location & Shipment Details:", 10, doc.lastAutoTable.finalY + 10);
+    doc.autoTable({
+      startY: doc.lastAutoTable.finalY + 15,
+      body: [
+        ["INCO Term", incoterms],
+        ["Delivery Address", deliveryAddress],
+        ["FX Rate (USD)", USD.toFixed(2)],
+        ["FX Rate (EURO)", EUR.toFixed(2)],
+        ["Required Transit Days", transitDays],
+        ["Destination Port", Dest_Port],
+      ],
+      styles: { fontSize: 9 },
+      theme: "grid",
+    });
+  
+    doc.setFontSize(10);
+    doc.text("Supplier Details:", 10, doc.lastAutoTable.finalY + 10);
+    doc.autoTable({
+      startY: doc.lastAutoTable.finalY + 15,
+      head: [["Supplier No.", "Supplier Name"]],
+      body: [
+        ["1", suppliers[0] || "N/A"],
+        ["2", suppliers[1] || "N/A"],
+        ["3", suppliers[2] || "N/A"],
+        ["4", suppliers[3] || "N/A"],
+        ["5", suppliers[4] || "N/A"],
+        ["6", suppliers[5] || "N/A"],
+      ],
+      styles: { fontSize: 9 },
+      theme: "grid",
+    });
+  
+    doc.save("quotation_table.pdf");
+  };
+  
 
   return (
     <div className="">
-      <div className="card shadow rounded-lg bg-[var(--bgBody)]">
+      <div className="card shadow rounded-lg bg-[var(--bgBody)]" ref={tableRef}>
         <div className="card-header bg-[var(--bgBody)] text-white rounded-t-lg py-2 px-3 space-y-2">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-2">
             <div className="flex flex-col">
@@ -488,7 +598,11 @@ const QuotationTable = () => {
               <p className="text-xs text-gray-100">"Export Print FCL rates for {currentDateInfo}"</p>
               <p className="text-xs text-gray-100">Quote for GTI to {locationName || "{select location}"} shipment</p>
             </div>
+            <div className="flex flex-col lg:flex-row justify-end items-start lg:items-center lg:space-y-0 sm:space-x-2 space-y-2">
             <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
+              <Button onClick={downloadPDF} variant="outline" className="bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)]">
+                <FileText className="mr-0" />
+              </Button>
               <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
@@ -535,7 +649,8 @@ const QuotationTable = () => {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div>
+            </div>
+            <div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     label={<span style={{ color: isDarkMode ? "#ffffff" : "#000000" }}>Select Month and Year</span>}
