@@ -187,6 +187,18 @@ const QuotationTable = () => {
 
       const data = await response.json();
 
+      console.log("Fetched Data : ", data);
+      if (data.length <= 0) {
+        setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
+        setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
+        setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
+        setSuppliers(["", "", "", "", "", ""]);
+        setTotalA(["", "", "", "", "", ""]);
+        setTotalB(["", "", "", "", "", ""]);
+        setTotalC(["", "", "", "", "", ""]);
+        setTotal(["", "", "", "", "", ""]);
+        return
+      }
       if (data && data.length > 0) {
         const updatedOriginCharges = [...originCharges];
         const updatedSeaFreightCharges = [...seaFreightCharges];
@@ -429,9 +441,13 @@ const QuotationTable = () => {
       fetchSupplierDetails(selectedLocation);
       const month = selectedDate.month() + 1;
       const year = selectedDate.year();
-      
-      fetchQuotationData(selectedLocation, month, year, 20); 
-      fetchQuotationData(selectedLocation, month, year, 40); 
+      console.log("selected Location : ", selectedLocation);
+      const fetchData = async () => {
+        await fetchQuotationData(selectedLocation, month, year, 20);
+        await fetchQuotationData(selectedLocation, month, year, 40);
+      };
+  
+      fetchData();
     }
   }, [selectedLocation, selectedDate]);
 
@@ -487,6 +503,18 @@ const QuotationTable = () => {
                       <CommandList>
                         <CommandEmpty>No location found.</CommandEmpty>
                         <CommandGroup>
+                          <CommandItem
+                            key="default"
+                            value=""
+                            onSelect={() => {
+                              setSelectedLocation("");
+                              setLocationName("Select Location...");
+                              setOpen(false);
+                            }}
+                          >
+                            Select Location...
+                            <Check className={cn("ml-auto", selectedLocation === "" ? "opacity-100" : "opacity-0")} />
+                          </CommandItem>
                           {locations.map((location) => (
                             <CommandItem
                               key={location.Location_Code}
@@ -498,12 +526,7 @@ const QuotationTable = () => {
                               }}
                             >
                               {location.Location_Name}
-                              <Check
-                                className={cn(
-                                  "ml-auto",
-                                  selectedLocation === location.Location_Code ? "opacity-100" : "opacity-0"
-                                )}
-                              />
+                              <Check className={cn("ml-auto", selectedLocation === location.Location_Code ? "opacity-100" : "opacity-0")} />
                             </CommandItem>
                           ))}
                         </CommandGroup>
