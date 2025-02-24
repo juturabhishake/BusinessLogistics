@@ -645,22 +645,22 @@ const QuotationTable = () => {
             <div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    label={<span style={{ color: "white" }}>Select Month and Year</span>}
+                    label={<span style={{ color: "var(--borderclr)" }}>Select</span>}
                     views={["year", "month"]}
                     openTo="month"
                     value={selectedDate}
                     className="w-full md:w-60"
                     sx={{
                         "& .MuiInputBase-root": {
-                          color: "var(--primary)",
+                          color: "var(--borderclr)",
                           borderRadius: "8px",
                           fontSize:"14px"
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "var(--primary)"
+                          borderColor: "var(--borderclr)"
                         },
                         "& .MuiSvgIcon-root": {
-                          color: "white",
+                          color: "var(--borderclr)",
                         },
                       }}
                     onChange={(newValue) => setSelectedDate(newValue)}
