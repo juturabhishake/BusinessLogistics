@@ -73,23 +73,24 @@ const Page = () => {
         <div className="order-1 sm:order-2 w-full md:w-auto">
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
-              label={<span style={{ color: isDarkMode ? "#ffffff" : "#000000" }}>Select Month and Year</span>}
+              label={<span style={{ color: "white" }}>Select Month and Year</span>}
               views={["year", "month"]}
               openTo="month"
               value={selectedDate}
               className="w-full md:w-60"
               sx={{
-                "& .MuiInputBase-root": {
-                  color: isDarkMode ? "#ffffff" : "#000000",
-                  borderRadius: "8px",
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: isDarkMode ? "#A0AEC0" : "#CBD5E0",
-                },
-                "& .MuiSvgIcon-root": {
-                  color: isDarkMode ? "#ffffff" : "#000000",
-                },
-              }}
+                  "& .MuiInputBase-root": {
+                    color: "var(--primary)",
+                    borderRadius: "8px",
+                    fontSize:"14px"
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--primary)"
+                  },
+                  "& .MuiSvgIcon-root": {
+                    color: "white",
+                  },
+                }}
               onChange={(newValue) => setSelectedDate(newValue)}
             />
           </LocalizationProvider>

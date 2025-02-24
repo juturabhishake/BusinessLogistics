@@ -483,128 +483,103 @@ const QuotationTable = () => {
     40: (totalOrigin[40] + totalSeaFreight[40] + totalDestination[40]).toFixed(2),
   };
   const downloadPDF = () => {
-    const doc = new jsPDF({ orientation: "landscape" });
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
   
-    const addHeader = (doc) => {
-      doc.setFontSize(12);
-      doc.text(`Export FCL Quote for the Month: ${currentDateInfo}`, 10, 10);
-    };
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
+    const selectedMonthYear = selectedDate.format("MMMM YYYY");
   
-    const addFooter = (doc) => {
-      const pageWidth = doc.internal.pageSize.width;
-      const footerText = "Greentech Industries (India) Pvt. Ltd.";
-      const textWidth = doc.getTextWidth(footerText);
-      const xPosition = (pageWidth - textWidth) / 2;
-      const yPosition = doc.internal.pageSize.height - 8;
-      doc.text(footerText, xPosition, yPosition);
-    };
-  
-    const getShortForm = (name) => {
-      if (!name) return "N/A";
-      return name.split(" ").map(word => word.charAt(0).toUpperCase()).join("");
-    };
-  
-    const shortSuppliers = suppliers.map(getShortForm);
-  
-    const headers = [
-      "S.No",
-      "Sea Freight RFQ - FCL",
-      "Currency in",
-      `${shortSuppliers[0]} (20ft)`,
-      `${shortSuppliers[1]} (20ft)`,
-      `${shortSuppliers[2]} (20ft)`,
-      `${shortSuppliers[3]} (40ft)`,
-      `${shortSuppliers[4]} (40ft)`,
-      `${shortSuppliers[5]} (40ft)`,
-      "Remarks"
+    const tableHeaders = [
+      [
+        { content: "S.No", rowSpan: 2 },
+        { content: "Descriptions", rowSpan: 2 },
+        { content: "Currency in", rowSpan: 2 },
+        { content: "20 ft", colSpan: 3, styles: { halign: "center" } },
+        { content: "40 ft", colSpan: 3, styles: { halign: "center" } },
+        { content: "Remarks", rowSpan: 2 },
+      ],
+      [suppliers[0], suppliers[1], suppliers[2], suppliers[3], suppliers[4], suppliers[5]],
     ];
   
-    const body = [];
+    const tableBody = [];
   
-    const addChargesToBody = (charges, currency, startIndex) => {
+    const addChargesToBody = (charges, currency) => {
       charges.forEach((charge, index) => {
-        body.push([
-          startIndex + index + 1,
+        tableBody.push([
+          index + 1,
           charge.description,
           `${currency} / Shipment`,
-          charge.sc1 || "0.00",
-          charge.sc2 || "0.00",
-          charge.sc3 || "0.00",
-          charge.sc4 || "0.00",
-          charge.sc5 || "0.00",
-          charge.sc6 || "0.00",
+          charge.sc1 || "0",
+          charge.sc2 || "0",
+          charge.sc3 || "0",
+          charge.sc4 || "0",
+          charge.sc5 || "0",
+          charge.sc6 || "0",
           charge.remarks,
         ]);
       });
-      return startIndex + charges.length;
     };
   
-    let startIndex = 0;
-    startIndex = addChargesToBody(originCharges, "INR", startIndex);
-    startIndex = addChargesToBody(seaFreightCharges, "USD", startIndex);
-    startIndex = addChargesToBody(destinationCharges, currency, startIndex);
+    addChargesToBody(originCharges, "INR");
+    tableBody.push(["", "Total Origin Charges", "INR", ...totalA, ""]);
   
-    body.push(["", "Total Origin Charges", "INR", totalA[0] || "0.00", totalA[1] || "0.00", totalA[2] || "0.00",
-      totalA[3] || "0.00", totalA[4] || "0.00", totalA[5] || "0.00", ""]);
-    body.push(["", "Total Sea Freight Charges", "USD", totalB[0] || "0.00", totalB[1] || "0.00", totalB[2] || "0.00",
-      totalB[3] || "0.00", totalB[4] || "0.00", totalB[5] || "0.00", ""]);
-    body.push(["", "Total Destination Charges", currency, totalC[0] || "0.00", totalC[1] || "0.00", totalC[2] || "0.00",
-      totalC[3] || "0.00", totalC[4] || "0.00", totalC[5] || "0.00", ""]);
-    body.push(["", "Total Shipment Cost (A + B + C)", "INR", total[0] || "0.00", total[1] || "0.00", total[2] || "0.00",
-      total[3] || "0.00", total[4] || "0.00", total[5] || "0.00", ""]);
+    addChargesToBody(seaFreightCharges, "USD");
+    tableBody.push(["", "Total Sea Freight Charges", "USD", ...totalB, ""]);
+  
+    addChargesToBody(destinationCharges, "INR");
+    tableBody.push(["", "Total Destination Charges", "INR", ...totalC, ""]);
+  
+    tableBody.push(["", "Total Shipment Cost (A + B + C)", "INR", ...total, ""]);
+  
+    tableBody.push([{ content: "INCO Term", colSpan: 2, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 7 }]);
+    tableBody.push([{ content: "Delivery Address", colSpan: 2, styles: { fontStyle: "bold" } }, { content: deliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap",  } }]);
+    tableBody.push([{ content: "FX Rate (USD)", colSpan: 2, styles: { fontStyle: "bold" } }, { content: USD.toFixed(2), colSpan: 3 }, { content: "FX Rate (EURO)", colSpan: 2, styles: { fontStyle: "bold" } }, { content: EUR.toFixed(2), colSpan: 2 }]);
+    tableBody.push([{ content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 7 }]);
+    tableBody.push([{ content: "Destination Port", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Dest_Port, colSpan: 7 }]);
+  
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("Comparative Statement of Quotations", 140, 10, { align: "center" });
+  
+    doc.setFontSize(8);
+    doc.text(`RFQ Export rates for ${selectedMonthYear} (01.${selectedMonthYear} - 28.${selectedMonthYear})`, 140, 14, { align: "center" });
+    doc.text("We are following 'ATT 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 140, 18, { align: "center" });
   
     doc.autoTable({
-      head: [headers],
-      body: body,
-      startY: 20,
-      margin: { top: 10, left: 5, right: 5 },
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [204, 229, 252], textColor: [0, 0, 0] },
-      theme: "grid",
-      didDrawPage: () => {
-        addHeader(doc);
-        addFooter(doc);
+      head: tableHeaders,
+      body: tableBody,
+      startY: 22,
+      styles: { fontSize: 7, cellPadding: 1, overflow: "linebreak" },
+      headStyles: { fillColor: [204, 229, 252], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.02, lineColor: [0, 0, 0] },
+      columnStyles: {
+          0: { cellWidth: 10, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          1: { cellWidth: 60, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          2: { cellWidth: 21, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          3: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          4: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          5: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          6: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          7: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          8: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
+          9: { cellWidth: 34, lineWidth: 0.02, lineColor: [0, 0, 0] },
       },
-    });
-  
-    doc.setFontSize(10);
-    doc.text("Location & Shipment Details:", 10, doc.lastAutoTable.finalY + 10);
-    doc.autoTable({
-      startY: doc.lastAutoTable.finalY + 15,
-      body: [
-        ["INCO Term", incoterms],
-        ["Delivery Address", deliveryAddress],
-        ["FX Rate (USD)", USD.toFixed(2)],
-        ["FX Rate (EURO)", EUR.toFixed(2)],
-        ["Required Transit Days", transitDays],
-        ["Destination Port", Dest_Port],
-      ],
-      styles: { fontSize: 9 },
+      margin: { left: 5, right: 5 },
       theme: "grid",
     });
   
-    doc.setFontSize(10);
-    doc.text("Supplier Details:", 10, doc.lastAutoTable.finalY + 10);
-    doc.autoTable({
-      startY: doc.lastAutoTable.finalY + 15,
-      head: [["Supplier No.", "Supplier Short Code", "Full Supplier Name"]],
-      body: [
-        ["1", shortSuppliers[0] || "N/A", suppliers[0] || "N/A"],
-        ["2", shortSuppliers[1] || "N/A", suppliers[1] || "N/A"],
-        ["3", shortSuppliers[2] || "N/A", suppliers[2] || "N/A"],
-        ["4", shortSuppliers[3] || "N/A", suppliers[3] || "N/A"],
-        ["5", shortSuppliers[4] || "N/A", suppliers[4] || "N/A"],
-        ["6", shortSuppliers[5] || "N/A", suppliers[5] || "N/A"],
-      ],
-      styles: { fontSize: 9 },
-      theme: "grid",
-    });
+    const finalY = doc.lastAutoTable.finalY + 10;
   
-    doc.save("quotation_table.pdf");
+    doc.setFontSize(8);
+    doc.text("Approved By: ______________", 10, finalY + 5);
+    doc.text("Checked By: ______________", 100, finalY + 5);
+    doc.text("Prepared By: ______________", doc.internal.pageSize.width - 50, finalY + 5);
+  
+    doc.text(`Date: ${formattedDate}`, doc.internal.pageSize.width - 50, finalY + 10);
+    doc.text("GreenTech Industries ©2023.04.03 by Muni Kranth.", 140, doc.internal.pageSize.height - 8, { align: "center" });
+  
+    doc.save("quotation_print_ExportFCL.pdf");
   };
   
-  
-
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]" ref={tableRef}>
@@ -670,22 +645,22 @@ const QuotationTable = () => {
             <div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    label={<span style={{ color: isDarkMode ? "#ffffff" : "#000000" }}>Select Month and Year</span>}
+                    label={<span style={{ color: "white" }}>Select Month and Year</span>}
                     views={["year", "month"]}
                     openTo="month"
                     value={selectedDate}
                     className="w-full md:w-60"
                     sx={{
                         "& .MuiInputBase-root": {
-                          color: isDarkMode ? "#ffffff" : "#000000",
+                          color: "var(--primary)",
                           borderRadius: "8px",
                           fontSize:"14px"
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: isDarkMode ? "#A0AEC0" : "#CBD5E0",
+                          borderColor: "var(--primary)"
                         },
                         "& .MuiSvgIcon-root": {
-                          color: isDarkMode ? "#ffffff" : "#000000",
+                          color: "white",
                         },
                       }}
                     onChange={(newValue) => setSelectedDate(newValue)}
@@ -696,7 +671,7 @@ const QuotationTable = () => {
           </div>
         </div>
         <div className="card-body p-0 overflow-x-auto pb-3">
-          <table className="table-auto border-[var(--primary)] text-center w-full min-w-[800px] text-xs"
+          <table id="quotationTable" className="table-auto border-[var(--primary)] text-center w-full min-w-[800px] text-xs"
           style={{ 
                 fontSize: "13px", 
                 padding: "1px",

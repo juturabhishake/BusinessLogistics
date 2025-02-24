@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import {
-  Tag,
+  // Tag,
   Users,
   LocateFixedIcon,
   Settings,
-  Bookmark,
+  // Bookmark,
   SquarePen,
   LayoutGrid,
   LucideIcon,
@@ -76,16 +76,16 @@ export function getMenuList(pathname: string): Group[] {
               { href: "/RFQ-Prices/LCL", label: "LCL" }
             ],
           },
-          {
-            href: "/categories",
-            label: "Categories",
-            icon: Bookmark
-          },
-          {
-            href: "/tags",
-            label: "Tags",
-            icon: Tag
-          }
+          // {
+          //   href: "/categories",
+          //   label: "Categories",
+          //   icon: Bookmark
+          // },
+          // {
+          //   href: "/tags",
+          //   label: "Tags",
+          //   icon: Tag
+          // }
         ]
       } : null,
       isAdmin ? 

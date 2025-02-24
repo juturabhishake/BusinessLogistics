@@ -141,27 +141,22 @@ const Page = () => {
         </div>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
-            label={
-                <span style={{ color: isDarkMode ? "#ffffff" : "#000000" }}>
-                  Select Month and Year
-                </span>
-              }
-              views={["year", "month"]}
-              openTo="month" 
-              //  format="MMM YYYY"
-              value={selectedDate}
-              className="w-60"
-              sx={{
+            label={<span style={{ color: "white" }}>Select Month and Year</span>}
+            views={["year", "month"]}
+            openTo="month"
+            value={selectedDate}
+            className="w-full md:w-60"
+            sx={{
                 "& .MuiInputBase-root": {
-                  // backgroundColor: isDarkMode ? "#2D3748" : "#ffffff",
-                  color: isDarkMode ? "#ffffff" : "#000000",
+                  color: "var(--primary)",
                   borderRadius: "8px",
+                  fontSize:"14px"
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: isDarkMode ? "#A0AEC0" : "#CBD5E0",
+                  borderColor: "var(--primary)"
                 },
                 "& .MuiSvgIcon-root": {
-                  color: isDarkMode ? "#ffffff" : "#000000",
+                  color: "white",
                 },
               }}
               onChange={(newValue) => {
