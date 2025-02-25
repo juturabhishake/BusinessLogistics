@@ -176,7 +176,7 @@ const QuotationTable = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Loc_Code: locCode }),
+        body: JSON.stringify({ Loc_Code: locCode , sc: secureLocalStorage.getItem("sc") || "Unknown Supplier"}),
       });
   
       if (!response.ok) {
