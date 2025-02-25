@@ -491,7 +491,7 @@ const QuotationTable = () => {
   
     const tableHeaders = [
       [
-        { content: "S.No", rowSpan: 2 },
+        { content: "S.No", rowSpan: 2 ,style:{ verticalAlign: "middle"}},
         { content: "Descriptions", rowSpan: 2 },
         { content: "Currency in", rowSpan: 2 },
         { content: "20 ft", colSpan: 3, styles: { halign: "center" } },
@@ -509,76 +509,106 @@ const QuotationTable = () => {
           index + 1,
           charge.description,
           `${currency} / Shipment`,
-          charge.sc1 || "0",
-          charge.sc2 || "0",
-          charge.sc3 || "0",
-          charge.sc4 || "0",
-          charge.sc5 || "0",
-          charge.sc6 || "0",
+            { content: (charge.sc1 === 0 || charge.sc1 === '0.00' || charge.sc1 === '0' || charge.sc1 === 0.00) ? "" : charge.sc1 || "", styles: { halign: "center" } },
+            { content: (charge.sc2 === 0 || charge.sc2 === '0.00' || charge.sc2 === '0' || charge.sc2 === 0.00) ? "" : charge.sc2 || "", styles: { halign: "center" } },
+            { content: (charge.sc3 === 0 || charge.sc3 === '0.00' || charge.sc3 === '0' || charge.sc3 === 0.00) ? "" : charge.sc3 || "", styles: { halign: "center" } },
+            { content: (charge.sc4 === 0 || charge.sc4 === '0.00' || charge.sc4 === '0' || charge.sc4 === 0.00) ? "" : charge.sc4 || "", styles: { halign: "center" } },
+            { content: (charge.sc5 === 0 || charge.sc5 === '0.00' || charge.sc5 === '0' || charge.sc5 === 0.00) ? "" : charge.sc5 || "", styles: { halign: "center" } },
+            { content: (charge.sc6 === 0 || charge.sc6 === '0.00' || charge.sc6 === '0' || charge.sc6 === 0.00) ? "" : charge.sc6 || "", styles: { halign: "center" } },
           charge.remarks,
         ]);
       });
     };
   
     addChargesToBody(originCharges, "INR");
-    tableBody.push(["", "Total Origin Charges", "INR", ...totalA, ""]);
+    tableBody.push([
+      "",
+      { content: "A) Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      ...totalA.map((val) => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+      "",
+    ]);
   
     addChargesToBody(seaFreightCharges, "USD");
-    tableBody.push(["", "Total Sea Freight Charges", "USD", ...totalB, ""]);
+    tableBody.push([
+      "",
+      { content: "B) Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      ...totalB.map((val) => ({ content:  (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+      "",
+    ]);
   
-    addChargesToBody(destinationCharges, "INR");
-    tableBody.push(["", "Total Destination Charges", "INR", ...totalC, ""]);
+    addChargesToBody(destinationCharges, 'USD');
+    tableBody.push([
+      "",
+      { content: "C) Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      ...totalC.map((val) => ({ content:  (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+      "",
+    ]);
   
-    tableBody.push(["", "Total Shipment Cost (A + B + C)", "INR", ...total, ""]);
+    tableBody.push([
+      "",
+      { content: "Total Shipment Cost (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      ...total.map((val) => ({ content:  (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+      "",
+    ]);
   
-    tableBody.push([{ content: "INCO Term", colSpan: 2, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 7 }]);
-    tableBody.push([{ content: "Delivery Address", colSpan: 2, styles: { fontStyle: "bold" } }, { content: deliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap",  } }]);
-    tableBody.push([{ content: "FX Rate (USD)", colSpan: 2, styles: { fontStyle: "bold" } }, { content: USD.toFixed(2), colSpan: 3 }, { content: "FX Rate (EURO)", colSpan: 2, styles: { fontStyle: "bold" } }, { content: EUR.toFixed(2), colSpan: 2 }]);
-    tableBody.push([{ content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 7 }]);
-    tableBody.push([{ content: "Destination Port", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Dest_Port, colSpan: 7 }]);
-  
+    tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 7 }]);
+    tableBody.push([{ content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } }, { content: deliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap"  }}]);
+    tableBody.push([{ content: "FX rate", colSpan: 3, styles: { fontStyle: "bold" } }, { content: "USD",styles: { halign: "center" }},{ content: USD.toFixed(2), colSpan: 1 ,styles: { halign: "center" }}, { content: "EURO",styles: { halign: "center" }},  { content: EUR.toFixed(2), colSpan: 1,styles: { halign: "center" } }]); 
+    tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } }, { content: Dest_Port, colSpan: 2 },{ content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 3 }]);
+    tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 7 }]);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text("Comparative Statement of Quotations", 140, 10, { align: "center" });
+    doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
-    doc.text(`RFQ Export rates for ${selectedMonthYear} (01.${selectedMonthYear} - 28.${selectedMonthYear})`, 140, 14, { align: "center" });
-    doc.text("We are following 'ATT 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 140, 18, { align: "center" });
+    doc.text(`RFQ Export rates for ${selectedMonthYear} (01.${selectedMonthYear} - 28.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Quote for GTI to ${locationName} shipment`, 5, 18, { align: "left" });
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.setFontSize(8);
+    let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
+    let xPosition = doc.internal.pageSize.width - 10;
+    doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 10);
+    const approvalText =  "Approved by:                                                 Checked by:                                                 Prepared by:                                  ";
+    let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
+    doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
+    const startY = 24;
   
     doc.autoTable({
       head: tableHeaders,
       body: tableBody,
-      startY: 22,
-      styles: { fontSize: 7, cellPadding: 1, overflow: "linebreak" },
-      headStyles: { fillColor: [204, 229, 252], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.02, lineColor: [0, 0, 0] },
+      startY: startY,
+      styles: { fontSize: 8, cellPadding: 1.2, overflow: "linebreak" },
+      headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.02, lineColor: [0, 0, 0] },
       columnStyles: {
-          0: { cellWidth: 10, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          1: { cellWidth: 60, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          2: { cellWidth: 21, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          3: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          4: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          5: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          6: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          7: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          8: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          9: { cellWidth: 34, lineWidth: 0.02, lineColor: [0, 0, 0] },
+        0: { cellWidth: 10, lineWidth: 0.1, lineColor: [0, 0, 0] }, // Thinner borders
+        1: { cellWidth: 60, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        2: { cellWidth: 25, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        3: { cellWidth: 27, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        4: { cellWidth: 27, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        5: { cellWidth: 27, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        6: { cellWidth: 27, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        7: { cellWidth: 27, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        8: { cellWidth: 27, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        9: { cellWidth: 30, lineWidth: 0.1, lineColor: [0, 0, 0] },
       },
       margin: { left: 5, right: 5 },
       theme: "grid",
     });
   
-    const finalY = doc.lastAutoTable.finalY + 10;
+ 
   
-    doc.setFontSize(8);
-    doc.text("Approved By: ______________", 10, finalY + 5);
-    doc.text("Checked By: ______________", 100, finalY + 5);
-    doc.text("Prepared By: ______________", doc.internal.pageSize.width - 50, finalY + 5);
+    const footerText = "GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.";
+    const footerWidth = doc.getStringUnitWidth(footerText) * doc.internal.scaleFactor;
+    const footerXPosition = (doc.internal.pageSize.width - footerWidth) / 2;
   
-    doc.text(`Date: ${formattedDate}`, doc.internal.pageSize.width - 50, finalY + 10);
-    doc.text("GreenTech Industries ©2023.04.03 by Muni Kranth.", 140, doc.internal.pageSize.height - 8, { align: "center" });
+    doc.text(footerText, footerXPosition, doc.internal.pageSize.height - 8);
   
     doc.save("quotation_print_ExportFCL.pdf");
   };
+  
+  
   
   return (
     <div className="">
