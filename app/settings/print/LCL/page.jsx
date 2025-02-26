@@ -677,7 +677,7 @@ const QuotationTable = () => {
               {sections.seaFreight && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
-                  <td className="py-1 px-3 border">USD</td>
+                  <td className="py-1 px-3 border">INR</td>
                   {totalB.map((total, index) => (
                     <td key={index} className="py-1 px-3 border">{total}</td>
                   ))}
