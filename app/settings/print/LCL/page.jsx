@@ -44,24 +44,24 @@ const QuotationTable = () => {
     { description: "Terminal Handling Charges - Origin", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
     { description: "Bill of Lading Charges", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
     { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Halting", remarks: "If any", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "CFS Charges", remarks: "If any", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
   ]);
 
   const [seaFreightCharges, setSeaFreightCharges] = useState([
     { description: "Sea Freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "ENS", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "ISPS", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Seal Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "FSC (Fuel Surcharge)", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    // { description: "ISPS", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    // { description: "Seal Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
   ]);
 
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Destination Terminal Handling Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "BL Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Delivery by Barge/Road", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Delivery Order Fees", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Handling Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "T1 Doc", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Custom Clearance", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "CC Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "D.O Charges per BL", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "AAI Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Loading/Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Delivery", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    // { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
   ]);
 
   const [suppliers, setSuppliers] = useState(Array(18).fill(""));
@@ -174,75 +174,110 @@ const QuotationTable = () => {
 
   const fetchQuotationData = async (locationCode, month, year, CBM) => {
     try {
-      const response = await fetch("/api/prints/ExportLCL", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          quote_month: month,
-          quote_year: year,
-          sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
-          username: secureLocalStorage.getItem("un") || "Unknown",
-          loc_code: locationCode,
-          CBM: CBM,
-        }),
-      });
+        const response = await fetch("/api/prints/ExportLCL", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                quote_month: month,
+                quote_year: year,
+                sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
+                username: secureLocalStorage.getItem("un") || "Unknown",
+                loc_code: locationCode,
+                CBM: CBM,
+            }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      console.log("Fetched Data : ", data);
-      if (data.length <= 0) {
-        setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" })));
-        setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" })));
-        setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" })));
-        setSuppliers(Array(18).fill(""));
-        setTotalA(Array(18).fill(""));
-        setTotalB(Array(18).fill(""));
-        setTotalC(Array(18).fill(""));
-        setTotal(Array(18).fill(""));
-        return;
-      }
-      if (data && data.length > 0) {
+        if (data.length <= 0) {
+            setSuppliers(prev => [...prev]);
+            setTotalA(prev => [...prev]);
+            setTotalB(prev => [...prev]);
+            setTotalC(prev => [...prev]);
+            setTotal(prev => [...prev]);
+            return;
+        }
+
         const updatedOriginCharges = [...originCharges];
         const updatedSeaFreightCharges = [...seaFreightCharges];
         const updatedDestinationCharges = [...destinationCharges];
 
-        for (let i = 1; i <= 6; i++) {
-          const suffix = i === 1 ? "1" : i === 2 ? "2" : i === 3 ? "3" : i === 4 ? "4" : i === 5 ? "5" : "6";
-          const supplierData = data.filter(item => item.Attribute.includes(`Supplier_${suffix}`));
+        if (CBM >= 1 && CBM <= 6) {
+            setSuppliers(prev => {
+                const newSuppliers = [...prev];
+                for (let i = 0; i < 3; i++) {
+                    newSuppliers[(CBM - 1) * 3 + i] = data.find(item => item.Attribute === "Vendor_Name")?.[`Supplier_${i + 1}`] || prev[(CBM - 1) * 3 + i];
+                }
+                return newSuppliers;
+            });
 
-          updatedOriginCharges.forEach((charge, index) => {
-            charge[`sc${(i - 1) * 3 + 1}`] = supplierData[index]?.Supplier_1 || "";
-            charge[`sc${(i - 1) * 3 + 2}`] = supplierData[index]?.Supplier_2 || "";
-            charge[`sc${(i - 1) * 3 + 3}`] = supplierData[index]?.Supplier_3 || "";
-          });
+            ["O_CCD", "O_LTG", "O_THC", "O_BLC", "O_LUS", "O_CFS"].forEach((attribute, index) => {
+                for (let i = 0; i < 3; i++) {
+                    updatedOriginCharges[index][`sc${(CBM - 1) * 3 + i + 1}`] =
+                        data.find(item => item.Attribute === attribute)?.[`Supplier_${i + 1}`] || updatedOriginCharges[index][`sc${(CBM - 1) * 3 + i + 1}`];
+                }
+            });
 
-          updatedSeaFreightCharges.forEach((charge, index) => {
-            charge[`sc${(i - 1) * 3 + 1}`] = supplierData[index]?.Supplier_1 || "";
-            charge[`sc${(i - 1) * 3 + 2}`] = supplierData[index]?.Supplier_2 || "";
-            charge[`sc${(i - 1) * 3 + 3}`] = supplierData[index]?.Supplier_3 || "";
-          });
+            ["S_SeaFre", "S_FSC"].forEach((attribute, index) => {
+                for (let i = 0; i < 3; i++) {
+                    updatedSeaFreightCharges[index][`sc${(CBM - 1) * 3 + i + 1}`] =
+                        data.find(item => item.Attribute === attribute)?.[`Supplier_${i + 1}`] || updatedSeaFreightCharges[index][`sc${(CBM - 1) * 3 + i + 1}`];
+                }
+            });
 
-          updatedDestinationCharges.forEach((charge, index) => {
-            charge[`sc${(i - 1) * 3 + 1}`] = supplierData[index]?.Supplier_1 || "";
-            charge[`sc${(i - 1) * 3 + 2}`] = supplierData[index]?.Supplier_2 || "";
-            charge[`sc${(i - 1) * 3 + 3}`] = supplierData[index]?.Supplier_3 || "";
-          });
+            ["D_CUC", "D_CCF", "D_DOC", "D_AAI", "D_LU", "D_Del"].forEach((attribute, index) => {
+                for (let i = 0; i < 3; i++) {
+                    updatedDestinationCharges[index][`sc${(CBM - 1) * 3 + i + 1}`] =
+                        data.find(item => item.Attribute === attribute)?.[`Supplier_${i + 1}`] || updatedDestinationCharges[index][`sc${(CBM - 1) * 3 + i + 1}`];
+                }
+            });
+
+            setTotalA(prev => {
+                const newTotalA = [...prev];
+                for (let i = 0; i < 3; i++) {
+                    newTotalA[(CBM - 1) * 3 + i] =
+                        data.find(item => item.Attribute === "O_Total_Chg")?.[`Supplier_${i + 1}`] || prev[(CBM - 1) * 3 + i];
+                }
+                return newTotalA;
+            });
+
+            setTotalB(prev => {
+                const newTotalB = [...prev];
+                for (let i = 0; i < 3; i++) {
+                    newTotalB[(CBM - 1) * 3 + i] =
+                        data.find(item => item.Attribute === "S_Total_Chg")?.[`Supplier_${i + 1}`] || prev[(CBM - 1) * 3 + i];
+                }
+                return newTotalB;
+            });
+
+            setTotalC(prev => {
+                const newTotalC = [...prev];
+                for (let i = 0; i < 3; i++) {
+                    newTotalC[(CBM - 1) * 3 + i] =
+                        data.find(item => item.Attribute === "D_Total_Chg")?.[`Supplier_${i + 1}`] || prev[(CBM - 1) * 3 + i];
+                }
+                return newTotalC;
+            });
+
+            setTotal(prev => {
+                const newTotal = [...prev];
+                for (let i = 0; i < 3; i++) {
+                    newTotal[(CBM - 1) * 3 + i] =
+                        data.find(item => item.Attribute === "Total_Ship_Cost")?.[`Supplier_${i + 1}`] || prev[(CBM - 1) * 3 + i];
+                }
+                return newTotal;
+            });
         }
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
         setDestinationCharges(updatedDestinationCharges);
-      } else {
-        setOriginCharges(originCharges.map((item) => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" })));
-        setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" })));
-        setDestinationCharges(destinationCharges.map((item) => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" })));
-      }
     } catch (error) {
-      console.error("Error fetching quotation data:", error);
+        console.error("Error fetching quotation data:", error);
     }
-  };
+};
 
   useEffect(() => {
     if (selectedLocation) {
@@ -259,8 +294,12 @@ const QuotationTable = () => {
       const year = selectedDate.year();
       console.log("selected Location : ", selectedLocation);
       const fetchData = async () => {
-        await fetchQuotationData(selectedLocation, month, year, 20);
-        await fetchQuotationData(selectedLocation, month, year, 40);
+        await fetchQuotationData(selectedLocation, month, year, 1);
+        await fetchQuotationData(selectedLocation, month, year, 2);
+        await fetchQuotationData(selectedLocation, month, year, 3);
+        await fetchQuotationData(selectedLocation, month, year, 4);
+        await fetchQuotationData(selectedLocation, month, year, 5);
+        await fetchQuotationData(selectedLocation, month, year, 6);
       };
   
       fetchData();
@@ -303,133 +342,123 @@ const QuotationTable = () => {
 
   const downloadPDF = () => {
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-  
+
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
     const selectedMonthYear = selectedDate.format("MMMM YYYY");
-  
+
     const tableHeaders = [
-      [
-        { content: "S.No", rowSpan: 2 },
-        { content: "Descriptions", rowSpan: 2 },
-        { content: "Currency in", rowSpan: 2 },
-        { content: "1 CBM", colSpan: 3, styles: { halign: "center" } },
-        { content: "2 CBM", colSpan: 3, styles: { halign: "center" } },
-        { content: "3 CBM", colSpan: 3, styles: { halign: "center" } },
-        { content: "4 CBM", colSpan: 3, styles: { halign: "center" } },
-        { content: "5 CBM", colSpan: 3, styles: { halign: "center" } },
-        { content: "6 CBM", colSpan: 3, styles: { halign: "center" } },
-        { content: "Remarks", rowSpan: 2 },
-      ],
-      [
-        suppliers[0], suppliers[1], suppliers[2],
-        suppliers[3], suppliers[4], suppliers[5],
-        suppliers[6], suppliers[7], suppliers[8],
-        suppliers[9], suppliers[10], suppliers[11],
-        suppliers[12], suppliers[13], suppliers[14],
-        suppliers[15], suppliers[16], suppliers[17],
-      ],
+        [
+            { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
+            { content: "Descriptions", rowSpan: 2 },
+            { content: "Currency", rowSpan: 2 },
+            ...Array.from({ length: 6 }, (_, i) => ({ content: `${i + 1} CBM`, colSpan: 3, styles: { halign: "center" } })),
+            { content: "Remarks", rowSpan: 2 },
+        ],
+        [...suppliers.slice(0, 18)],
     ];
-  
+
     const tableBody = [];
-  
-    const addChargesToBody = (charges, currency) => {
-      charges.forEach((charge, index) => {
+
+    const addSectionHeader = (sectionName) => {
         tableBody.push([
-          index + 1,
-          charge.description,
-          `${currency} / Shipment`,
-          charge.sc1 || "0",
-          charge.sc2 || "0",
-          charge.sc3 || "0",
-          charge.sc4 || "0",
-          charge.sc5 || "0",
-          charge.sc6 || "0",
-          charge.sc7 || "0",
-          charge.sc8 || "0",
-          charge.sc9 || "0",
-          charge.sc10 || "0",
-          charge.sc11 || "0",
-          charge.sc12 || "0",
-          charge.sc13 || "0",
-          charge.sc14 || "0",
-          charge.sc15 || "0",
-          charge.sc16 || "0",
-          charge.sc17 || "0",
-          charge.sc18 || "0",
-          charge.remarks,
+            { content: sectionName, colSpan: 20, styles: { halign: "left", fontStyle: "bold", fillColor: [180, 180, 180] } }
         ]);
-      });
     };
-  
+
+    const addChargesToBody = (charges, currency) => {
+        charges.forEach((charge, index) => {
+            tableBody.push([
+                index + 1,
+                charge.description,
+                currency,
+                ...Array.from({ length: 18 }, (_, i) => ({
+                    content: charge[`sc${i + 1}`] || "",
+                    styles: { halign: "center" }
+                })),
+                charge.remarks,
+            ]);
+        });
+    };
+
+    addSectionHeader("A) ORIGIN CHARGES");
     addChargesToBody(originCharges, "INR");
     tableBody.push(["", "Total Origin Charges", "INR", ...totalA, ""]);
-  
+
+    addSectionHeader("B) SEA FREIGHT CHARGES");
     addChargesToBody(seaFreightCharges, "USD");
     tableBody.push(["", "Total Sea Freight Charges", "USD", ...totalB, ""]);
-  
+
+    addSectionHeader("C) DESTINATION CHARGES");
     addChargesToBody(destinationCharges, "INR");
     tableBody.push(["", "Total Destination Charges", "INR", ...totalC, ""]);
-  
-    tableBody.push(["", "Total Shipment Cost (A + B + C)", "INR", ...total, ""]);
-  
-    tableBody.push([{ content: "INCO Term", colSpan: 2, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 7 }]);
-    tableBody.push([{ content: "Delivery Address", colSpan: 2, styles: { fontStyle: "bold" } }, { content: deliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap",  } }]);
-    tableBody.push([{ content: "FX Rate (USD)", colSpan: 2, styles: { fontStyle: "bold" } }, { content: USD.toFixed(2), colSpan: 3 }, { content: "FX Rate (EURO)", colSpan: 2, styles: { fontStyle: "bold" } }, { content: EUR.toFixed(2), colSpan: 2 }]);
-    tableBody.push([{ content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 7 }]);
-    tableBody.push([{ content: "Destination Port", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Dest_Port, colSpan: 7 }]);
-  
+
+    tableBody.push(["", "TOTAL SHIPMENT COST (A + B + C)", "INR", ...total, ""]);
+
+    tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 7 }]);
+
+    tableBody.push([{ content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: deliveryAddress.replace(/\n/g, " "), colSpan: 7, styles: { fontSize: 6, whiteSpace: "nowrap" } }
+    ]);
+
+    tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: "USD", styles: { halign: "center" } },
+        { content: USD.toFixed(2), colSpan: 2, styles: { halign: "center" } },
+        { content: "EURO", styles: { halign: "center" } },
+        { content: EUR.toFixed(2), colSpan: 3, styles: { halign: "center" } }
+    ]);
+
+    tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: Dest_Port, colSpan: 2 },
+        { content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } },
+        { content: transitDays, colSpan: 3 }
+    ]);
+
+    tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 7 }]);
+
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.text("Comparative Statement of Quotations", 140, 10, { align: "center" });
-  
-    doc.setFontSize(8);
-    doc.text(`RFQ Export rates for ${selectedMonthYear} (01.${selectedMonthYear} - 28.${selectedMonthYear})`, 140, 14, { align: "center" });
-    doc.text("We are following 'ATT 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 140, 18, { align: "center" });
-  
+    doc.setFontSize(7);
+    doc.text("Comparative Statement of Quotations", 5, 8);
+
+    doc.setFontSize(6);
+    doc.text(`RFQ Export rates for ${selectedMonthYear} (01.${selectedMonthYear} - 28.${selectedMonthYear})`, 5, 12);
+    doc.text(`Quote for GTI to ${locationName} shipment`, 5, 16);
+
+    doc.setFontSize(5);
+    doc.text("We follow 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 20);
+
+    let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
+    let xPosition = doc.internal.pageSize.width - 10;
+    doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 8);
+
+    const approvalText = "Approved:________  Checked:________  Prepared:________";
+    let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
+    doc.text(approvalText, xPosition - approvalTextWidth - 5, 18);
+
+    const startY = 22;
+
     doc.autoTable({
-      head: tableHeaders,
-      body: tableBody,
-      startY: 22,
-      styles: { fontSize: 7, cellPadding: 1, overflow: "linebreak" },
-      headStyles: { fillColor: [204, 229, 252], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.02, lineColor: [0, 0, 0] },
-      columnStyles: {
-          0: { cellWidth: 10, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          1: { cellWidth: 60, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          2: { cellWidth: 21, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          3: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          4: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          5: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          6: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          7: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          8: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          9: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          10: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          11: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          12: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          13: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          14: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          15: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          16: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-          17: { cellWidth: 27, lineWidth: 0.02, lineColor: [0, 0, 0] },
-      },
-      margin: { left: 5, right: 5 },
-      theme: "grid",
+        head: tableHeaders,
+        body: tableBody,
+        startY: startY,
+        styles: { fontSize: 6, cellPadding: 0, overflow: "linebreak" },
+        headStyles: { fillColor: [210, 225, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.01 },
+        columnStyles: {
+            0: { cellWidth: 8 },
+            1: { cellWidth: 40 },
+            2: { cellWidth: 12 },
+            ...Array.from({ length: 18 }, (_, i) => ({ [i + 3]: { cellWidth: 12 } })).reduce((a, b) => ({ ...a, ...b }), {}),
+            19: { cellWidth: 30 },
+        },
+        margin: { left: 3, right: 3 },
+        theme: "grid",
     });
-  
-    const finalY = doc.lastAutoTable.finalY + 10;
-  
-    doc.setFontSize(8);
-    doc.text("Approved By: ______________", 10, finalY + 5);
-    doc.text("Checked By: ______________", 100, finalY + 5);
-    doc.text("Prepared By: ______________", doc.internal.pageSize.width - 50, finalY + 5);
-  
-    doc.text(`Date: ${formattedDate}`, doc.internal.pageSize.width - 50, finalY + 10);
-    doc.text("GreenTech Industries ©2023.04.03 by Muni Kranth.", 140, doc.internal.pageSize.height - 8, { align: "center" });
-  
+
+    doc.text("GREENTECH INDUSTRIES Business ©2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 5, { align: "center" });
+
     doc.save("quotation_print_ExportFCL.pdf");
-  };
-  
+};
+
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]" ref={tableRef}>
@@ -622,7 +651,7 @@ const QuotationTable = () => {
               {sections.destination &&
                 destinationCharges.map((item, index) => (
                   <tr key={index} className="border">
-                    <td className="py-1 px-3 border">{index + 11}</td>
+                    <td className="py-1 px-3 border">{index + 9}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">{currency} / Shipment</td>
                     {Array.from({ length: 18 }, (_, i) => (
