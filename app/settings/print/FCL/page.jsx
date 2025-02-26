@@ -495,11 +495,11 @@ const QuotationTable = () => {
     const tableHeaders = [
         [
             { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
-            { content: "Descriptions", rowSpan: 2 },
-            { content: "Currency in", rowSpan: 2 },
+            { content: "Descriptions", rowSpan: 2, styles: { valign: "middle" }  },
+            { content: "Currency in", rowSpan: 2, styles: { valign: "middle" }  },
             { content: "20 ft", colSpan: 3, styles: { halign: "center" } },
             { content: "40 ft", colSpan: 3, styles: { halign: "center" } },
-            { content: "Remarks", rowSpan: 2 },
+            { content: "Remarks", rowSpan: 2, styles: { valign: "middle" }  },
         ],
         [suppliers[0], suppliers[1], suppliers[2], suppliers[3], suppliers[4], suppliers[5]],
     ];
@@ -545,10 +545,10 @@ const QuotationTable = () => {
     ]);
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, "USD");
+    addChargesToBody(destinationCharges, currency);
     tableBody.push([
         "",
-        { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        { content: "Total Destination Charges ("+currency+")", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
         ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
         "",
     ]);

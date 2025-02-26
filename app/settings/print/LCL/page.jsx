@@ -84,6 +84,7 @@ const QuotationTable = () => {
   const [totalB, setTotalB] = useState(Array(18).fill(""));
   const [totalC, setTotalC] = useState(Array(18).fill(""));
   const [total, setTotal] = useState(Array(18).fill(""));
+  let curr = "";
 
   const tableRef = useRef();
 
@@ -166,6 +167,7 @@ const QuotationTable = () => {
         setDeliveryAddress(data.result[0].Delivery_Address);
         setDest_Port(data.result[0].Dest_Port);
         setCurrency(data.result[0].Currency);
+        curr = data.result[0].Currency;
       }
     } catch (error) {
       console.error("Error fetching supplier details:", error);
@@ -341,6 +343,7 @@ const QuotationTable = () => {
   };
 
   const downloadPDF = () => {
+    console.log("curr :", curr);
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
     const currentDate = new Date();
@@ -390,8 +393,8 @@ const QuotationTable = () => {
     tableBody.push(["", "Total Sea Freight Charges", "USD", ...totalB, ""]);
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, {currency});
-    tableBody.push(["", "Total Destination Charges", {currency}, ...totalC, ""]);
+    addChargesToBody(destinationCharges, curr);
+    tableBody.push(["", "Total Destination Charges", curr, ...totalC, ""]);
 
     tableBody.push(["", "TOTAL SHIPMENT COST (A + B + C)", "INR", ...total, ""]);
 
