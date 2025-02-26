@@ -104,7 +104,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCL' }),
+          body: JSON.stringify({ RFQType: 'LCL' }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -359,13 +359,17 @@ const QuotationTable = () => {
           
         ],
         [
-          // Dynamically add supplier names
-          ...suppliers.slice(0, 18).map(supplier => ({
-              content: supplier,
-              styles: { halign: "center" }  // Center-align the supplier names in the table
-          }))
-      ]
-  
+          ...suppliers.slice(0, 18).map((supplier, index) => {
+            // Here, val is assumed to be the supplier value
+            const val = supplier;
+      
+            return {
+              content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "",
+              styles: { halign: "center",valign: "middle" }  // Center-align the supplier names
+            };
+          })
+        ]
+      
     ];
 
     const tableBody = [];
@@ -398,9 +402,8 @@ const QuotationTable = () => {
     addChargesToBody(originCharges, "INR / Shipmt");
     tableBody.push([
       { content: "", styles: { halign: "center" } },
-      { content: "Total Origin Charges", styles: { halign: "center" } },
-      { content: "INR", styles: { halign: "center" } },
-      ...totalA.map(val => ({ content: val, styles: { halign: "center" } })),
+      { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } }, 
+      ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
       { content: "", styles: { halign: "center" } }
   ]);
   
@@ -409,28 +412,26 @@ const QuotationTable = () => {
     addChargesToBody(seaFreightCharges, "USD / Shipmt");
     tableBody.push([
       { content: "", styles: { halign: "center" } },
-      { content: "Total Sea Freight Charges", styles: { halign: "center" } },
-      { content: "INR", styles: { halign: "center" } },
-      ...totalB.map(val => ({ content: val, styles: { halign: "center" } })),
+      { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },       
+      ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
       { content: "", styles: { halign: "center" } }
   ]);
   
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, currency+" / Shipmt");
+    addChargesToBody(destinationCharges,  currency+" / Shipmt");
     tableBody.push([
       { content: "", styles: { halign: "center" } },
-      { content: "Total Destination Charges", styles: { halign: "center" } },
-      { content: "INR", styles: { halign: "center" } },
-      ...totalC.map(val => ({ content: val, styles: { halign: "center" } })),
+      { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },      
+      ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
       { content: "", styles: { halign: "center" } }
   ]);
 
   tableBody.push([
     { content: "", styles: { halign: "center" } },
-    { content: "TOTAL SHIPMENT COST (A + B + C)", styles: { halign: "center" } },
+    { content: "TOTAL SHIPMENT COST (A + B + C)", styles: { halign: "center", fontStyle: "bold" } },
     { content: "INR", styles: { halign: "center" } },
-    ...total.map(val => ({ content: val, styles: { halign: "center" } })),
+    ...total.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
     { content: "", styles: { halign: "center" } }
 ]);
 
@@ -438,7 +439,7 @@ const QuotationTable = () => {
     tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 18 }]);
 
     tableBody.push([{ content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: deliveryAddress.replace(/\n/g, " "), colSpan: 18, styles: { fontSize: 6, whiteSpace: "nowrap" } }
+        { content: deliveryAddress.replace(/\n/g, " "), colSpan: 18, styles: { fontSize: 7, whiteSpace: "nowrap" } }
     ]);
 
     tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } },
