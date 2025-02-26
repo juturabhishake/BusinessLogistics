@@ -639,7 +639,9 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-2">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparative Statement of quotations</h2>
-              <p className="text-xs text-gray-100">"Export Print FCL rates for {currentDateInfo}"</p>
+              <p className="text-xs text-gray-100">
+                {`Export Print FCL rates for ${selectedDate.format("MMMM YYYY")} (${selectedDate.startOf("month").format("DD")}.${selectedDate.format("MMMM YYYY")} - ${selectedDate.endOf("month").format("DD")}.${selectedDate.format("MMMM YYYY")})`}
+              </p>
               <p className="text-xs text-gray-100">Quote for GTI to {locationName || "{select location}"} shipment</p>
             </div>
             <div className="flex flex-col lg:flex-row justify-end items-start lg:items-center lg:space-y-0 sm:space-x-2 space-y-2">
