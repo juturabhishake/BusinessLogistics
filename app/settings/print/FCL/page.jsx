@@ -501,14 +501,18 @@ const QuotationTable = () => {
             { content: "40 ft", colSpan: 3, styles: { halign: "center" } },
             { content: "Remarks", rowSpan: 2, styles: { valign: "middle" }  },
         ],
-        [suppliers[0], suppliers[1], suppliers[2], suppliers[3], suppliers[4], suppliers[5]],
+        // [suppliers[0], suppliers[1], suppliers[2], suppliers[3], suppliers[4], suppliers[5]],
+        [
+          ...suppliers.slice(0, 6).map(supplier => ({ content: supplier, styles: { halign: "center" } }))
+        ]
+      
     ];
 
     const tableBody = [];
 
     const addSectionHeader = (sectionName) => {
         tableBody.push([
-            { content: sectionName, colSpan: 10, styles: { halign: "left", fontStyle: "bold", fillColor: [230, 230, 230] } }
+            { content: sectionName, colSpan: 10, styles: { halign: "left", fontStyle: "bold", fillColor: [255, 255, 255] } }
         ]);
     };
 
@@ -599,7 +603,7 @@ const QuotationTable = () => {
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
     let xPosition = doc.internal.pageSize.width - 10;
     doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 10);
-    const approvalText = "Approved by:______________              Checked by:______________              Prepared by:______________              ";
+    const approvalText = "Approved by:                                          Checked by:                                          Prepared by:                                  ";
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
@@ -609,8 +613,8 @@ const QuotationTable = () => {
         head: tableHeaders,
         body: tableBody,
         startY: startY,
-        styles: { fontSize: 7, cellPadding: 1.2, overflow: "linebreak" },
-        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.02, }, 
+        styles: { fontSize: 7, cellPadding: 1.2, overflow: "linebreak",lineWidth: 0.05 },
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.05, }, 
         columnStyles: {
             0: { cellWidth: 10 },
             1: { cellWidth: 60 },

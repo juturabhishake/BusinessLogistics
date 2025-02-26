@@ -39,29 +39,29 @@ const QuotationTable = () => {
   });
 
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Local Transportation From GTI-Chennai", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Terminal Handling Charges - Origin", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Bill of Lading Charges", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "CFS Charges", remarks: "If any", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Customs Clearance & Documentation", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Local Transportation From GTI-Chennai", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Terminal Handling Charges - Origin", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Bill of Lading Charges", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Loading/Unloading / SSR", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "CFS Charges (At Actual)", remarks: "At Actual", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
   ]);
 
   const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "Sea Freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "FSC (Fuel Surcharge)", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    // { description: "ISPS", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    // { description: "Seal Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Sea Freight", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "FSC (Fuel Surcharge)", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    // { description: "ISPS", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    // { description: "Seal Fee", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
   ]);
 
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Custom Clearance", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "CC Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "D.O Charges per BL", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "AAI Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Loading/Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Delivery", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    // { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Custom Clearance", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "CC Fee", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "D.O Charges ", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "AAI Charges", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Loading/Unloading", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    // { description: "LOLO Charges", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
   ]);
 
   const [suppliers, setSuppliers] = useState(Array(18).fill(""));
@@ -356,85 +356,124 @@ const QuotationTable = () => {
             { content: "Descriptions", rowSpan: 2,styles: { valign: "middle" } },
             { content: "Currency", rowSpan: 2, styles: { valign: "middle" } },
             ...Array.from({ length: 6 }, (_, i) => ({ content: `${i + 1} CBM`, colSpan: 3, styles: { halign: "center" } })),
-            { content: "Remarks", rowSpan: 2, styles: { valign: "middle" } },
+          
         ],
-        [...suppliers.slice(0, 18)],
+        [
+          // Dynamically add supplier names
+          ...suppliers.slice(0, 18).map(supplier => ({
+              content: supplier,
+              styles: { halign: "center" }  // Center-align the supplier names in the table
+          }))
+      ]
+  
     ];
 
     const tableBody = [];
 
     const addSectionHeader = (sectionName) => {
         tableBody.push([
-            { content: sectionName, colSpan: 20, styles: { halign: "left", fontStyle: "bold", fillColor: [180, 180, 180] } }
+            { content: sectionName, colSpan: 20, styles: { halign: "left", fontStyle: "bold", fillColor: [255, 255, 255] } }
         ]);
     };
 
     const addChargesToBody = (charges, currency) => {
-        charges.forEach((charge, index) => {
-            tableBody.push([
-                index + 1,
-                charge.description,
-                currency,
-                ...Array.from({ length: 18 }, (_, i) => ({
-                    content: charge[`sc${i + 1}`] || "",
-                    styles: { halign: "center" }
-                })),
-                charge.remarks,
-            ]);
-        });
-    };
+      charges.forEach((charge, index) => {
+          tableBody.push([
+              index + 1,
+              charge.description,
+              currency,
+              ...Array.from({ length: 18 }, (_, i) => {
+                  const val = charge[`sc${i + 1}`];
+                  return {
+                      content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "",
+                      styles: { halign: "center" }
+                  };
+              }),
+          ]);
+      });
+  };
+  
 
     addSectionHeader("A) ORIGIN CHARGES");
-    addChargesToBody(originCharges, "INR");
-    tableBody.push(["", "Total Origin Charges", "INR", ...totalA, ""]);
+    addChargesToBody(originCharges, "INR / Shipmt");
+    tableBody.push([
+      { content: "", styles: { halign: "center" } },
+      { content: "Total Origin Charges", styles: { halign: "center" } },
+      { content: "INR", styles: { halign: "center" } },
+      ...totalA.map(val => ({ content: val, styles: { halign: "center" } })),
+      { content: "", styles: { halign: "center" } }
+  ]);
+  
 
     addSectionHeader("B) SEA FREIGHT CHARGES");
-    addChargesToBody(seaFreightCharges, "USD");
-    tableBody.push(["", "Total Sea Freight Charges", "USD", ...totalB, ""]);
+    addChargesToBody(seaFreightCharges, "USD / Shipmt");
+    tableBody.push([
+      { content: "", styles: { halign: "center" } },
+      { content: "Total Sea Freight Charges", styles: { halign: "center" } },
+      { content: "INR", styles: { halign: "center" } },
+      ...totalB.map(val => ({ content: val, styles: { halign: "center" } })),
+      { content: "", styles: { halign: "center" } }
+  ]);
+  
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, curr);
-    tableBody.push(["", "Total Destination Charges", curr, ...totalC, ""]);
+    addChargesToBody(destinationCharges, "EURO / Shipmt");
+    tableBody.push([
+      { content: "", styles: { halign: "center" } },
+      { content: "Total Destination Charges", styles: { halign: "center" } },
+      { content: "INR", styles: { halign: "center" } },
+      ...totalC.map(val => ({ content: val, styles: { halign: "center" } })),
+      { content: "", styles: { halign: "center" } }
+  ]);
 
-    tableBody.push(["", "TOTAL SHIPMENT COST (A + B + C)", "INR", ...total, ""]);
+  tableBody.push([
+    { content: "", styles: { halign: "center" } },
+    { content: "TOTAL SHIPMENT COST (A + B + C)", styles: { halign: "center" } },
+    { content: "INR", styles: { halign: "center" } },
+    ...total.map(val => ({ content: val, styles: { halign: "center" } })),
+    { content: "", styles: { halign: "center" } }
+]);
 
-    tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 7 }]);
+
+    tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 18 }]);
 
     tableBody.push([{ content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: deliveryAddress.replace(/\n/g, " "), colSpan: 7, styles: { fontSize: 6, whiteSpace: "nowrap" } }
+        { content: deliveryAddress.replace(/\n/g, " "), colSpan: 18, styles: { fontSize: 6, whiteSpace: "nowrap" } }
     ]);
 
     tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } },
         { content: "USD", styles: { halign: "center" } },
         { content: USD.toFixed(2), colSpan: 2, styles: { halign: "center" } },
         { content: "EURO", styles: { halign: "center" } },
-        { content: EUR.toFixed(2), colSpan: 3, styles: { halign: "center" } }
+        { content: EUR.toFixed(2), colSpan: 3, styles: { halign: "center" } },
+        { content: "", colSpan: 13,}
     ]);
 
     tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: Dest_Port, colSpan: 2 },
-        { content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } },
-        { content: transitDays, colSpan: 3 }
+        { content: Dest_Port, colSpan: 4 },
+        { content: "Required Transit Days", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: transitDays, colSpan: 11 }
     ]);
 
-    tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 7 }]);
+    tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 18 }]);
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(7);
+    doc.setFontSize(10);
     doc.text("Comparative Statement of Quotations", 5, 8);
 
-    doc.setFontSize(6);
+    doc.setFontSize(8);
     doc.text(`RFQ Export rates for ${selectedMonthYear} (01.${selectedMonthYear} - 28.${selectedMonthYear})`, 5, 12);
     doc.text(`Quote for GTI to ${locationName} shipment`, 5, 16);
 
-    doc.setFontSize(5);
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
     doc.text("We follow 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 20);
-
+    doc.setFontSize(8);
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
     let xPosition = doc.internal.pageSize.width - 10;
     doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 8);
 
-    const approvalText = "Approved:________  Checked:________  Prepared:________";
+    const approvalText = "Approved by:                                          Checked by:                                          Prepared by:                                  ";
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 18);
 
@@ -444,14 +483,14 @@ const QuotationTable = () => {
         head: tableHeaders,
         body: tableBody,
         startY: startY,
-        styles: { fontSize: 6, cellPadding: 0, overflow: "linebreak" },
-        headStyles: { fillColor: [210, 225, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.01 },
+        styles: { fontSize: 7, cellPadding: 1, overflow: "linebreak",lineWidth: 0.05 },
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.05 },
         columnStyles: {
             0: { cellWidth: 8 },
-            1: { cellWidth: 40 },
-            2: { cellWidth: 12 },
+            1: { cellWidth: 45 },
+            2: { cellWidth: 20 },
             ...Array.from({ length: 18 }, (_, i) => ({ [i + 3]: { cellWidth: 12 } })).reduce((a, b) => ({ ...a, ...b }), {}),
-            19: { cellWidth: 30 },
+          
         },
         margin: { left: 3, right: 3 },
         theme: "grid",
