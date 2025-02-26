@@ -417,11 +417,11 @@ const QuotationTable = () => {
   
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, "EURO / Shipmt");
+    addChargesToBody(destinationCharges, currency+" / Shipmt");
     tableBody.push([
       { content: "", styles: { halign: "center" } },
       { content: "Total Destination Charges", styles: { halign: "center" } },
-      { content: "INR", styles: { halign: "center" } },
+      { content: currency, styles: { halign: "center" } },
       ...totalC.map(val => ({ content: val, styles: { halign: "center" } })),
       { content: "", styles: { halign: "center" } }
   ]);
