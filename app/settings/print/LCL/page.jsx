@@ -350,10 +350,10 @@ const QuotationTable = () => {
     const tableHeaders = [
         [
             { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
-            { content: "Descriptions", rowSpan: 2 },
-            { content: "Currency", rowSpan: 2 },
+            { content: "Descriptions", rowSpan: 2,styles: { valign: "middle" } },
+            { content: "Currency", rowSpan: 2, styles: { valign: "middle" } },
             ...Array.from({ length: 6 }, (_, i) => ({ content: `${i + 1} CBM`, colSpan: 3, styles: { halign: "center" } })),
-            { content: "Remarks", rowSpan: 2 },
+            { content: "Remarks", rowSpan: 2, styles: { valign: "middle" } },
         ],
         [...suppliers.slice(0, 18)],
     ];
@@ -390,8 +390,8 @@ const QuotationTable = () => {
     tableBody.push(["", "Total Sea Freight Charges", "USD", ...totalB, ""]);
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, "INR");
-    tableBody.push(["", "Total Destination Charges", "INR", ...totalC, ""]);
+    addChargesToBody(destinationCharges, {currency});
+    tableBody.push(["", "Total Destination Charges", {currency}, ...totalC, ""]);
 
     tableBody.push(["", "TOTAL SHIPMENT COST (A + B + C)", "INR", ...total, ""]);
 
