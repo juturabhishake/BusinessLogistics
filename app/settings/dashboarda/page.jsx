@@ -11,7 +11,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { FaSearch, FaSortUp, FaSortDown, FaSort, FaFileExcel, FaFilePdf } from "react-icons/fa";
 import * as XLSX from "xlsx"; 
 import jsPDF from "jspdf";
-import "jspdf-autotable"; 
+import "jspdf-autotable";
 
 const Page = () => {
   const { theme } = useTheme();
@@ -109,23 +109,23 @@ const Page = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsContent value="exportFCL">
-          <DataTable data={exportFCLData} />
+          <DataTable data={exportFCLData} selectedDate={selectedDate} />
         </TabsContent>
         <TabsContent value="importFCL">
-          <DataTable data={importFCLData} />
+          <DataTable data={importFCLData} selectedDate={selectedDate} />
         </TabsContent>
         <TabsContent value="exportLCL">
-          <DataTable data={exportLCLData} />
+          <DataTable data={exportLCLData} selectedDate={selectedDate} />
         </TabsContent>
         <TabsContent value="importLCL">
-          <DataTable data={importLCLData} />
+          <DataTable data={importLCLData} selectedDate={selectedDate} />
         </TabsContent>
       </Tabs>
     </div>
   );
 };
 
-const DataTable = ({ data }) => {
+const DataTable = ({ data, selectedDate }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortedData, setSortedData] = useState(data);
   const [sortConfig, setSortConfig] = useState(null);
@@ -214,11 +214,16 @@ const DataTable = ({ data }) => {
 
   const exportToPDF = () => {   
     const doc = new jsPDF({ orientation: "landscape" });
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
 
+    const startDate = selectedDate.startOf("month").format("DD");
+    const endDate = selectedDate.endOf("month").format("DD");
+    const selectedMonthYear = selectedDate.format("MMMM YYYY");
    
     const addHeader = (doc) => {
       doc.setFontSize(10);
-      doc.text(`Export FCL Quote for the Month:`, 5, 5);
+      doc.text(`Export FCL Quote for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 5);
   };
    
   const addFooter = (doc) => {

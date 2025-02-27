@@ -104,11 +104,20 @@ export function getMenuList(pathname: string): Group[] {
             },
             {
               href: "",
-              label: "Prints",
+              label: "Prints(Export)",
               icon: Database,
               submenus: [
-                { href: "/settings/print/FCL", label: "FCL" },
-                { href: "/settings/print/LCL", label: "LCL" }
+                { href: "/settings/print/Export/FCL", label: "FCL" },
+                { href: "/settings/print/Export/LCL", label: "LCL" }
+              ]
+            },
+            {
+              href: "",
+              label: "Prints(Import)",
+              icon: Database,
+              submenus: [
+                { href: "/settings/print/Import/FCL", label: "FCL" },
+                { href: "/settings/print/Import/LCL", label: "LCL" }
               ]
             },
             {
