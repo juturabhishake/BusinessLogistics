@@ -348,6 +348,9 @@ const QuotationTable = () => {
 
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
+
+    const startDate = selectedDate.startOf("month").format("DD");
+    const endDate = selectedDate.endOf("month").format("DD");
     const selectedMonthYear = selectedDate.format("MMMM YYYY");
 
     const tableHeaders = [
@@ -462,7 +465,7 @@ const QuotationTable = () => {
     doc.text("Comparative Statement of Quotations", 5, 8);
 
     doc.setFontSize(8);
-    doc.text(`RFQ Export rates for ${selectedMonthYear} (01.${selectedMonthYear} - 28.${selectedMonthYear})`, 5, 12);
+    doc.text(`RFQ Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 12);
     doc.text(`Quote for GTI to ${locationName} shipment`, 5, 16);
 
     doc.setFontSize(7);
