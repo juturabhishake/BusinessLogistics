@@ -188,8 +188,12 @@ const QuotationTable = () => {
       }
   
       const data = await response.json();
+
+      if (!data.result || !Array.isArray(data.result)) {
+        throw new Error("Invalid API response format");
+      }
   
-      if (data.result && data.result.length > 0) {
+     // if (data.result && data.result.length > 0) {
         const origin = Array(6).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
         const seaFreight = Array(2).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
         const destination = Array(6).fill(null).map(() => ({ "1CBM": "", "2CBM": "", "3CBM": "", "4CBM": "", "5CBM": "", "6CBM": "" }));
@@ -197,34 +201,34 @@ const QuotationTable = () => {
         data.result.forEach((item) => {
           const cbmKey = `${item.CBM}CBM`;
           if (item.CBM <= 6) {
-            origin[0][cbmKey] = item.O_CCD || "0";
-            origin[1][cbmKey] = item.O_LTG || "0";
-            origin[2][cbmKey] = item.O_THC || "0";
-            origin[3][cbmKey] = item.O_BLC || "0";
-            origin[4][cbmKey] = item.O_LUS || "0";
-            origin[5][cbmKey] = item.O_CFS || "0";
+            if (origin[0]) origin[0][cbmKey] = item.O_CCD || "0";
+            if (origin[1]) origin[1][cbmKey] = item.O_LTG || "0";
+            if (origin[2]) origin[2][cbmKey] = item.O_THC || "0";
+            if (origin[3]) origin[3][cbmKey] = item.O_BLC || "0";
+            if (origin[4]) origin[4][cbmKey] = item.O_LUS || "0";
+            if (origin[5]) origin[5][cbmKey] = item.O_CFS || "0";
   
             // if (item.CBM <= 2) {
-              seaFreight[0][cbmKey] = item.S_SeaFre || "0";
-              seaFreight[1][cbmKey] = item.S_FSC || "0";
+            if (seaFreight[0]) seaFreight[0][cbmKey] = item.S_SeaFre || "0";
+            if (seaFreight[1]) seaFreight[1][cbmKey] = item.S_FSC || "0";
             // }
   
-            destination[0][cbmKey] = item.D_CUC || "0";
-            destination[1][cbmKey] = item.D_CCF || "0";
-            destination[2][cbmKey] = item.D_DOC || "0";
-            destination[3][cbmKey] = item.D_AAI || "0";
-            destination[4][cbmKey] = item.D_LU || "0";
-            destination[5][cbmKey] = item.D_Del || "0";
-          }
+            if (destination[0]) destination[0][cbmKey] = item.D_CUC || "0";
+            if (destination[1]) destination[1][cbmKey] = item.D_CCF || "0";
+            if (destination[2]) destination[2][cbmKey] = item.D_DOC || "0";
+            if (destination[3]) destination[3][cbmKey] = item.D_AAI || "0";
+            if (destination[4]) destination[4][cbmKey] = item.D_LU || "0";
+            if (destination[5]) destination[5][cbmKey] = item.D_Del || "0";
+          } 
         });
         setOriginData(origin);
         setSeaFreightData(seaFreight);
         setDestinationData(destination);
   
         console.log("Updated state data:", { originData, seaFreightData, destinationData });
-      } else {
-        console.log("No LCL Quote data found for the selected location.");
-      }
+      // } else {
+      //   console.log("No LCL Quote data found for the selected location.");
+      // }
     } catch (error) {
       console.error("Error fetching LCL Quote data:", error);
       alert(`Error fetching LCL Quote data: ${error.message}`);
