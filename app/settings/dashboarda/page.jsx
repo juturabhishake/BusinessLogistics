@@ -13,6 +13,9 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
+
+
+
 const Page = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
@@ -22,6 +25,7 @@ const Page = () => {
   const [importFCLData, setImportFCLData] = useState([]);
   const [exportLCLData, setExportLCLData] = useState([]);
   const [importLCLData, setImportLCLData] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -35,6 +39,18 @@ const Page = () => {
       }
     };
     checkLogin();
+  }, []);
+
+  useEffect(() => {
+    let flag = false
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    flag = (check_sc === 'admin')
+    console.log("is admin : ", isAdmin, flag, check_sc)
+    if(!flag) {
+      // secureLocalStorage.clear();
+      window.location.href = "/";
+    }
   }, []);
 
   const fetchData = async (apiUrl, setData) => {

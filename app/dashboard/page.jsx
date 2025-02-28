@@ -26,6 +26,8 @@ const Page = () => {
   const [importFCLChartData, setImportFCLChartData] = useState([]);
   const [exportLCLChartData, setExportLCLChartData] = useState([]);
   const [importLCLChartData, setImportLCLChartData] = useState([]);
+  const [exportFCLData, setExportFCLData] = useState([]);
+  const [exportLCLData, setExportLCLData] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -105,12 +107,36 @@ const Page = () => {
     }
   };
 
+  const fetchData = async (apiUrl, setData) => {
+    try {
+      const sc = secureLocalStorage.getItem("sc");
+      const username = secureLocalStorage.getItem("un");
+      const quote_month = selectedDate.month() + 1;
+      const quote_year = selectedDate.year();
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quote_month, quote_year, sc, username }),
+      });
+
+      const data = await response.json();
+      setData(data); 
+      console.log("API Data:", data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+
   useEffect(() => {
     if (selectedDate) {
       fetchChartData("/api/dashboard/get_Export_FCL_Quote", setExportFCLChartData);
       fetchChartData("/api/dashboard/get_Import_FCL_Quote", setImportFCLChartData);
       fetchChartData("/api/dashboard/get_Export_LCL_Quote", setExportLCLChartData);
       fetchChartData("/api/dashboard/get_Import_LCL_Quote", setImportLCLChartData);
+      fetchData("/api/dashboard/get_Export_FCL_Quote", setExportFCLData);
+      fetchData("/api/dashboard/get_Export_LCL_Quote", setExportLCLData);
     }
   }, [selectedDate]);
 
@@ -247,13 +273,13 @@ const Page = () => {
             </TabsList>
 
             <TabsContent value="exportFCL">
-              <Table data={exportFCLChartData} />
+              <Table data={exportFCLData} />
             </TabsContent>
             <TabsContent value="importFCL">
               <Table data={importFCLChartData} />
             </TabsContent>
             <TabsContent value="exportLCL">
-              <Table data={exportLCLChartData} />
+              <Table data={exportLCLData} />
             </TabsContent>
             <TabsContent value="importLCL">
               <Table data={importLCLChartData} />
