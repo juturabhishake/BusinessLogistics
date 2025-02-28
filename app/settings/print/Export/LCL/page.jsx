@@ -104,7 +104,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCL' }),
+          body: JSON.stringify({ RFQType: 'LCL' }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -361,13 +361,25 @@ const QuotationTable = () => {
             ...Array.from({ length: 6 }, (_, i) => ({ content: `${i + 1} CBM`, colSpan: 3, styles: { halign: "center" } })),
           
         ],
-        [
-          // Dynamically add supplier names
-          ...suppliers.slice(0, 18).map(supplier => ({
-              content: supplier,
-              styles: { halign: "center" }  // Center-align the supplier names in the table
-          }))
-      ]
+      //   [
+      //     // Dynamically add supplier names
+      //     ...suppliers.slice(0, 18).map(supplier => ({
+      //         content: supplier,
+      //         styles: { halign: "center" }  // Center-align the supplier names in the table
+      //     }))
+      // ]
+      [
+        // ...suppliers.slice(0, 6).map(supplier => ({ content: supplier, styles: { halign: "center" } }))
+        ...suppliers.slice(0, 18).map((supplier) => {
+          // Here, val is assumed to be the supplier value
+          const val = supplier;
+    
+          return {
+            content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "",
+            styles: { halign: "center",valign: "middle" }  // Center-align the supplier names
+          };
+        })
+      ]     
   
     ];
 
@@ -403,7 +415,8 @@ const QuotationTable = () => {
       { content: "", styles: { halign: "center" } },
       { content: "Total Origin Charges", styles: { halign: "center" } },
       { content: "INR", styles: { halign: "center" } },
-      ...totalA.map(val => ({ content: val, styles: { halign: "center" } })),
+      // ...totalA.map(val => ({ content: val, styles: { halign: "center" } })),
+      ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
       { content: "", styles: { halign: "center" } }
   ]);
   
@@ -414,7 +427,8 @@ const QuotationTable = () => {
       { content: "", styles: { halign: "center" } },
       { content: "Total Sea Freight Charges", styles: { halign: "center" } },
       { content: "INR", styles: { halign: "center" } },
-      ...totalB.map(val => ({ content: val, styles: { halign: "center" } })),
+      // ...totalB.map(val => ({ content: val, styles: { halign: "center" } })),
+      ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
       { content: "", styles: { halign: "center" } }
   ]);
   
@@ -425,7 +439,8 @@ const QuotationTable = () => {
       { content: "", styles: { halign: "center" } },
       { content: "Total Destination Charges", styles: { halign: "center" } },
       { content: "INR", styles: { halign: "center" } },
-      ...totalC.map(val => ({ content: val, styles: { halign: "center" } })),
+      // ...totalC.map(val => ({ content: val, styles: { halign: "center" } })),
+      ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
       { content: "", styles: { halign: "center" } }
   ]);
 
@@ -433,7 +448,8 @@ const QuotationTable = () => {
     { content: "", styles: { halign: "center" } },
     { content: "TOTAL SHIPMENT COST (A + B + C)", styles: { halign: "center" } },
     { content: "INR", styles: { halign: "center" } },
-    ...total.map(val => ({ content: val, styles: { halign: "center" } })),
+    // ...total.map(val => ({ content: val, styles: { halign: "center" } })),
+    ...total.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
     { content: "", styles: { halign: "center" } }
 ]);
 

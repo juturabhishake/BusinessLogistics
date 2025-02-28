@@ -104,7 +104,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCL' }),
+          body: JSON.stringify({ RFQType: 'LCLImport' }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -502,9 +502,21 @@ const QuotationTable = () => {
             { content: "Remarks", rowSpan: 2, styles: { valign: "middle" }  },
         ],
         // [suppliers[0], suppliers[1], suppliers[2], suppliers[3], suppliers[4], suppliers[5]],
+        // [
+        //   ...suppliers.slice(0, 6).map(supplier => ({ content: supplier, styles: { halign: "center" } }))
+        // ]
         [
-          ...suppliers.slice(0, 6).map(supplier => ({ content: supplier, styles: { halign: "center" } }))
-        ]
+          // ...suppliers.slice(0, 6).map(supplier => ({ content: supplier, styles: { halign: "center" } }))
+          ...suppliers.slice(0, 6).map((supplier) => {
+            // Here, val is assumed to be the supplier value
+            const val = supplier;
+      
+            return {
+              content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "",
+              styles: { halign: "center",valign: "middle" }  // Center-align the supplier names
+            };
+          })
+        ]    
       
     ];
 
