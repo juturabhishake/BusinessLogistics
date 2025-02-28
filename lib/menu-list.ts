@@ -78,7 +78,7 @@ export function getMenuList(pathname: string): Group[] {
             ],
           },
           {
-            href: "terms_conditions",
+            href: "/terms_conditions",
             label: "Terms",
             icon: NotepadText
           },
