@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import {
-  // Tag,
+  Tag,
   Users,
   LocateFixedIcon,
   Settings,
@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   LucideIcon,
   Database,
+  NotepadText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
@@ -76,11 +77,11 @@ export function getMenuList(pathname: string): Group[] {
               { href: "/RFQ-Prices/LCL", label: "LCL" }
             ],
           },
-          // {
-          //   href: "/categories",
-          //   label: "Categories",
-          //   icon: Bookmark
-          // },
+          {
+            href: "terms_conditions",
+            label: "Terms",
+            icon: NotepadText
+          },
           // {
           //   href: "/tags",
           //   label: "Tags",
@@ -133,6 +134,11 @@ export function getMenuList(pathname: string): Group[] {
               href: "/account",
               label: "Account",
               icon: Settings
+            },
+            {
+              href: "/terms_conditions",
+              label: "Terms",
+              icon: NotepadText
             }
           ]
         } : null,
