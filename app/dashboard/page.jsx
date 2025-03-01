@@ -29,15 +29,14 @@ const Page = () => {
   const [exportFCLData, setExportFCLData] = useState([]);
   const [exportLCLData, setExportLCLData] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [modalData, setModalData] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
-    let flag = false
     const check_sc = secureLocalStorage.getItem("sc");
     setIsAdmin(check_sc === 'admin');
-    flag = (check_sc === 'admin')
-    console.log("is admin : ", isAdmin, flag, check_sc)
-    if(flag) {
-      // secureLocalStorage.clear();
+    if (check_sc === 'admin') {
       window.location.href = "/";
     }
   }, []);
@@ -67,7 +66,7 @@ const Page = () => {
       const sc = secureLocalStorage.getItem("sc");
       if (!sc || !selectedDate) return;
 
-      const quote_month = selectedDate.month()+1;
+      const quote_month = selectedDate.month() + 1;
       const quote_year = selectedDate.year();
    
       const response = await fetch(apiUrl, {
@@ -82,7 +81,7 @@ const Page = () => {
       data.forEach((curr) => {
         const location = curr.Location;
         const cbmKey = `${curr.CBM || curr.Cont_Feet}${curr.CBM ? "cbm" : "ft"}`;
-        const totalCost =  Number(curr.Total_Ship_Cost);        
+        const totalCost = Number(curr.Total_Ship_Cost);        
 
         if (!groupedData[location]) {
           groupedData[location] = { Location: location };
@@ -122,12 +121,10 @@ const Page = () => {
 
       const data = await response.json();
       setData(data); 
-      console.log("API Data:", data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
 
   useEffect(() => {
     if (selectedDate) {
@@ -140,6 +137,47 @@ const Page = () => {
     }
   }, [selectedDate]);
 
+  const fetchQuoteData = async () => {
+    if (!selectedId) {
+      console.error("fetchQuoteData called but selectedId is null.");
+      return;
+    }
+  
+    const quoteType = activeSubTab; 
+  
+    try {
+      const response = await fetch("/api/dashboard/get_quote_data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedId, quote: quoteType }), 
+      });
+  
+      const result = await response.json();
+      if (result.success) {
+        setModalData(result.data[0]);
+        setIsAddModalOpen(true);
+      } else {
+        console.error("Error fetching quote data:", result);
+      }
+    } catch (error) {
+      console.error("Error fetching quote data:", error);
+    }
+  };
+  
+  useEffect(() => {
+    if (selectedId) {
+      fetchQuoteData();
+    }
+  }, [selectedId]);
+    
+  const handleRowClick = (id) => {
+    if (!id) {
+      console.error("ID is undefined. Cannot fetch quote data.");
+      return;
+    }
+    setSelectedId(id);  
+  };
+  
   const chartConfig = {
     cbm: {
       label: "CBM",
@@ -154,16 +192,62 @@ const Page = () => {
     { title: "Import LCL Data", data: importLCLChartData },
   ];
 
+  const fullFormMapping = {
+    "O_CCD": "Origin_Customs Clearance & Documentation",
+    "O_LTG": "Origin_Local Transportation From GTI-Chennai",
+    "O_THC": "Origin_Terminal Handling Charges",
+    "O_BLC": "Origin_Bill of Lading Charges",
+    "O_LUS": "OriginLoading/Unloading / SSR",
+    "O_Halt": "Origin_Halting",
+    "O_CFS": "Origin_CFS Charges (At Actual)",
+    "O_Total_Chg": "Origin_Total_Charges",
+    "S_SeaFre": "SeaFreight_Sea Freight",
+    "S_ENS": "SeaFreight_ENS",
+    "S_ISPS": "SeaFreight_ISPS",
+    "S_ITT": "SeaFreight_Seal Fee",
+    "S_Total_Chg": "SeaFreight_Total_Charges",
+    "D_DTH": "Destination Terminal Handling Charges",
+    "D_BLF": "Destination_BL Fee",
+    "D_DBR": "Destination_Delivery by Barge/Road",
+    "D_DOF": "Destination_Delivery Order Fees",
+    "D_HC": "Destination_Handling Charges",
+    "D_TDO": "Destination_T1 Doc",
+    "D_LOC": "Destination_LOLO Charges",
+    "D_Total_Chg": "Destination_Total_Charges",
+    "D_CFS": "Destination_CFS Charges (At Actual)",
+    "D_CCD": "Destination_Customs Clearance & Documentation",
+    "D_LTG": "Destination_Local Transportation From GTI-Chennai",
+    "D_THC": "Destination_Terminal Handling Charges",
+    "D_BLC": "Destination_Bill of Lading Charges",
+    "D_LUS": "Destination_Loading/Unloading / SSR",
+    "D_Halt": "Destination_Halting",
+    "D_CUC": "Destination_Customs Clearance Charges",
+    "D_CCF": "Destination_CC Fee",
+    "D_DOC": "Destination_D.O Charges per BL",
+    "D_AAI": "Destination_AAI Charges",
+    "D_LU" : "Destination_Loading/Unloading",
+    "D_Del": "Destination_Delivery",
+    "D_Total_Chg": "Destination_Total_Charges",
+    "O_DTH": "Origin Terminal Handling Charges",
+    "O_BLF": "Origin_BL Fee",
+    "O_DBR": "Origin_Delivery by Barge/Road",
+    "O_DOF": "Origin_Delivery Order Fees",
+    "O_HC": "Origin_Handling Charges",
+    "O_TDO": "Origin_T1 Doc",
+    "O_LOC": "Origin_LOLO Charges",
+    "O_Total_Chg": "Origin_Total_Charges"
+  };
+
   return (
     <div className="grid grid-cols-1 gap-6">
       <div className="flex flex-wrap items-center justify-between mb-4 space-y-4 lg:space-y-0">
-        {/* <h2 className="text-lg font-bold px-2">Hi {String(secureLocalStorage.getItem("un"))} !! </h2> */}
         <div className="items-center">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="visualization">Visualization View</TabsTrigger>
-          <TabsTrigger value="table">Table View</TabsTrigger>
-        </TabsList>  </Tabs>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              <TabsTrigger value="visualization">Visualization View</TabsTrigger>
+              <TabsTrigger value="table">Table View</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
@@ -173,31 +257,26 @@ const Page = () => {
             value={selectedDate}
             className="w-full md:w-60"
             sx={{
-                "& .MuiInputBase-root": {
-                  color: "var(--borderclr)",
-                  borderRadius: "8px",
-                  fontSize:"14px"
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "var(--borderclr)"
-                },
-                "& .MuiSvgIcon-root": {
-                  color: "var(--borderclr)",
-                },
-              }}
-              onChange={(newValue) => {
-                setSelectedDate(newValue);
-              }}
+              "& .MuiInputBase-root": {
+                color: "var(--borderclr)",
+                borderRadius: "8px",
+                fontSize: "14px"
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "var(--borderclr)"
+              },
+              "& .MuiSvgIcon-root": {
+                color: "var(--borderclr)",
+              },
+            }}
+            onChange={(newValue) => {
+              setSelectedDate(newValue);
+            }}
           />
         </LocalizationProvider>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {/* <TabsList>
-          <TabsTrigger value="visualization">Visualization View</TabsTrigger>
-          <TabsTrigger value="table">Table View</TabsTrigger>
-        </TabsList> */}
-
         <TabsContent value="visualization">
           {charts.map((chart, index) => (
             <motion.div key={index} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -208,52 +287,49 @@ const Page = () => {
                 <CardContent>
                   {chart.data.length > 0 ? (
                     <div className="overflow-x-auto w-full">
-                    <ChartContainer 
-                      config={chartConfig} 
-                      className={`min-w-[700px] w-full h-[200px]`} 
-                    >
-                      <BarChart                      
-                        height={200}
-                        accessibilityLayer
-                        data={chart.data}
-                        barSize={30}
-                        barGap={8}
+                      <ChartContainer 
+                        config={chartConfig} 
+                        className={`min-w-[700px] w-full h-[200px]`} 
                       >
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                          dataKey="Location"
-                          tickLine={false}
-                          axisLine={false}
-                          tickMargin={8}
-                          interval={0}
-                          minTickGap={10}
-                        />
-                        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-                        {Object.keys(chart.data[0] || {})
-                          .filter((k) => k !== "Location")
-                          .map((key, idx) => {
-                            const colors = [                        
-                              "#e76e51", "#2a9d90", "#f6a262",  "#76b5c5", "#e7c468","#154c79",
-                              "#FF4500", "#eab676", "#eeeee4", "#FF6347"
-                            ]; 
-                          
-                            const barColor = colors[idx % colors.length]; 
-                          
-                            return (
-                              <Bar
-                                key={idx}
-                                dataKey={key}
-                                type="natural"
-                                fill={barColor}
-                                stroke={barColor}
-                                radius={4}
-                              />
-                            );
-                          })}
-
-                      </BarChart>
-                    </ChartContainer>
-                  </div>
+                        <BarChart                      
+                          height={200}
+                          accessibilityLayer
+                          data={chart.data}
+                          barSize={30}
+                          barGap={8}
+                        >
+                          <CartesianGrid vertical={false} />
+                          <XAxis
+                            dataKey="Location"
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            interval={0}
+                            minTickGap={10}
+                          />
+                          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                          {Object.keys(chart.data[0] || {})
+                            .filter((k) => k !== "Location")
+                            .map((key, idx) => {
+                              const colors = [                        
+                                "#e76e51", "#2a9d90", "#f6a262",  "#76b5c5", "#e7c468","#154c79",
+                                "#FF4500", "#eab676", "#eeeee4", "#FF6347"
+                              ]; 
+                              const barColor = colors[idx % colors.length]; 
+                              return (
+                                <Bar
+                                  key={idx}
+                                  dataKey={key}
+                                  type="natural"
+                                  fill={barColor}
+                                  stroke={barColor}
+                                  radius={4}
+                                />
+                              );
+                            })}
+                        </BarChart>
+                      </ChartContainer>
+                    </div>
                   ) : (
                     <div>No data available for this chart.</div>
                   )}
@@ -273,25 +349,66 @@ const Page = () => {
             </TabsList>
 
             <TabsContent value="exportFCL">
-              <Table data={exportFCLData} />
+              <Table data={exportFCLData} handleRowClick={handleRowClick} />
             </TabsContent>
             <TabsContent value="importFCL">
-              <Table data={importFCLChartData} />
+              <Table data={importFCLChartData} handleRowClick={handleRowClick} idKey="FCL_Id"/>
             </TabsContent>
             <TabsContent value="exportLCL">
-              <Table data={exportLCLData} />
+              <Table data={exportLCLData} handleRowClick={handleRowClick} />
             </TabsContent>
             <TabsContent value="importLCL">
-              <Table data={importLCLChartData} />
+              <Table data={importLCLChartData} handleRowClick={handleRowClick} idKey="LCL_Id"/>
             </TabsContent>
           </Tabs>
         </TabsContent>
       </Tabs>
+
+      {isAddModalOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          onClick={() => setIsAddModalOpen(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[54vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
+              <h2 className="text-lg font-bold">Quote Details</h2>
+            </div>
+            <div className="p-6 overflow-y-auto h-[calc(50vh-100px)]">
+              {modalData && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(modalData).map(([key, value], index) => (
+                    <div key={index} className="col-span-1">
+                      <label className="block text-sm font-semibold">{fullFormMapping[key] || key}</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded"
+                        value={value}
+                        readOnly
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const Table = ({ data }) => {
+const Table = ({ data, handleRowClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortedData, setSortedData] = useState(data);
   const [sortConfig, setSortConfig] = useState(null);
@@ -380,16 +497,38 @@ const Table = ({ data }) => {
           </thead>
           <tbody>
             {filteredData.length > 0 ? (
-              filteredData.map((row, i) => (
-                <tr key={i} className="border hover:bg-muted">
-                  {Object.values(row).map((value, j) => (
-                    <td key={j} className="px-4 py-2 border">{String(value)}</td>
-                  ))}
-                </tr>
-              ))
+              filteredData.map((row, i) => {
+                const rowId = row.id || row.ID || row.Id; 
+                return (
+                  <tr 
+                    key={i} 
+                    className="border hover:bg-muted cursor-pointer" 
+                    onClick={() => handleRowClick(rowId)}
+                  >
+                    {Object.values(row).map((value, j) => (
+                      <td key={j} className="px-4 py-2 border">
+                        {j === 0 ? (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRowClick(rowId);
+                            }}
+                          >
+                            {String(value)}
+                          </button>
+                        ) : (
+                          String(value)
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
             ) : (
               <tr>
-                <td colSpan={data.length > 0 ? Object.keys(data[0]).length : 1} className="text-center py-4">No matching records found.</td>
+                <td colSpan={data.length > 0 ? Object.keys(data[0]).length : 1} className="text-center py-4">
+                  No matching records found.
+                </td>
               </tr>
             )}
           </tbody>

@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       }
       try {
           const result = await prisma.$queryRaw`EXEC [dbo].[Get_Import_LCL_Quote_Dashboard] ${quote_month}, ${quote_year}, ${sc}`;
-          // console.log('FCL Data:', result);        
+          console.log('LCL Data:', result);        
           return res.status(200).json(result);
       } catch (error) {
           console.error('Error fetching Get_Import_LCL_Quote_Dashboard:', error);

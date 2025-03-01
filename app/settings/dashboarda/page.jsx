@@ -13,9 +13,6 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-
-
-
 const Page = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
@@ -26,6 +23,9 @@ const Page = () => {
   const [exportLCLData, setExportLCLData] = useState([]);
   const [importLCLData, setImportLCLData] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [modalData, setModalData] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -42,13 +42,9 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
-    let flag = false
     const check_sc = secureLocalStorage.getItem("sc");
     setIsAdmin(check_sc === 'admin');
-    flag = (check_sc === 'admin')
-    console.log("is admin : ", isAdmin, flag, check_sc)
-    if(!flag) {
-      // secureLocalStorage.clear();
+    if (check_sc !== 'admin') {
       window.location.href = "/";
     }
   }, []);
@@ -68,7 +64,6 @@ const Page = () => {
 
       const data = await response.json();
       setData(data); 
-      console.log("API Data:", data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -82,6 +77,47 @@ const Page = () => {
       fetchData("/api/admindashboard/get_Admin_I_LCL", setImportLCLData);
     }
   }, [selectedDate]);
+
+  const fetchQuoteData = async () => {
+    if (!selectedId) {
+      console.error("fetchQuoteData called but selectedId is null.");
+      return;
+    }
+
+    const quoteType = activeTab; 
+
+    try {
+      const response = await fetch("/api/dashboard/get_quote_data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedId, quote: quoteType }), 
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setModalData(result.data[0]);
+        setIsAddModalOpen(true);
+      } else {
+        console.error("Error fetching quote data:", result);
+      }
+    } catch (error) {
+      console.error("Error fetching quote data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedId) {
+      fetchQuoteData();
+    }
+  }, [selectedId]);
+
+  const handleRowClick = (id) => {
+    if (!id) {
+      console.error("ID is undefined. Cannot fetch quote data.");
+      return;
+    }
+    setSelectedId(id);  
+  };
 
   return (
     <div className="grid grid-cols-1 gap-6">
@@ -125,23 +161,64 @@ const Page = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsContent value="exportFCL">
-          <DataTable data={exportFCLData} selectedDate={selectedDate} />
+          <DataTable data={exportFCLData} handleRowClick={handleRowClick} />
         </TabsContent>
         <TabsContent value="importFCL">
-          <DataTable data={importFCLData} selectedDate={selectedDate} />
+          <DataTable data={importFCLData} handleRowClick={handleRowClick} />
         </TabsContent>
         <TabsContent value="exportLCL">
-          <DataTable data={exportLCLData} selectedDate={selectedDate} />
+          <DataTable data={exportLCLData} handleRowClick={handleRowClick} />
         </TabsContent>
         <TabsContent value="importLCL">
-          <DataTable data={importLCLData} selectedDate={selectedDate} />
+          <DataTable data={importLCLData} handleRowClick={handleRowClick} />
         </TabsContent>
       </Tabs>
+
+      {isAddModalOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          onClick={() => setIsAddModalOpen(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[54vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
+              <h2 className="text-lg font-bold">Quote Details</h2>
+            </div>
+            <div className="p-6 overflow-y-auto h-[calc(50vh-100px)]">
+              {modalData && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(modalData).map(([key, value], index) => (
+                    <div key={index} className="col-span-1">
+                      <label className="block text-sm font-semibold">{fullFormMapping[key] || key}</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded"
+                        value={value}
+                        readOnly
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const DataTable = ({ data, selectedDate }) => {
+const DataTable = ({ data, handleRowClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortedData, setSortedData] = useState(data);
   const [sortConfig, setSortConfig] = useState(null);
@@ -187,116 +264,6 @@ const DataTable = ({ data, selectedDate }) => {
     );
   });
 
-  // const exportToExcel = () => {
-  //   const worksheet = XLSX.utils.json_to_sheet(filteredData);
-  //   const workbook = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-  //   XLSX.writeFile(workbook, "data.xlsx");
-  // };
-
-  const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(filteredData);
-    
-    // Apply header styles
-    const headerStyle = { font: { bold: true }, fill: { fgColor: { rgb: "FFFF00" } } };
-    const borderStyle = { border: { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } } };
-
-    // Get column keys
-    const columns = Object.keys(filteredData[0] || {});
-
-    // Apply styles to headers
-    columns.forEach((key, index) => {
-      const cellRef = XLSX.utils.encode_cell({ r: 0, c: index });
-      if (!ws[cellRef]) ws[cellRef] = {};
-      ws[cellRef].s = headerStyle;
-    });
-
-    // Apply borders and adjust column width
-    const range = XLSX.utils.decode_range(ws["!ref"]);
-    for (let R = range.s.r; R <= range.e.r; ++R) {
-      for (let C = range.s.c; C <= range.e.c; ++C) {
-        const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
-        if (cell) cell.s = borderStyle;
-      }
-    }
-
-    // Auto fit column width
-    ws["!cols"] = columns.map(() => ({ wch: 20 }));
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Quote Data");
-    XLSX.writeFile(wb, "data.xlsx");
-  };
-
-  const exportToPDF = () => {   
-    const doc = new jsPDF({ orientation: "landscape" });
-    const currentDate = new Date();
-    const formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
-
-    const startDate = selectedDate.startOf("month").format("DD");
-    const endDate = selectedDate.endOf("month").format("DD");
-    const selectedMonthYear = selectedDate.format("MMMM YYYY");
-   
-    const addHeader = (doc) => {
-      doc.setFontSize(10);
-      doc.text(`Export FCL Quote for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 5);
-  };
-   
-  const addFooter = (doc) => {
-    const pageWidth = doc.internal.pageSize.width;
-    const footerText = "Greentech Industries (India) Pvt. Ltd.";
-    const textWidth = doc.getTextWidth(footerText);
-    const xPosition = (pageWidth - textWidth) / 2; // Center align footer
-    const yPosition = doc.internal.pageSize.height - 8; // Bottom margin
-    doc.text(footerText, xPosition, yPosition);
-};
-
-    const headers = Object.keys(filteredData[0] || {}).map(key => key.toUpperCase());
-
-    // Numeric columns that should be right-aligned
-    const numericColumns = ["TOTAL_SHIPMENT_COST", "ORIGIN_CHARGES", "SEAFREIGHT_CHARGES", "DESTINATION_CHARGES"];
-
-    // Get the index of numeric columns
-    const numericColumnIndexes = headers
-      .map((header, index) => numericColumns.includes(header.replace(/\s+/g, "_")) ? index : -1)
-      .filter(index => index !== -1);
-
-      const formatNumber = (num) => {
-        return typeof num === "number" ? num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : num;
-      };
-    
-      const formattedBody = filteredData.map(row => 
-        Object.values(row).map((value, index) => numericColumnIndexes.includes(index) ? formatNumber(value) : value)
-      );
-
-    doc.autoTable({
-      head: [headers],
-      body: formattedBody,
-      startY: 8, // Reduced top margin
-      margin: { top: 8, left: 5, right: 5 },
-      styles: { fontSize: 9},
-      headStyles: { 
-        fillColor: [204, 229, 252], 
-        textColor: [0, 0, 0], 
-        // fontStyle: "bold", 
-        lineWidth: 0.1, // Ensure header grid lines
-        lineColor: [0, 0, 0] // Black border for the header
-      },
-      columnStyles: numericColumnIndexes.reduce((acc, index) => {
-        acc[index] = { halign: "right" }; 
-        return acc;
-      }, {}),
-      theme: "grid",
-      didDrawPage: (data) => {
-        addHeader(doc);
-        addFooter(doc);
-    },
-    });
-    doc.save("data.pdf");
-  };
-
- 
-
   return (
     <div className="bg-card p-4 rounded-lg shadow-lg">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 space-y-2">
@@ -309,14 +276,6 @@ const DataTable = ({ data, selectedDate }) => {
             value={searchTerm}
             onChange={handleSearch}
           />
-        </div>
-        <div className="flex space-x-2">
-          <button onClick={exportToExcel} className="flex items-center px-4 py-2 bg-green-500 text-white rounded">
-            <FaFileExcel className="mr-2" /> Excel
-          </button>
-          <button onClick={exportToPDF} className="flex items-center px-4 py-2 bg-red-500 text-white rounded">
-            <FaFilePdf className="mr-2" /> PDF
-          </button>
         </div>
       </div>
 
@@ -333,54 +292,93 @@ const DataTable = ({ data, selectedDate }) => {
           <thead className="bg-muted">
             <tr>
               {sortedData.length > 0 && Object.keys(sortedData[0]).map((key, index) => (
-                <th key={index} className="px-4 py-2 border"
-                //  onClick={() => handleSort(key)}
-                >
+                <th key={index} className="px-4 py-2 border">
                   {key.toUpperCase()} 
-                  {/* {sortConfig && sortConfig.key === key ? (
-                    sortConfig.direction === 'ascending' ? <FaSortUp className="inline" /> :
-                    sortConfig.direction === 'descending' ? <FaSortDown className="inline" /> :
-                    <FaSort className="inline" />
-                  ) : (
-                    <FaSort className="inline" />
-                  )} */}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-          {filteredData.length > 0 ? (
-            filteredData.map((item, index) => (
-              <tr key={index} className="border hover:bg-muted">
-                {Object.keys(item).map((key) => (
-                  <td key={key} className="px-4 py-2 border">
-                    {/* Format currency fields */}
-                    {["Total_Shipment_Cost", "Origin_Charges", "Seafreight_Charges", "Destination_Charges"].includes(key) ? (
-                      <div style={{ textAlign: "right" }}>
-                        {parseFloat(item[key]).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </div>
-                    ) : (
-                      String(item[key]) // Convert all values to strings for safety
-                    )}
-                  </td>
-                ))}
+            {filteredData.length > 0 ? (
+              filteredData.map((row, index) => {
+                const rowId = row.id || row.ID || row.Id;
+                return (
+                  <tr 
+                    key={index} 
+                    className="border hover:bg-muted cursor-pointer" 
+                    onClick={() => handleRowClick(rowId)}
+                  >
+                    {Object.values(row).map((value, j) => (
+                      <td key={j} className="px-4 py-2 border">
+                        {j === 0 ? (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRowClick(rowId);
+                            }}
+                          >
+                            {String(value)}
+                          </button>
+                        ) : (
+                          String(value)
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={filteredData.length > 0 ? Object.keys(filteredData[0]).length : 1} className="text-center py-4">
+                  No results found.
+                </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={filteredData.length > 0 ? Object.keys(filteredData[0]).length : 1} className="text-center py-4">
-                No results found.
-              </td>
-            </tr>
-          )}
+            )}
           </tbody>
         </table>
       </div>
     </div>
   );
+};
+
+const fullFormMapping = {
+  "O_CCD": "Origin_Customs Clearance & Documentation",
+  "O_LTG": "Origin_Local Transportation From GTI-Chennai",
+  "O_THC": "Origin_Terminal Handling Charges",
+  "O_BLC": "Origin_Bill of Lading Charges",
+  "O_LUS": "OriginLoading/Unloading / SSR",
+  "O_Halt": "Origin_Halting",
+  "O_CFS": "Origin_CFS Charges (At Actual)",
+  "O_Total_Chg": "Origin_Total_Charges",
+  "S_SeaFre": "SeaFreight_Sea Freight",
+  "S_ENS": "SeaFreight_ENS",
+  "S_ISPS": "SeaFreight_ISPS",
+  "S_ITT": "SeaFreight_Seal Fee",
+  "S_Total_Chg": "SeaFreight_Total_Charges",
+  "D_DTH": "Destination Terminal Handling Charges",
+  "D_BLF": "Destination_BL Fee",
+  "D_DBR": "Destination_Delivery by Barge/Road",
+  "D_DOF": "Destination_Delivery Order Fees",
+  "D_HC": "Destination_Handling Charges",
+  "D_TDO": "Destination_T1 Doc",
+  "D_LOC": "Destination_LOLO Charges",
+  "D_Total_Chg": "Destination_Total_Charges",
+  "D_CFS": "Destination_CFS Charges (At Actual)",
+  "D_CCD": "Destination_Customs Clearance & Documentation",
+  "D_LTG": "Destination_Local Transportation From GTI-Chennai",
+  "D_THC": "Destination_Terminal Handling Charges",
+  "D_BLC": "Destination_Bill of Lading Charges",
+  "D_LUS": "Destination_Loading/Unloading / SSR",
+  "D_Halt": "Destination_Halting",
+  "D_Total_Chg": "Destination_Total_Charges",
+  "O_DTH": "Origin Terminal Handling Charges",
+  "O_BLF": "Origin_BL Fee",
+  "O_DBR": "Origin_Delivery by Barge/Road",
+  "O_DOF": "Origin_Delivery Order Fees",
+  "O_HC": "Origin_Handling Charges",
+  "O_TDO": "Origin_T1 Doc",
+  "O_LOC": "Origin_LOLO Charges",
+  "O_Total_Chg": "Origin_Total_Charges"
 };
 
 export default Page;
