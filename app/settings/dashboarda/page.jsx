@@ -13,6 +13,48 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
+const fullFormMapping = {
+  "O_CCD": "Origin_Customs Clearance & Documentation",
+  "O_LTG": "Origin_Local Transportation From GTI-Chennai",
+  "O_THC": "Origin_Terminal Handling Charges",
+  "O_BLC": "Origin_Bill of Lading Charges",
+  "O_LUS": "OriginLoading/Unloading / SSR",
+  "O_Halt": "Origin_Halting",
+  "O_CFS": "Origin_CFS Charges (At Actual)",
+  "O_Total_Chg": "Origin_Total_Charges",
+  "S_SeaFre": "SeaFreight_Sea Freight",
+  "S_ENS": "SeaFreight_ENS",
+  "S_ISPS": "SeaFreight_ISPS",
+  "S_ITT": "SeaFreight_Seal Fee",
+  "S_Total_Chg": "SeaFreight_Total_Charges",
+  "D_DTH": "Destination Terminal Handling Charges",
+  "D_BLF": "Destination_BL Fee",
+  "D_DBR": "Destination_Delivery by Barge/Road",
+  "D_DOF": "Destination_Delivery Order Fees",
+  "D_HC": "Destination_Handling Charges",
+  "D_TDO": "Destination_T1 Doc",
+  "D_LOC": "Destination_LOLO Charges",
+  "D_Total_Chg": "Destination_Total_Charges",
+  "D_CFS": "Destination_CFS Charges (At Actual)",
+  "D_CCD": "Destination_Customs Clearance & Documentation",
+  "D_LTG": "Destination_Local Transportation From GTI-Chennai",
+  "D_THC": "Destination_Terminal Handling Charges",
+  "D_BLC": "Destination_Bill of Lading Charges",
+  "D_LUS": "Destination_Loading/Unloading / SSR",
+  "D_Halt": "Destination_Halting",
+  "D_Total_Chg": "Destination_Total_Charges",
+  "O_DTH": "Origin Terminal Handling Charges",
+  "O_BLF": "Origin_BL Fee",
+  "O_DBR": "Origin_Delivery by Barge/Road",
+  "O_DOF": "Origin_Delivery Order Fees",
+  "O_HC": "Origin_Handling Charges",
+  "O_TDO": "Origin_T1 Doc",
+  "O_LOC": "Origin_LOLO Charges",
+  "O_Total_Chg": "Origin_Total_Charges"
+};
+
+
+
 const Page = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
@@ -42,9 +84,13 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
+    let flag = false
     const check_sc = secureLocalStorage.getItem("sc");
     setIsAdmin(check_sc === 'admin');
-    if (check_sc !== 'admin') {
+    flag = (check_sc === 'admin')
+    console.log("is admin : ", isAdmin, flag, check_sc)
+    if(!flag) {
+      // secureLocalStorage.clear();
       window.location.href = "/";
     }
   }, []);
@@ -64,6 +110,7 @@ const Page = () => {
 
       const data = await response.json();
       setData(data); 
+      console.log("API Data:", data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -161,19 +208,18 @@ const Page = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsContent value="exportFCL">
-          <DataTable data={exportFCLData} handleRowClick={handleRowClick} />
+          <DataTable data={exportFCLData} selectedDate={selectedDate} handleRowClick={handleRowClick} />
         </TabsContent>
         <TabsContent value="importFCL">
-          <DataTable data={importFCLData} handleRowClick={handleRowClick} />
+          <DataTable data={importFCLData} selectedDate={selectedDate} handleRowClick={handleRowClick} />
         </TabsContent>
         <TabsContent value="exportLCL">
-          <DataTable data={exportLCLData} handleRowClick={handleRowClick} />
+          <DataTable data={exportLCLData} selectedDate={selectedDate} handleRowClick={handleRowClick} />
         </TabsContent>
         <TabsContent value="importLCL">
-          <DataTable data={importLCLData} handleRowClick={handleRowClick} />
+          <DataTable data={importLCLData} selectedDate={selectedDate} handleRowClick={handleRowClick} />
         </TabsContent>
       </Tabs>
-
       {isAddModalOpen && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
@@ -218,7 +264,7 @@ const Page = () => {
   );
 };
 
-const DataTable = ({ data, handleRowClick }) => {
+const DataTable = ({ data, selectedDate, handleRowClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortedData, setSortedData] = useState(data);
   const [sortConfig, setSortConfig] = useState(null);
@@ -264,6 +310,116 @@ const DataTable = ({ data, handleRowClick }) => {
     );
   });
 
+  // const exportToExcel = () => {
+  //   const worksheet = XLSX.utils.json_to_sheet(filteredData);
+  //   const workbook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+  //   XLSX.writeFile(workbook, "data.xlsx");
+  // };
+
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(filteredData);
+    
+    // Apply header styles
+    const headerStyle = { font: { bold: true }, fill: { fgColor: { rgb: "FFFF00" } } };
+    const borderStyle = { border: { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } } };
+
+    // Get column keys
+    const columns = Object.keys(filteredData[0] || {});
+
+    // Apply styles to headers
+    columns.forEach((key, index) => {
+      const cellRef = XLSX.utils.encode_cell({ r: 0, c: index });
+      if (!ws[cellRef]) ws[cellRef] = {};
+      ws[cellRef].s = headerStyle;
+    });
+
+    // Apply borders and adjust column width
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+        if (cell) cell.s = borderStyle;
+      }
+    }
+
+    // Auto fit column width
+    ws["!cols"] = columns.map(() => ({ wch: 20 }));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Quote Data");
+    XLSX.writeFile(wb, "data.xlsx");
+  };
+
+  const exportToPDF = () => {   
+    const doc = new jsPDF({ orientation: "landscape" });
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
+
+    const startDate = selectedDate.startOf("month").format("DD");
+    const endDate = selectedDate.endOf("month").format("DD");
+    const selectedMonthYear = selectedDate.format("MMMM YYYY");
+   
+    const addHeader = (doc) => {
+      doc.setFontSize(10);
+      doc.text(`Export FCL Quote for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 5);
+  };
+   
+  const addFooter = (doc) => {
+    const pageWidth = doc.internal.pageSize.width;
+    const footerText = "Greentech Industries (India) Pvt. Ltd.";
+    const textWidth = doc.getTextWidth(footerText);
+    const xPosition = (pageWidth - textWidth) / 2; // Center align footer
+    const yPosition = doc.internal.pageSize.height - 8; // Bottom margin
+    doc.text(footerText, xPosition, yPosition);
+};
+
+    const headers = Object.keys(filteredData[0] || {}).map(key => key.toUpperCase());
+
+    // Numeric columns that should be right-aligned
+    const numericColumns = ["TOTAL_SHIPMENT_COST", "ORIGIN_CHARGES", "SEAFREIGHT_CHARGES", "DESTINATION_CHARGES"];
+
+    // Get the index of numeric columns
+    const numericColumnIndexes = headers
+      .map((header, index) => numericColumns.includes(header.replace(/\s+/g, "_")) ? index : -1)
+      .filter(index => index !== -1);
+
+      const formatNumber = (num) => {
+        return typeof num === "number" ? num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : num;
+      };
+    
+      const formattedBody = filteredData.map(row => 
+        Object.values(row).map((value, index) => numericColumnIndexes.includes(index) ? formatNumber(value) : value)
+      );
+
+    doc.autoTable({
+      head: [headers],
+      body: formattedBody,
+      startY: 8, // Reduced top margin
+      margin: { top: 8, left: 5, right: 5 },
+      styles: { fontSize: 9},
+      headStyles: { 
+        fillColor: [204, 229, 252], 
+        textColor: [0, 0, 0], 
+        // fontStyle: "bold", 
+        lineWidth: 0.1, // Ensure header grid lines
+        lineColor: [0, 0, 0] // Black border for the header
+      },
+      columnStyles: numericColumnIndexes.reduce((acc, index) => {
+        acc[index] = { halign: "right" }; 
+        return acc;
+      }, {}),
+      theme: "grid",
+      didDrawPage: (data) => {
+        addHeader(doc);
+        addFooter(doc);
+    },
+    });
+    doc.save("data.pdf");
+  };
+
+ 
+
   return (
     <div className="bg-card p-4 rounded-lg shadow-lg">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 space-y-2">
@@ -277,10 +433,18 @@ const DataTable = ({ data, handleRowClick }) => {
             onChange={handleSearch}
           />
         </div>
+        <div className="flex space-x-2">
+          <button onClick={exportToExcel} className="flex items-center px-4 py-2 bg-green-500 text-white rounded">
+            <FaFileExcel className="mr-2" /> Excel
+          </button>
+          <button onClick={exportToPDF} className="flex items-center px-4 py-2 bg-red-500 text-white rounded">
+            <FaFilePdf className="mr-2" /> PDF
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border rounded-lg bg-card text-foreground" 
+      <table className="min-w-full border rounded-lg bg-card text-foreground" 
           style={{ 
             tableLayout: "fixed",
             fontSize: "13px", 
@@ -292,9 +456,11 @@ const DataTable = ({ data, handleRowClick }) => {
           <thead className="bg-muted">
             <tr>
               {sortedData.length > 0 && Object.keys(sortedData[0]).map((key, index) => (
-                <th key={index} className="px-4 py-2 border">
-                  {key.toUpperCase()} 
-                </th>
+                key !== "id" && ( 
+                  <th key={index} className="px-4 py-2 border">
+                    {key.toUpperCase()} 
+                  </th>
+                )
               ))}
             </tr>
           </thead>
@@ -308,28 +474,19 @@ const DataTable = ({ data, handleRowClick }) => {
                     className="border hover:bg-muted cursor-pointer" 
                     onClick={() => handleRowClick(rowId)}
                   >
-                    {Object.values(row).map((value, j) => (
-                      <td key={j} className="px-4 py-2 border">
-                        {j === 0 ? (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRowClick(rowId);
-                            }}
-                          >
-                            {String(value)}
-                          </button>
-                        ) : (
-                          String(value)
-                        )}
-                      </td>
+                    {Object.entries(row).map(([key, value], j) => (
+                      key !== "id" && ( 
+                        <td key={j} className="px-4 py-2 border">
+                          {String(value)}
+                        </td>
+                      )
                     ))}
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan={filteredData.length > 0 ? Object.keys(filteredData[0]).length : 1} className="text-center py-4">
+                <td colSpan={filteredData.length > 0 ? Object.keys(filteredData[0]).length - 1 : 1} className="text-center py-4">
                   No results found.
                 </td>
               </tr>
@@ -339,46 +496,6 @@ const DataTable = ({ data, handleRowClick }) => {
       </div>
     </div>
   );
-};
-
-const fullFormMapping = {
-  "O_CCD": "Origin_Customs Clearance & Documentation",
-  "O_LTG": "Origin_Local Transportation From GTI-Chennai",
-  "O_THC": "Origin_Terminal Handling Charges",
-  "O_BLC": "Origin_Bill of Lading Charges",
-  "O_LUS": "OriginLoading/Unloading / SSR",
-  "O_Halt": "Origin_Halting",
-  "O_CFS": "Origin_CFS Charges (At Actual)",
-  "O_Total_Chg": "Origin_Total_Charges",
-  "S_SeaFre": "SeaFreight_Sea Freight",
-  "S_ENS": "SeaFreight_ENS",
-  "S_ISPS": "SeaFreight_ISPS",
-  "S_ITT": "SeaFreight_Seal Fee",
-  "S_Total_Chg": "SeaFreight_Total_Charges",
-  "D_DTH": "Destination Terminal Handling Charges",
-  "D_BLF": "Destination_BL Fee",
-  "D_DBR": "Destination_Delivery by Barge/Road",
-  "D_DOF": "Destination_Delivery Order Fees",
-  "D_HC": "Destination_Handling Charges",
-  "D_TDO": "Destination_T1 Doc",
-  "D_LOC": "Destination_LOLO Charges",
-  "D_Total_Chg": "Destination_Total_Charges",
-  "D_CFS": "Destination_CFS Charges (At Actual)",
-  "D_CCD": "Destination_Customs Clearance & Documentation",
-  "D_LTG": "Destination_Local Transportation From GTI-Chennai",
-  "D_THC": "Destination_Terminal Handling Charges",
-  "D_BLC": "Destination_Bill of Lading Charges",
-  "D_LUS": "Destination_Loading/Unloading / SSR",
-  "D_Halt": "Destination_Halting",
-  "D_Total_Chg": "Destination_Total_Charges",
-  "O_DTH": "Origin Terminal Handling Charges",
-  "O_BLF": "Origin_BL Fee",
-  "O_DBR": "Origin_Delivery by Barge/Road",
-  "O_DOF": "Origin_Delivery Order Fees",
-  "O_HC": "Origin_Handling Charges",
-  "O_TDO": "Origin_T1 Doc",
-  "O_LOC": "Origin_LOLO Charges",
-  "O_Total_Chg": "Origin_Total_Charges"
 };
 
 export default Page;
