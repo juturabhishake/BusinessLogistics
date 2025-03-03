@@ -24,7 +24,7 @@ export default function Home() {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginState, setLoginState] = useState("idle");
   const [loading, setLoading] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(60);
+  const [otpTimer, setOtpTimer] = useState(180);
   const [otpExpired, setOtpExpired] = useState(false);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function Home() {
 
         if (response.ok) {
             setStep(2);
-            setOtpTimer(60);
+            setOtpTimer(180);
             setOtpExpired(false);
         } else {
             const errorData = await response.json();

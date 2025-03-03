@@ -22,12 +22,23 @@ function runMiddleware(req, res, fn) {
   });
 }
 
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
+//     user: process.env.EMAIL,
+//     pass: process.env.APP_PASSWORD,
+//   },
+// });
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'mail.nws.cn', // Your SMTP host (remove 'https://' and port)
+  port: 465, // Use 465 for SSL, or 587 for TLS
+  secure: true, // true for 465, false for 587
   auth: {
-    user: process.env.EMAIL,
-    pass: process.env.APP_PASSWORD,
+    user: process.env.EMAIL, // Your domain email (e.g., you@nws.cn)
+    pass: process.env.EMAIL_PASSWORD, // Your email password
   },
+  authMethod: 'LOGIN',
 });
 
 const otpStore = {};
