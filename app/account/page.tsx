@@ -308,7 +308,7 @@ const Page: React.FC = () => {
                        onClick={() => setIsModalOpen(true)}
                        style={{width: "100%"}}
                      >
-                       Forgot Password
+                       Change Password
                      </Button>
                      <Button
                         type="submit"

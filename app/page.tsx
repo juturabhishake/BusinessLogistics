@@ -156,6 +156,7 @@ export default function Home() {
           secureLocalStorage.setItem("address", user.Address);
           secureLocalStorage.setItem("sc", user.Vendor_Code);
           // console.log('vendor code:', user.Vendor_Code);
+          secureLocalStorage.setItem("vn", user.Vendor_Name);
           setLoginState("success");
           setTimeout(() => {
             if (user.Vendor_Code === 'admin') {

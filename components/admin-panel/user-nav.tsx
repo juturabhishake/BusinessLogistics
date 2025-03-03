@@ -30,6 +30,7 @@ import {
 export function UserNav() {
   const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
+  const [vendorName, setVendorName] = useState("");
   useEffect(() => {
     const checkLogin = async () => {
       const user = secureLocalStorage.getItem("un");
@@ -60,6 +61,10 @@ export function UserNav() {
     };
     checkLogin();
     const em = secureLocalStorage.getItem("em");
+    const vname = secureLocalStorage.getItem("vn");
+    if (typeof vname === "string") {
+      setVendorName(vname);
+    }
   }, []);
   const handleLogout = () => {
     secureLocalStorage.clear();
@@ -94,6 +99,9 @@ export function UserNav() {
             <p className="text-sm font-medium leading-none">{user}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {email}
+            </p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {vendorName}
             </p>
           </div>
         </DropdownMenuLabel>

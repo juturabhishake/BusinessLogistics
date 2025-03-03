@@ -67,14 +67,14 @@ export default async function handler(req, res) {
                     SELECT [Login_id]
                         ,[Username]
                         ,[Email]
-                        ,[Password] = ${password}
+                        ,[Password]
                         ,[Phone]
                         ,[Company]
                         ,[Address]
                         ,[Is_Active]
                         ,[Created_Date]
-                        ,[Vendor_Code]
-                    FROM [dbo].[Web_Login] where email = ${email}`;
+                        ,wl.[Vendor_Code], v.Vendor_Name
+                    FROM [dbo].[Web_Login] wl left join Vendors v on wl.Vendor_Code = v.Vendor_Code where email = ${email}`;
                     console.log("login data : ", query)
                 return res.status(200).json({ message: loginMessage, data: query });
             } else {
