@@ -65,6 +65,7 @@ const QuotationTable = () => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [currency, setCurrency] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [remarks, setRemarks] = useState("");
 
   useEffect(() => {
     let flag = false
@@ -138,13 +139,13 @@ const QuotationTable = () => {
         body: JSON.stringify({ Loc_Code: locationCode, sc: secureLocalStorage.getItem("sc") || "Unknown Supplier", }),
       });
 
-      const data = await response.json();
+      const data = await response.json();    
 
       if (data.result && data.result.length > 0) {
         const updatedOriginCharges = [...originCharges];
         const updatedSeaFreightCharges = [...seaFreightCharges];
         const updatedDestinationCharges = [...destinationCharges];
-
+        
         const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
         const fcl40 = data.result.find((item) => item.Cont_Feet === 40) || {};
 
@@ -184,6 +185,8 @@ const QuotationTable = () => {
         updatedDestinationCharges[5][40] = fcl40.D_TDO || "";
         updatedDestinationCharges[6][20] = fcl20.D_LOC || "";
         updatedDestinationCharges[6][40] = fcl40.D_LOC || "";
+
+        setRemarks(fcl20.remarks || "");
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
@@ -229,6 +232,7 @@ const QuotationTable = () => {
       totalSeaFreight: totalSeaFreight[containerSize],
       totalDestination: totalDestination[containerSize],
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
+      remarks: remarks || "N/A",
     };
   
     try {
@@ -493,7 +497,7 @@ const QuotationTable = () => {
                     </td>
                   </tr>
                   );
-})}
+              })}
               {sections.origin && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
@@ -640,6 +644,18 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">{Dest_Port}</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">
+                    <input
+                        type="text"
+                        placeholder="type here..."                       
+                        className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                      />
+                </td>
               </tr>
             </tbody>
           </table>

@@ -65,6 +65,7 @@ const QuotationTable = () => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [currency, setCurrency] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [remarks, setRemarks] = useState("");
 
   useEffect(() => {
     let flag = false
@@ -185,6 +186,8 @@ const QuotationTable = () => {
         updatedDestinationCharges[6][20] = fcl20.D_LOC || "";
         updatedDestinationCharges[6][40] = fcl40.D_LOC || "";
 
+        setRemarks(fcl20.remarks || "");
+
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
         setDestinationCharges(updatedDestinationCharges);
@@ -229,6 +232,7 @@ const QuotationTable = () => {
       totalSeaFreight: totalSeaFreight[containerSize],
       totalDestination: totalDestination[containerSize],
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
+      remarks: remarks || "N/A",
     };
   
     try {
@@ -632,6 +636,18 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">{Dest_Port}</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
+              <td colSpan="4" className="py-1 px-3 border text-left">
+                    <input
+                        type="text"
+                        placeholder="type here..."                       
+                        className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                      />
+                </td>
               </tr>
             </tbody>
           </table>

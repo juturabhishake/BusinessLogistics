@@ -69,6 +69,7 @@ model FCL_Quote {
   Created_By      String?   @db.VarChar(100)
   Updated_Date    DateTime? @db.DateTime
   Updated_By      String?   @db.VarChar(100)
+  remarks         String?   @db.VarChar(Max)
 
   @@ignore
 }
@@ -104,6 +105,7 @@ model LCL_Quote {
   Created_By      String?   @db.VarChar(100)
   Updated_Date    DateTime? @db.DateTime
   Updated_By      String?   @db.VarChar(100)
+  remarks         String?   @db.VarChar(Max)
 
   @@ignore
 }
@@ -189,6 +191,7 @@ model Import_LCL_Quote {
   Created_By      String?   @db.VarChar(100)
   Updated_Date    DateTime? @db.DateTime
   Updated_By      String?   @db.VarChar(100)
+  remarks         String?   @db.VarChar(Max)
 
   @@ignore
 }
@@ -208,6 +211,7 @@ model Vendors {
   CreatedBy     String?   @db.VarChar(50)
   UpdatedDate   DateTime? @db.DateTime
   UpdatedBy     String?   @db.VarChar(50)
+  Short_Name    String?   @db.VarChar(10)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -244,6 +248,21 @@ model Import_FCL_Quote {
   Created_By      String?   @db.VarChar(100)
   Updated_Date    DateTime? @db.DateTime
   Updated_By      String?   @db.VarChar(100)
+  remarks         String?   @db.VarChar(Max)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Quote_Calendar {
+  Tran_Id       Int       @default(autoincrement())
+  Month_No      Int?
+  Year_No       Int?
+  Start_Date    DateTime  @db.DateTime
+  End_Time      DateTime  @db.DateTime
+  Finalize_Date DateTime  @db.DateTime
+  Created_By    String?   @db.VarChar(50)
+  Created_Date  DateTime? @default(now(), map: "DF_Quote_Calendar_Created_Date") @db.DateTime
 
   @@ignore
 }

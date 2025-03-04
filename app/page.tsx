@@ -271,7 +271,7 @@ export default function Home() {
                     required
                   />
                   <Button
- className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+                    className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
                     onClick={handleNextStep}
                     disabled={loading}
                   >

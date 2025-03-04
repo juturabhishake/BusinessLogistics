@@ -62,6 +62,7 @@ const QuotationTable = () => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [currency, setCurrency] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [remarks, setRemarks] = useState("");
 
   useEffect(() => {
     let flag = false
@@ -213,6 +214,7 @@ const QuotationTable = () => {
           if (origin[4]) origin[4][cbmKey] = item.O_LU || "0";
           if (origin[5]) origin[5][cbmKey] = item.O_Del || "0";
         }
+        setRemarks(item.remarks || "");
       });
   
       setOriginData(origin);
@@ -289,6 +291,7 @@ const QuotationTable = () => {
       Total_Ship_Cost: totalShipmentCost[cbm],
       Created_By: secureLocalStorage.getItem("un") || "Unknown",
       Updated_By: secureLocalStorage.getItem("un") || "Unknown",
+      remarks: remarks || "N/A",
     };
   
     try {
@@ -624,6 +627,18 @@ const QuotationTable = () => {
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Remarks:</td>
                 <td colSpan="7" className="py-1 px-3 border">{Commodity}</td>
+              </tr>
+              <tr>
+                <td colSpan="3" className="py-1 px-3 border text-start">Remarks</td>
+              <td colSpan="7" className="py-1 px-3 border text-left">
+                    <input
+                        type="text"
+                        placeholder="type here..."                       
+                        className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                      />
+                </td>
               </tr>
             </tbody>
           </table>

@@ -39,6 +39,7 @@ export default async function handler(req, res) {
     totalSeaFreight,
     totalDestination,
     createdBy,
+    remarks,
   } = req.body;
 
   if (
@@ -89,6 +90,7 @@ export default async function handler(req, res) {
     Total_Ship_Cost: parseDecimal(totalShipmentCost),
     Created_Date: new Date(),
     Created_By: createdBy || "Unknown",
+    remarks: remarks || "N/A",
   };
 
   try {

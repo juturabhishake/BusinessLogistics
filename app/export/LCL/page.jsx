@@ -53,6 +53,8 @@ const QuotationTable = () => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [currency, setCurrency] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [remarks, setRemarks] = useState("");
+  
 
   useEffect(() => {
     let flag = false
@@ -220,11 +222,12 @@ const QuotationTable = () => {
             if (destination[4]) destination[4][cbmKey] = item.D_LU || "0";
             if (destination[5]) destination[5][cbmKey] = item.D_Del || "0";
           } 
+          setRemarks(item.remarks || "");
         });
         setOriginData(origin);
         setSeaFreightData(seaFreight);
         setDestinationData(destination);
-  
+        
         console.log("Updated state data:", { originData, seaFreightData, destinationData });
       // } else {
       //   console.log("No LCL Quote data found for the selected location.");
@@ -293,6 +296,7 @@ const QuotationTable = () => {
   
       Total_Ship_Cost: totalShipmentCost[cbm],
       Created_By: secureLocalStorage.getItem("un") || "Unknown",
+      remarks: remarks || "N/A",
     };
   
     try {
@@ -638,6 +642,18 @@ const QuotationTable = () => {
               <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Destination Port:</td>
                 <td colSpan="7" className="py-1 px-3 border text-left">{Dest_Port}</td>
+              </tr>
+              <tr>
+                <td colSpan="3" className="py-1 px-3 border text-start">Remarks</td>
+              <td colSpan="7" className="py-1 px-3 border text-left">
+                    <input
+                        type="text"
+                        placeholder="type here..."                       
+                        className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                      />
+                </td>
               </tr>
             </tbody>
           </table>
