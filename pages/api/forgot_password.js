@@ -31,7 +31,7 @@ function runMiddleware(req, res, fn) {
 // });
 
 const transporter = nodemailer.createTransport({
-  host: 'mail.nws.cn', // Your SMTP host (remove 'https://' and port)
+  host: 'smtpout.secureserver.net', // Your SMTP host (remove 'https://' and port)
   port: 465, // Use 465 for SSL, or 587 for TLS
   secure: true, // true for 465, false for 587
   auth: {
