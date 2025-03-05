@@ -296,7 +296,7 @@ const QuotationTable = () => {
   
       Total_Ship_Cost: totalShipmentCost[cbm],
       Created_By: secureLocalStorage.getItem("un") || "Unknown",
-      remarks: remarks || "N/A",
+      remarks: remarks || "",
     };
   
     try {

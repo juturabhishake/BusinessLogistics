@@ -291,7 +291,7 @@ const QuotationTable = () => {
       Total_Ship_Cost: totalShipmentCost[cbm],
       Created_By: secureLocalStorage.getItem("un") || "Unknown",
       Updated_By: secureLocalStorage.getItem("un") || "Unknown",
-      remarks: remarks || "N/A",
+      remarks: remarks || "",
     };
   
     try {
@@ -633,7 +633,7 @@ const QuotationTable = () => {
               <td colSpan="7" className="py-1 px-3 border text-left">
                     <input
                         type="text"
-                        placeholder="type here..."                       
+                        placeholder="..."                       
                         className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
                         value={remarks}
                         onChange={(e) => setRemarks(e.target.value)}

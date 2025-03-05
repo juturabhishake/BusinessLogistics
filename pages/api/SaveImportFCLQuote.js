@@ -63,7 +63,7 @@ export default async function handler(req, res) {
 
   const quoteData = {
     Supplier_Code: supplierCode,
-    Location_Code: locationCode || "N/A",
+    Location_Code: locationCode || "",
     Quote_Month: quoteMonth,
     Quote_Year: quoteYear,
     Cont_Feet: containerSize,
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
     Total_Ship_Cost: parseDecimal(totalShipmentCost),
     Created_Date: new Date(),
     Created_By: createdBy || "Unknown",
-    remarks: remarks || "N/A",
+    remarks: remarks || "",
   };
 
   try {

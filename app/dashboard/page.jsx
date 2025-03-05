@@ -28,6 +28,8 @@ const Page = () => {
   const [importLCLChartData, setImportLCLChartData] = useState([]);
   const [exportFCLData, setExportFCLData] = useState([]);
   const [exportLCLData, setExportLCLData] = useState([]);
+  const [importFCLData, setImportFCLData] = useState([]);
+  const [importLCLData, setImportLCLData] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [modalData, setModalData] = useState(null);
@@ -134,6 +136,9 @@ const Page = () => {
       fetchChartData("/api/dashboard/get_Import_LCL_Quote", setImportLCLChartData);
       fetchData("/api/dashboard/get_Export_FCL_Quote", setExportFCLData);
       fetchData("/api/dashboard/get_Export_LCL_Quote", setExportLCLData);
+      fetchData("/api/dashboard/get_Import_FCL_Quote", setImportFCLData);
+      fetchData("/api/dashboard/get_Import_LCL_Quote", setImportLCLData);
+      
     }
   }, [selectedDate]);
 
@@ -352,13 +357,13 @@ const Page = () => {
               <Table data={exportFCLData} handleRowClick={handleRowClick} />
             </TabsContent>
             <TabsContent value="importFCL">
-              <Table data={importFCLChartData} handleRowClick={handleRowClick} idKey="FCL_Id"/>
+              <Table data={importFCLData} handleRowClick={handleRowClick} />
             </TabsContent>
             <TabsContent value="exportLCL">
               <Table data={exportLCLData} handleRowClick={handleRowClick} />
             </TabsContent>
             <TabsContent value="importLCL">
-              <Table data={importLCLChartData} handleRowClick={handleRowClick} idKey="LCL_Id"/>
+              <Table data={importLCLData} handleRowClick={handleRowClick} />
             </TabsContent>
           </Tabs>
         </TabsContent>

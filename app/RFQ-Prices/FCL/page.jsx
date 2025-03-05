@@ -232,7 +232,7 @@ const QuotationTable = () => {
       totalSeaFreight: totalSeaFreight[containerSize],
       totalDestination: totalDestination[containerSize],
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
-      remarks: remarks || "N/A",
+      remarks: remarks || "",
     };
   
     try {
