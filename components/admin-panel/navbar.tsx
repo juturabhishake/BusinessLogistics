@@ -13,7 +13,6 @@ export function Navbar({ title }: NavbarProps) {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [formattedTime, setFormattedTime] = useState<string>("Loading...");
 
-  // Fetch time left from API on mount
   useEffect(() => {
     const fetchTimeLeft = async () => {
       try {
@@ -31,7 +30,7 @@ export function Navbar({ title }: NavbarProps) {
         if (response.ok) {
           const data = await response.json();
           const totalMinutesLeft = data.result[0].Total_Minutes_Left;
-          setTimeLeft(totalMinutesLeft * 60); // Convert minutes to seconds
+          setTimeLeft(totalMinutesLeft * 60); 
         }
       } catch (error) {
         console.error("Error fetching time left:", error);
@@ -41,7 +40,6 @@ export function Navbar({ title }: NavbarProps) {
     fetchTimeLeft();
   }, []);
 
-  // Countdown timer effect
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0) return;
 
@@ -52,7 +50,6 @@ export function Navbar({ title }: NavbarProps) {
     return () => clearInterval(interval);
   }, [timeLeft]);
 
-  // Format time as `DD:H:M:S`
   useEffect(() => {
     const formatTime = (totalSeconds: number | null) => {
       if (totalSeconds === null) return "Loading...";
@@ -63,7 +60,7 @@ export function Navbar({ title }: NavbarProps) {
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
 
-      return `${days} d: ${hours} h: ${minutes} m: ${seconds} s`;
+      return `${days}D: ${hours}H: ${minutes}M: ${seconds}S`;
     };
 
     setFormattedTime(formatTime(timeLeft));

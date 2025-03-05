@@ -232,7 +232,7 @@ const QuotationTable = () => {
       totalSeaFreight: totalSeaFreight[containerSize],
       totalDestination: totalDestination[containerSize],
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
-      remarks: remarks || "",
+      remarks: remarks || "N/A",
     };
   
     try {
@@ -565,7 +565,9 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.origin &&
-                originCharges.map((item, index) => {
+                originCharges
+                .filter((item) => item.description !== "Halting")
+                .map((item, index) => {
                   const isHalting = item.description === "Halting";
                   return (
                   <tr key={index} className="border border border-[var(--bgBody)]">

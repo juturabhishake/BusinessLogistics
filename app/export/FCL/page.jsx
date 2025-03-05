@@ -466,7 +466,9 @@ const QuotationTable = () => {
               </tr>
             
               {sections.origin &&
-                originCharges.map((item, index) => {
+                originCharges
+                .filter((item) => item.description !== "Halting")
+                .map((item, index) => {
                   const isHalting = item.description === "Halting";
                   return (
                   <tr key={index} className="border border border-[var(--bgBody)]">
