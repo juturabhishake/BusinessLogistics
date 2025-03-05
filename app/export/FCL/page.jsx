@@ -66,6 +66,10 @@ const QuotationTable = () => {
   const [currency, setCurrency] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [remarks, setRemarks] = useState("");
+  const [Free_Days, setFree_Days] = useState(""); 
+  const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
+  const [HSN_Code, setHSN_Code] = useState(""); 
+  const [Pref_Liners, setPref_Liners] = useState(""); 
 
   useEffect(() => {
     let flag = false
@@ -353,6 +357,10 @@ const QuotationTable = () => {
         setDeliveryAddress(data.result[0].Delivery_Address);
         setDest_Port(data.result[0].Dest_Port);
         setCurrency(data.result[0].Currency);
+        setFree_Days(data.result[0].Free_Days);
+        setPref_Liners(data.result[0].Pref_Liners);
+        setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
+        setHSN_Code(data.result[0].HSN_Code);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -638,12 +646,23 @@ const QuotationTable = () => {
                 <td className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
-                <td colSpan="4" className="py-1 px-3 border text-left">{transitDays}</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days :</td>
+                <td colSpan="1" className="py-1 px-3 border text-left">{transitDays}</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Free Days Requirement at Destination :</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{Free_Days}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
-                <td colSpan="4" className="py-1 px-3 border text-left">{Dest_Port}</td>
+                <td colSpan="1" className="py-1 px-3 border text-left">{Dest_Port}</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{Pref_Liners}</td>
+              </tr>
+             
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
+                <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
