@@ -34,6 +34,8 @@ const Page = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [modalData, setModalData] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [currency, setCurrency] = useState("");
+  const [locationCode, setLocationCode] = useState("");
 
   useEffect(() => {
     const check_sc = secureLocalStorage.getItem("sc");
@@ -160,6 +162,7 @@ const Page = () => {
       const result = await response.json();
       if (result.success) {
         setModalData(result.data[0]);
+        setLocationCode(result.data[0].Location_Code);
         setIsAddModalOpen(true);
       } else {
         console.error("Error fetching quote data:", result);
@@ -171,7 +174,11 @@ const Page = () => {
   
   useEffect(() => {
     if (selectedId) {
-      fetchQuoteData();
+      const fetchQuote = async () => {
+        await fetchQuoteData();
+        await fetchSupplierDetails(locationCode);
+      }
+      fetchQuote();
     }
   }, [selectedId]);
     
@@ -242,7 +249,24 @@ const Page = () => {
     "O_LOC": "Origin_LOLO Charges",
     "O_Total_Chg": "Origin_Total_Charges"
   };
-
+  const fetchSupplierDetails = async (locCode) => {
+    try {
+      const response = await fetch('/api/GET_Supplier_LOC_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Loc_Code: locCode }),
+      });
+      const data = await response.json();
+      if (data.result && data.result.length > 0) {
+        setCurrency(data.result[0].Currency);
+        console.log("Supplier details fetched successfully:", currency, data.result[0].Currency);
+      }
+    } catch (error) {
+      console.error("Error fetching supplier details:", error);
+    }
+  };
   return (
     <div className="grid grid-cols-1 gap-6">
       <div className="flex flex-wrap items-center justify-between mb-4 space-y-4 lg:space-y-0">
@@ -392,7 +416,7 @@ const Page = () => {
                         .map(([key, value], index) => (
                           <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
                             <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
-                            <span className="text-sm">{value}</span>
+                            <span className="text-sm">₹{value}</span>
                           </div>
                         ))}
                     </div>
@@ -406,7 +430,7 @@ const Page = () => {
                         .map(([key, value], index) => (
                           <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
                             <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
-                            <span className="text-sm">{value}</span>
+                            <span className="text-sm">₹{value}</span>
                           </div>
                         ))}
                     </div>
@@ -420,7 +444,7 @@ const Page = () => {
                         .map(([key, value], index) => (
                           <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
                             <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
-                            <span className="text-sm">{value}</span>
+                            <span className="text-sm">{currency==='USD' ? '$' : '€'}{value}</span>
                           </div>
                         ))}
                     </div>
