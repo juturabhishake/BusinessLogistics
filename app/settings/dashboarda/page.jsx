@@ -70,7 +70,7 @@ const Page = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currency, setCurrency] = useState("");
   const [locationCode, setLocationCode] = useState("");
-
+  let curr = "";
   useEffect(() => {
     const checkLogin = async () => {
       const user = secureLocalStorage.getItem("un");
@@ -145,6 +145,9 @@ const Page = () => {
       const result = await response.json();
       if (result.success) {
         setModalData(result.data[0]);
+        setLocationCode(result.data[0].Location_Code);
+        console.log("Quote data fetched successfully:", result.data[0]);
+        console.log("Location Code:", result.data[0].Location_Code);
         setIsAddModalOpen(true);
       } else {
         console.error("Error fetching quote data:", result);
@@ -183,7 +186,9 @@ const Page = () => {
       const data = await response.json();
       if (data.result && data.result.length > 0) {
         setCurrency(data.result[0].Currency);
-        console.log("Supplier details fetched successfully:", currency, data.result[0].Currency);
+        curr = data.result[0].Currency;
+        setCurrency(curr);
+        console.log("Supplier details fetched successfully:", currency, data.result[0].Currency, curr);
       }
     } catch (error) {
       console.error("Error fetching supplier details:", error);
