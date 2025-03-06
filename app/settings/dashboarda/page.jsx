@@ -68,6 +68,8 @@ const Page = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [currency, setCurrency] = useState("");
+  const [locationCode, setLocationCode] = useState("");
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -154,7 +156,11 @@ const Page = () => {
 
   useEffect(() => {
     if (selectedId) {
-      fetchQuoteData();
+      const fetchQuote = async () => {
+        await fetchQuoteData();
+        await fetchSupplierDetails(locationCode);
+      }
+      fetchQuote();
     }
   }, [selectedId]);
 
@@ -165,7 +171,24 @@ const Page = () => {
     }
     setSelectedId(id);  
   };
-
+  const fetchSupplierDetails = async (locCode) => {
+    try {
+      const response = await fetch('/api/GET_Supplier_LOC_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Loc_Code: locCode }),
+      });
+      const data = await response.json();
+      if (data.result && data.result.length > 0) {
+        setCurrency(data.result[0].Currency);
+        console.log("Supplier details fetched successfully:", currency, data.result[0].Currency);
+      }
+    } catch (error) {
+      console.error("Error fetching supplier details:", error);
+    }
+  };
   return (
     <div className="grid grid-cols-1 gap-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 space-y-6">
@@ -226,33 +249,63 @@ const Page = () => {
           onClick={() => setIsAddModalOpen(false)}
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[60%] lg:w-[40%] h-[54vh] overflow-hidden"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg md:w-[70%] lg:w-[50%] h-[70vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
               <h2 className="text-lg font-bold">Quote Details</h2>
             </div>
-            <div className="p-6 overflow-y-auto h-[calc(50vh-100px)]">
+            <div className="p-6 overflow-y-auto h-[calc(70vh-100px)]">
               {modalData && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(modalData).map(([key, value], index) => (
-                    <div key={index} className="col-span-1">
-                      <label className="block text-sm font-semibold">{fullFormMapping[key] || key}</label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded"
-                        value={value}
-                        readOnly
-                      />
+                <div className="space-y-4">
+                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow">
+                    <h3 className="font-semibold text-lg mb-2">Origin Charges</h3>
+                    <div className="space-y-2">
+                      {Object.entries(modalData)
+                        .filter(([key]) => key.startsWith("O_"))
+                        .map(([key, value], index) => (
+                          <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
+                            <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
+                            <span className="text-sm">₹{value}</span>
+                          </div>
+                        ))}
                     </div>
-                  ))}
+                  </div>
+                      
+                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow">
+                    <h3 className="font-semibold text-lg mb-2">Sea Freight Charges</h3>
+                    <div className="space-y-2">
+                      {Object.entries(modalData)
+                        .filter(([key]) => key.startsWith("S_"))
+                        .map(([key, value], index) => (
+                          <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
+                            <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
+                            <span className="text-sm">₹{value}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                      
+                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow">
+                    <h3 className="font-semibold text-lg mb-2">Destination Charges</h3>
+                    <div className="space-y-2">
+                      {Object.entries(modalData)
+                        .filter(([key]) => key.startsWith("D_"))
+                        .map(([key, value], index) => (
+                          <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
+                            <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
+                            <span className="text-sm">{currency==='USD' ? '$' : '€'}{value}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
-            <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
+            <div className="flex justify-end px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="mr-2 px-4 py-2 bg-gray-500 text-white rounded"
+                className="mr-2 px-4 py-2 bg-gray-500 text-white text-[10px] rounded hover:bg-gray-600"
               >
                 Close
               </button>
