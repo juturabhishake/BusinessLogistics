@@ -114,6 +114,7 @@ const QuotationTable = () => {
 
   useEffect(() => {
     const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 20); 
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth(); 
     const monthNames = [

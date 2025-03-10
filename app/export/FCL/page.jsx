@@ -121,6 +121,7 @@ const QuotationTable = () => {
 
   useEffect(() => {
     const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 20); 
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth(); 
     const monthNames = [
@@ -130,7 +131,7 @@ const QuotationTable = () => {
     
     // const formattedDate = `${monthNames[currentMonth]} ${currentYear} - ${monthNames[currentMonth + 3]} ${currentYear}`;
     const formattedDate = `${monthNames[currentMonth]} ${currentYear}`;
-    console.log(formattedDate);
+    console.log(formattedDate, currentDate);
     setCurrentDateInfo(formattedDate);
   }, []);
   const fetchQuotationData = async (locationCode) => {
