@@ -139,22 +139,20 @@ const Page = () => {
       console.error("fetchQuoteData called but selectedId is null.");
       return;
     }
-
-    const quoteType = activeTab; 
-
+  
+    const quoteType = activeSubTab;
+  
     try {
       const response = await fetch("/api/dashboard/get_quote_data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedId, quote: quoteType }), 
+        body: JSON.stringify({ id: selectedId, quote: quoteType }),
       });
-
+  
       const result = await response.json();
       if (result.success) {
         setModalData(result.data[0]);
-        setLocationCode(result.data[0].Location_Code);
-        console.log("Quote data fetched successfully:", result.data[0]);
-        console.log("Location Code:", result.data[0].Location_Code);
+        setLocationCode(result.data[0].Location_Code); 
         setIsAddModalOpen(true);
       } else {
         console.error("Error fetching quote data:", result);
@@ -168,11 +166,15 @@ const Page = () => {
     if (selectedId) {
       const fetchQuote = async () => {
         await fetchQuoteData();
-        await fetchSupplierDetails(locationCode);
-      }
+      };
       fetchQuote();
     }
   }, [selectedId]);
+  useEffect(() => {
+    if (locationCode) {
+      fetchSupplierDetails(locationCode);
+    }
+  }, [locationCode]);
 
   const handleRowClick = (id) => {
     if (!id) {
