@@ -14,50 +14,43 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 const fullFormMapping = {
-  "O_CCD": "Clearance & Documentation",
-  "O_LTG": "Local Transportation From GTI-Chennai",
-  "O_THC": "Terminal Handling Charges",
-  "O_BLC": "Bill of Lading Charges",
-  "O_LUS": "Loading/Unloading / SSR",
-  "O_Halt": "Halting",
-  "O_CFS": "CFS Charges (At Actual)",
-  "O_Total_Chg": "Total Origin Charges",
-  "S_SeaFre": "Sea Freight",
-  "S_ENS": "ENS",
-  "S_ISPS": "ISPS",
-  "S_ITT": "Seal Fee",
-  "S_Total_Chg": "Total Sea Freight Charges",
-  "D_DTH": "Terminal Handling Charges",
-  "D_BLF": "BL Fee",
-  "D_DBR": "Delivery by Barge/Road",
-  "D_DOF": "Delivery Order Fees",
-  "D_HC": "Handling Charges",
-  "D_TDO": "T1 Doc",
-  "D_LOC": "LOLO Charges",
-  "D_Total_Chg": "Total Destination Charges",
-  "D_CFS": "CFS Charges (At Actual)",
-  "D_CCD": "Customs Clearance & Documentation",
-  "D_LTG": "Local Transportation From GTI-Chennai",
-  "D_THC": "Terminal Handling Charges",
-  "D_BLC": "Bill of Lading Charges",
-  "D_LUS": "Loading/Unloading / SSR",
-  "D_Halt": "Halting",
-  "D_Total_Chg": "Total Destination Charges",
+  "O_CCD": "Origin_Customs Clearance & Documentation",
+  "O_LTG": "Origin_Local Transportation From GTI-Chennai",
+  "O_THC": "Origin_Terminal Handling Charges",
+  "O_BLC": "Origin_Bill of Lading Charges",
+  "O_LUS": "OriginLoading/Unloading / SSR",
+  "O_Halt": "Origin_Halting",
+  "O_CFS": "Origin_CFS Charges (At Actual)",
+  "O_Total_Chg": "Origin_Total_Charges",
+  "S_SeaFre": "SeaFreight_Sea Freight",
+  "S_ENS": "SeaFreight_ENS",
+  "S_ISPS": "SeaFreight_ISPS",
+  "S_ITT": "SeaFreight_Seal Fee",
+  "S_Total_Chg": "SeaFreight_Total_Charges",
+  "D_DTH": "Destination Terminal Handling Charges",
+  "D_BLF": "Destination_BL Fee",
+  "D_DBR": "Destination_Delivery by Barge/Road",
+  "D_DOF": "Destination_Delivery Order Fees",
+  "D_HC": "Destination_Handling Charges",
+  "D_TDO": "Destination_T1 Doc",
+  "D_LOC": "Destination_LOLO Charges",
+  "D_Total_Chg": "Destination_Total_Charges",
+  "D_CFS": "Destination_CFS Charges (At Actual)",
+  "D_CCD": "Destination_Customs Clearance & Documentation",
+  "D_LTG": "Destination_Local Transportation From GTI-Chennai",
+  "D_THC": "Destination_Terminal Handling Charges",
+  "D_BLC": "Destination_Bill of Lading Charges",
+  "D_LUS": "Destination_Loading/Unloading / SSR",
+  "D_Halt": "Destination_Halting",
+  "D_Total_Chg": "Destination_Total_Charges",
   "O_DTH": "Origin Terminal Handling Charges",
-  "O_BLF": "BL Fee",
-  "O_DBR": "Delivery by Barge/Road",
-  "O_DOF": "Delivery Order Fees",
-  "O_HC": "Handling Charges",
-  "O_TDO": "T1 Doc",
-  "O_LOC": "LOLO Charges",
-  "O_Total_Chg": "Total Origin Charges",
-  "O_CC": "Custom Clearance",
-  "O_CCF":"CC Fee",
-  "O_DOC": "D.O Charges",
-  "O_LU":"Loading/Unloading",
-  "O_Del":"Delivery",
-    "S_FSC":"FSC (Fuel Surcharge)",
-    "S_SSC":"SSC"
+  "O_BLF": "Origin_BL Fee",
+  "O_DBR": "Origin_Delivery by Barge/Road",
+  "O_DOF": "Origin_Delivery Order Fees",
+  "O_HC": "Origin_Handling Charges",
+  "O_TDO": "Origin_T1 Doc",
+  "O_LOC": "Origin_LOLO Charges",
+  "O_Total_Chg": "Origin_Total_Charges"
 };
 
 
@@ -139,21 +132,24 @@ const Page = () => {
       console.error("fetchQuoteData called but selectedId is null.");
       return;
     }
-  
-    const quoteType = activeSubTab;
-  
+
+    const quoteType = activeTab; 
+
     try {
       const response = await fetch("/api/dashboard/get_quote_data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedId, quote: quoteType }),
+        body: JSON.stringify({ id: selectedId, quote: quoteType }), 
       });
-  
+
       const result = await response.json();
       if (result.success) {
         setModalData(result.data[0]);
-        setLocationCode(result.data[0].Location_Code); 
+        setLocationCode(result.data[0].Location_Code);
+        await fetchSupplierDetails(result.data[0].Location_Code);
         setIsAddModalOpen(true);
+        console.log("Quote data fetched successfully:", result.data[0]);
+        console.log("Location Code:", result.data[0].Location_Code);
       } else {
         console.error("Error fetching quote data:", result);
       }
@@ -291,21 +287,13 @@ const Page = () => {
                     <div className="space-y-2">
                       {Object.entries(modalData)
                         .filter(([key]) => key.startsWith("S_"))
-                        .map(([key, value]) => (
-                          <div 
-                            key={key} 
-                            className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600"
-                          >
+                        .map(([key, value], index) => (
+                          <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
                             <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
-                            <span className="text-sm">
-                              {key === "S_Total_Chg" ? "₹" : "$"}
-                              {value ?? "N/A"}
-                            </span>
+                            <span className="text-sm">₹{value}</span>
                           </div>
                         ))}
                     </div>
-
-
                   </div>
                       
                   <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow">
@@ -317,21 +305,6 @@ const Page = () => {
                           <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
                             <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
                             <span className="text-sm">{currency==='USD' ? '$' : '€'}{value}</span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-
-
-                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow">
-                    <h3 className="font-semibold text-lg mb-2">Total Shipment Cost</h3>
-                    <div className="space-y-2">
-                      {Object.entries(modalData)
-                        .filter(([key]) => key.startsWith("Total_Ship_Cost"))
-                        .map(([key, value], index) => (
-                          <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
-                            <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
-                            <span className="text-sm">₹{value}</span>
                           </div>
                         ))}
                     </div>

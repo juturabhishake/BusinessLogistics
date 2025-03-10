@@ -163,6 +163,7 @@ const Page = () => {
       if (result.success) {
         setModalData(result.data[0]);
         setLocationCode(result.data[0].Location_Code); 
+        await fetchSupplierDetails(result.data[0].Location_Code);
         setIsAddModalOpen(true);
       } else {
         console.error("Error fetching quote data:", result);
