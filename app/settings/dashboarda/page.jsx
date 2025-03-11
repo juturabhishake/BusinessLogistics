@@ -290,7 +290,7 @@ const Page = () => {
                         .map(([key, value], index) => (
                           <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
                             <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
-                            <span className="text-sm">₹{value}</span>
+                            <span className="text-sm">{key === "S_Total_Chg" ? "₹" : "$"}{value}</span>
                           </div>
                         ))}
                     </div>
@@ -304,7 +304,7 @@ const Page = () => {
                         .map(([key, value], index) => (
                           <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
                             <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
-                            <span className="text-sm">{currency==='USD' ? '$' : '€'}{value}</span>
+                            <span className="text-sm">{key === "D_Total_Chg" ? "₹" : (currency === 'USD' ? '$' : '€')}{value}</span>
                           </div>
                         ))}
                     </div>

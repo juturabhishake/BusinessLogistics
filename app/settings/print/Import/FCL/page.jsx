@@ -769,19 +769,19 @@ const QuotationTable = () => {
             <tbody className="bg-[var(--bgBody3)]">
               <tr
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
-                onClick={() => toggleSection("origin")}
+                onClick={() => toggleSection("destination")}
               >
                 <td>A.</td>
                 <td colSpan="8" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Origin Charges
+                  {sections.destination ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
-              {sections.origin &&
-                originCharges.map((item, index) => (
-                  <tr key={index} className="border border border-[var(--bgBody)]">
+              {sections.destination &&
+                destinationCharges.map((item, index) => (
+                  <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">INR / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">{item.sc1}</td>
                     <td className="py-1 px-3 border">{item.sc2}</td>
                     <td className="py-1 px-3 border">{item.sc3}</td>
@@ -791,16 +791,16 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">{item.remarks}</td>
                   </tr>
                 ))}
-              {sections.origin && (
+              {sections.destination && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border">{totalA[0] || ""}</td>
-                  <td className="py-1 px-3 border">{totalA[1] || ""}</td>
-                  <td className="py-1 px-3 border">{totalA[2] || ""}</td>
-                  <td className="py-1 px-3 border">{totalA[3] || ""}</td>
-                  <td className="py-1 px-3 border">{totalA[4] || ""}</td>
-                  <td className="py-1 px-3 border">{totalA[5] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[0] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[1] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[2] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[3] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[4] || ""}</td>
+                  <td className="py-1 px-3 border">{totalC[5] || ""}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -843,19 +843,19 @@ const QuotationTable = () => {
               )}
               <tr
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
-                onClick={() => toggleSection("destination")}
+                onClick={() => toggleSection("origin")}
               >
-                <td>C.</td>
+                <td>A.</td>
                 <td colSpan="8" className="py-2 px-3 text-start flex items-center">
-                  {sections.destination ? "▼" : "▶"} Destination Charges
+                  {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
-              {sections.destination &&
-                destinationCharges.map((item, index) => (
-                  <tr key={index} className="border">
+              {sections.origin &&
+                originCharges.map((item, index) => (
+                  <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 11}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">{currency} / Shipment</td>
+                    <td className="py-1 px-3 border">INR / Shipment</td>
                     <td className="py-1 px-3 border">{item.sc1}</td>
                     <td className="py-1 px-3 border">{item.sc2}</td>
                     <td className="py-1 px-3 border">{item.sc3}</td>
@@ -865,22 +865,22 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">{item.remarks}</td>
                   </tr>
                 ))}
-              {sections.destination && (
+              {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border">{totalC[0] || ""}</td>
-                  <td className="py-1 px-3 border">{totalC[1] || ""}</td>
-                  <td className="py-1 px-3 border">{totalC[2] || ""}</td>
-                  <td className="py-1 px-3 border">{totalC[3] || ""}</td>
-                  <td className="py-1 px-3 border">{totalC[4] || ""}</td>
-                  <td className="py-1 px-3 border">{totalC[5] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[0] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[1] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[2] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[3] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[4] || ""}</td>
+                  <td className="py-1 px-3 border">{totalA[5] || ""}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
               <tr className="border">
                 <td colSpan="2" className="font-bold py-1 px-3 border text-start">Total Shipment Cost in INR (A + B + C)</td>
-                <td className="py-1 px-3 border"></td>
+                <td className="py-1 px-3 border">INR</td>
                 <td className="py-1 px-3 border">{total[0] || ""}</td>
                 <td className="py-1 px-3 border">{total[1] || ""}</td>
                 <td className="py-1 px-3 border">{total[2] || ""}</td>
