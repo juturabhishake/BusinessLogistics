@@ -542,12 +542,12 @@ const QuotationTable = () => {
         });
     };
 
-    addSectionHeader("A) ORIGIN CHARGES");
-    addChargesToBody(originCharges, "INR");
+    addSectionHeader("A) DESTINATION CHARGES");
+    addChargesToBody(destinationCharges, currency);
     tableBody.push([
         "",
-        { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+        { content: "Total Destination Charges ("+currency+")", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
         "",
     ]);
 
@@ -560,12 +560,12 @@ const QuotationTable = () => {
         "",
     ]);
 
-    addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, currency);
+    addSectionHeader("C) ORIGIN CHARGES");
+    addChargesToBody(originCharges, "INR");
     tableBody.push([
         "",
-        { content: "Total Destination Charges ("+currency+")", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+        { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
         "",
     ]);
 
@@ -845,7 +845,7 @@ const QuotationTable = () => {
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
                 onClick={() => toggleSection("origin")}
               >
-                <td>A.</td>
+                <td>C.</td>
                 <td colSpan="8" className="py-2 px-3 text-start flex items-center">
                   {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>

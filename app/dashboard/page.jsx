@@ -583,35 +583,43 @@ const Table = ({ data, handleRowClick }) => {
           <tbody>
             {filteredData.length > 0 ? (
               filteredData.map((row, i) => {
-                const rowId = row.id || row.ID || row.Id; 
+                const rowId = row.id || row.ID || row.Id;
                 return (
                   <tr 
                     key={i} 
                     className="border hover:bg-muted cursor-pointer" 
                     onClick={() => handleRowClick(rowId)}
                   >
-                    {Object.values(row).map((value, j) => (
-                      <td key={j} className="px-4 py-2 border">
-                        {j === 0 ? (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRowClick(rowId);
-                            }}
+                    {Object.entries(row).map(([key, value], j) => {
+                      if (key !== "id") {
+                        const rightAlignColumns = [
+                          "Container", 
+                          "Destination_Charges", 
+                          "CBM", 
+                          "Cont_Feet", 
+                          "Origin_Charges", 
+                          "Seafreight_Charges", 
+                          "Total_Shipment_Cost",
+                          "Total_Ship_Cost",
+                        ];
+                        const isRightAligned = rightAlignColumns.includes(key);
+                        return (
+                          <td 
+                            key={j} 
+                            className={`px-4 py-2 border ${isRightAligned ? "text-right" : "text-left"}`}
                           >
                             {String(value)}
-                          </button>
-                        ) : (
-                          String(value)
-                        )}
-                      </td>
-                    ))}
+                          </td>
+                        );
+                      }
+                      return null;
+                    })}
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan={data.length > 0 ? Object.keys(data[0]).length : 1} className="text-center py-4">
+                <td colSpan={filteredData.length > 0 ? Object.keys(filteredData[0]).length : 1} className="text-center py-4">
                   No matching records found.
                 </td>
               </tr>

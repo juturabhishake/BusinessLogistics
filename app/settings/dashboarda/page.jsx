@@ -309,6 +309,19 @@ const Page = () => {
                         ))}
                     </div>
                   </div>
+                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow">
+                    <h3 className="font-semibold text-lg mb-2">Total Shipment Cost</h3>
+                    <div className="space-y-2">
+                      {Object.entries(modalData)
+                        .filter(([key]) => key.startsWith("Total_Ship_Cost"))
+                        .map(([key, value], index) => (
+                          <div key={index} className="flex justify-between gap-[30%] py-1 border-b border-gray-300 dark:border-gray-600">
+                            <span className="text-sm font-medium">{fullFormMapping[key] || key}</span>
+                            <span className="text-sm">₹{value}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -537,13 +550,27 @@ const DataTable = ({ data, selectedDate, handleRowClick }) => {
                     className="border hover:bg-muted cursor-pointer" 
                     onClick={() => handleRowClick(rowId)}
                   >
-                    {Object.entries(row).map(([key, value], j) => (
-                      key !== "id" && ( 
-                        <td key={j} className="px-4 py-2 border">
-                          {String(value)}
-                        </td>
-                      )
-                    ))}
+                    {Object.entries(row).map(([key, value], j) => {
+                      if (key !== "id") {
+                        const rightAlignColumns = [
+                          "Container", 
+                          "Destination_Charges", 
+                          "Origin_Charges", 
+                          "Seafreight_Charges", 
+                          "Total_Shipment_Cost"
+                        ];
+                        const isRightAligned = rightAlignColumns.includes(key);
+                        return (
+                          <td 
+                            key={j} 
+                            className={`px-4 py-2 border ${isRightAligned ? "text-right" : "text-left"}`}
+                          >
+                            {String(value)}
+                          </td>
+                        );
+                      }
+                      return null;
+                    })}
                   </tr>
                 );
               })
