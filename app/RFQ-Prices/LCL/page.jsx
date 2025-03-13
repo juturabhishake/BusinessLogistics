@@ -625,10 +625,10 @@ const QuotationTable = () => {
                 <td colSpan="3" className="py-1 px-3 border text-start">Required Transit Days:</td>
                 <td colSpan="7" className="py-1 px-3 border text-left">{transitDays}</td>
               </tr>
-              <tr className="border">
+              {/* <tr className="border">
                 <td colSpan="3" className="py-1 px-3 border text-start">Remarks:</td>
                 <td colSpan="7" className="py-1 px-3 border">{Commodity}</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td colSpan="3" className="py-1 px-3 border text-start">Remarks</td>
               <td colSpan="7" className="py-1 px-3 border text-left">
