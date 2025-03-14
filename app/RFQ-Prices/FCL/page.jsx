@@ -81,12 +81,12 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations' , {
+        const response = await fetch('/api/get_locations_vendors' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'LCLImport' }),
+          body: JSON.stringify({ RFQType: 'FCLImport',sc: secureLocalStorage.getItem("sc") }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -117,7 +117,6 @@ const QuotationTable = () => {
 
   useEffect(() => {
     const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + 20); 
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth(); 
     const monthNames = [
@@ -233,7 +232,7 @@ const QuotationTable = () => {
       totalSeaFreight: totalSeaFreight[containerSize],
       totalDestination: totalDestination[containerSize],
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
-      remarks: remarks || "N/A",
+      remarks: remarks || "",
     };
   
     try {
@@ -566,9 +565,7 @@ const QuotationTable = () => {
                 </td>
               </tr>
               {sections.origin &&
-                originCharges
-                .filter((item) => item.description !== "Halting")
-                .map((item, index) => {
+                originCharges.map((item, index) => {
                   const isHalting = item.description === "Halting";
                   return (
                   <tr key={index} className="border border border-[var(--bgBody)]">
@@ -645,7 +642,7 @@ const QuotationTable = () => {
               <td colSpan="4" className="py-1 px-3 border text-left">
                     <input
                         type="text"
-                        placeholder="type here..."                       
+                        placeholder="..."                       
                         className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
                         value={remarks}
                         onChange={(e) => setRemarks(e.target.value)}
