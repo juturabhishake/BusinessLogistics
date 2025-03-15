@@ -58,7 +58,7 @@ const fullFormMapping = {
 const Page = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState();
   const [activeTab, setActiveTab] = useState("exportFCL");
   const [exportFCLData, setExportFCLData] = useState([]);
   const [importFCLData, setImportFCLData] = useState([]);
@@ -84,6 +84,31 @@ const Page = () => {
     };
     checkLogin();
   }, []);
+
+  useEffect(() => {
+      const fetchLatestMonthYear = async () => {
+        try {
+          const response = await fetch("/api/get_latest_month_year");
+    
+          const result = await response.json();
+          if (result.result && result.result.length > 0) {
+            const { latest_month, latest_year } = result.result[0];
+            if (latest_month && latest_year) {
+              setSelectedDate(dayjs(`${latest_year}-${latest_month}-01`));
+            } else {
+              setSelectedDate(dayjs());
+            }
+          } else {
+            setSelectedDate(dayjs());
+          }
+        } catch (error) {
+          console.error("Error fetching latest month and year:", error);
+          setSelectedDate(dayjs());
+        }
+      };
+    
+      fetchLatestMonthYear();
+    }, []);
 
   useEffect(() => {
     let flag = false

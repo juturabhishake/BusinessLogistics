@@ -80,7 +80,7 @@ const QuotationTable = () => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [currency, setCurrency] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(dayjs()); 
+  const [selectedDate, setSelectedDate] = useState(); 
   const [totalA, setTotalA] = useState(["", "", "", "", "", ""]);
   const [totalB, setTotalB] = useState(["", "", "", "", "", ""]);
   const [totalC, setTotalC] = useState(["", "", "", "", "", ""]);
@@ -94,6 +94,31 @@ const QuotationTable = () => {
     if (check_sc !== 'admin') {
       window.location.href = "/";
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchLatestMonthYear = async () => {
+      try {
+        const response = await fetch("/api/get_latest_month_year");
+  
+        const result = await response.json();
+        if (result.result && result.result.length > 0) {
+          const { latest_month, latest_year } = result.result[0];
+          if (latest_month && latest_year) {
+            setSelectedDate(dayjs(`${latest_year}-${latest_month}-01`));
+          } else {
+            setSelectedDate(dayjs());
+          }
+        } else {
+          setSelectedDate(dayjs());
+        }
+      } catch (error) {
+        console.error("Error fetching latest month and year:", error);
+        setSelectedDate(dayjs());
+      }
+    };
+  
+    fetchLatestMonthYear();
   }, []);
 
   useEffect(() => {
@@ -656,7 +681,12 @@ const QuotationTable = () => {
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparative Statement of quotations</h2>
               <p className="text-xs text-gray-100">
-                {`Import Print FCL rates for ${selectedDate.format("MMMM YYYY")} (${selectedDate.startOf("month").format("DD")}.${selectedDate.format("MMMM YYYY")} - ${selectedDate.endOf("month").format("DD")}.${selectedDate.format("MMMM YYYY")})`}
+                {`Import Print FCL rates for 
+                  ${selectedDate 
+                  ? `${selectedDate.format("MMMM YYYY")} (${selectedDate.startOf("month").format("DD")}.${selectedDate.format("MMMM YYYY")} - ${selectedDate.endOf("month").format("DD")}.${selectedDate.format("MMMM YYYY")})` 
+                  : "Loading..."
+                  }`
+                }
               </p>
               <p className="text-xs text-gray-100">Quote for GTI to {locationName || "{select location}"} shipment</p>
             </div>

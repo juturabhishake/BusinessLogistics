@@ -19,7 +19,7 @@ import './page.css';
 const Page = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === secureLocalStorage.getItem("theme") || theme === "dark";
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState();
   const [activeTab, setActiveTab] = useState("visualization");
   const [activeSubTab, setActiveSubTab] = useState("exportFCL");
   const [exportFCLChartData, setExportFCLChartData] = useState([]);
@@ -143,6 +143,31 @@ const Page = () => {
       
     }
   }, [selectedDate]);
+
+  useEffect(() => {
+    const fetchLatestMonthYear = async () => {
+      try {
+        const response = await fetch("/api/get_latest_month_year");
+  
+        const result = await response.json();
+        if (result.result && result.result.length > 0) {
+          const { latest_month, latest_year } = result.result[0];
+          if (latest_month && latest_year) {
+            setSelectedDate(dayjs(`${latest_year}-${latest_month}-01`));
+          } else {
+            setSelectedDate(dayjs());
+          }
+        } else {
+          setSelectedDate(dayjs());
+        }
+      } catch (error) {
+        console.error("Error fetching latest month and year:", error);
+        setSelectedDate(dayjs());
+      }
+    };
+  
+    fetchLatestMonthYear();
+  }, []);
 
   const fetchQuoteData = async () => {
     if (!selectedId) {
