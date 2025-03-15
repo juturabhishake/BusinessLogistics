@@ -469,8 +469,8 @@ const QuotationTable = () => {
       setTotalC(["", "", "", "", "", ""]);
       setTotal(["", "", "", "", "", ""]);
       fetchSupplierDetails(selectedLocation);
-      const month = selectedDate.month() + 1;
-      const year = selectedDate.year();
+      const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
+      const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
       console.log("selected Location : ", selectedLocation);
       const fetchData = async () => {
         await fetchQuotationData(selectedLocation, month, year, 20);
