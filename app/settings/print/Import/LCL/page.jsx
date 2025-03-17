@@ -437,11 +437,11 @@ const QuotationTable = () => {
       });
   };
   
-  addSectionHeader("A) DESTINATION CHARGES");
+  addSectionHeader("A) ORIGIN CHARGES");
   addChargesToBody(destinationCharges, currency+" / Shipmt");
   tableBody.push([
     { content: "", styles: { halign: "center" } },
-    { content: "Total Destination Charges", styles: { halign: "center" } },
+    { content: "Total Origin Charges", styles: { halign: "center" } },
     { content: "INR", styles: { halign: "center" } },
     // ...totalC.map(val => ({ content: val, styles: { halign: "center" } })),
     ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
@@ -459,11 +459,11 @@ const QuotationTable = () => {
       { content: "", styles: { halign: "center" } }
   ]);
 
-  addSectionHeader("C) ORIGIN CHARGES");
+  addSectionHeader("C) DESTINATION CHARGES");
     addChargesToBody(originCharges, "INR / Shipmt");
     tableBody.push([
       { content: "", styles: { halign: "center" } },
-      { content: "Total Origin Charges", styles: { halign: "center" } },
+      { content: "Total Destination Charges", styles: { halign: "center" } },
       { content: "INR", styles: { halign: "center" } },
       // ...totalA.map(val => ({ content: val, styles: { halign: "center" } })),
       ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
@@ -677,7 +677,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="18" className="py-2 px-3 text-start flex items-center">
-                  {sections.destination ? "▼" : "▶"} Destination Charges
+                  {sections.destination ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
               {sections.destination &&
@@ -694,7 +694,7 @@ const QuotationTable = () => {
                 ))}
               {sections.destination && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   {totalC.map((total, index) => (
                     <td key={index} className="py-1 px-3 border">{total}</td>
@@ -726,7 +726,7 @@ const QuotationTable = () => {
               {sections.seaFreight && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
-                  <td className="py-1 px-3 border">USD</td>
+                  <td className="py-1 px-3 border">INR</td>
                   {totalB.map((total, index) => (
                     <td key={index} className="py-1 px-3 border">{total}</td>
                   ))}
@@ -739,7 +739,7 @@ const QuotationTable = () => {
               >
                 <td>C.</td>
                 <td colSpan="18" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Origin Charges
+                  {sections.origin ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
               {sections.origin &&
@@ -756,7 +756,7 @@ const QuotationTable = () => {
                 ))}
               {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   {totalA.map((total, index) => (
                     <td key={index} className="py-1 px-3 border">{total}</td>

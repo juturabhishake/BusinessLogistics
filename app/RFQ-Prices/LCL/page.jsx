@@ -491,7 +491,7 @@ const QuotationTable = () => {
               >
                 <td>A</td>
                 <td colSpan="9" className="py-2 px-3 text-start flex items-center">
-                  {sections.destination ? "▼" : "▶"} Destination Charges
+                  {sections.destination ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
               {sections.destination &&
@@ -511,7 +511,7 @@ const QuotationTable = () => {
               {sections.destination && (
                 <tr className="border font-bold">
                   <td className="py-1 px-3 border"></td>
-                  <td  className="py-1 px-3 border">Total Destination Cost</td>
+                  <td  className="py-1 px-3 border">Total Origin Cost</td>
                   <td className="py-1 px-3 border">INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">
@@ -563,7 +563,7 @@ const QuotationTable = () => {
               >
                 <td>C</td>
                 <td colSpan="9" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Origin Charges
+                  {sections.origin ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
               {sections.origin &&
@@ -586,7 +586,7 @@ const QuotationTable = () => {
               {sections.origin && (
                 <tr className="border font-bold">
                     <td className="py-1 px-3 border"></td>
-                    <td className="py-1 px-3 border">Total Origin Cost</td>
+                    <td className="py-1 px-3 border">Total Destination Cost</td>
                     <td className="py-1 px-3 border">INR</td>
                   {[...Array(6)].map((_, i) => (
                     <td key={i} className="py-1 px-3 border">

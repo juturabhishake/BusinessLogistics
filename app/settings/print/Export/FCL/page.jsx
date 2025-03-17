@@ -596,7 +596,7 @@ const QuotationTable = () => {
     addChargesToBody(destinationCharges, currency);
     tableBody.push([
         "",
-        { content: "Total Destination Charges ("+currency+")", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
         ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
         "",
     ]);
