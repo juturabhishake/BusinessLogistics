@@ -148,7 +148,17 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchCurrency = async () => {
       try {
-        const response = await fetch('/api/get_currency');
+        const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
+        const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
+        console.log('Curr Month:', month);  
+        console.log('Curr Year:', year);  
+        const response = await fetch('/api/get_currency_MonthYear',{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ Month: month,Year :  year}),
+        });
         const data = await response.json();
         if (data.result && data.result.length > 0) {
           setUSD(parseFloat(data.result[0].USD));
@@ -217,7 +227,7 @@ const QuotationTable = () => {
 
       const data = await response.json();
 
-      console.log("Fetched Data : ", data);
+      // console.log("Fetched Data : ", data);
       if (data.length <= 0) {
         setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
         setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));

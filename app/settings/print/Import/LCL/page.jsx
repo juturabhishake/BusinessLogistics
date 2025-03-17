@@ -147,7 +147,15 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchCurrency = async () => {
       try {
-        const response = await fetch('/api/get_currency');
+        const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
+        const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
+        const response = await fetch('/api/get_currency_MonthYear',{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ Month: month,Year :  year}),
+        });
         const data = await response.json();
         if (data.result && data.result.length > 0) {
           setUSD(parseFloat(data.result[0].USD));
