@@ -144,33 +144,39 @@ const QuotationTable = () => {
 
     fetchLocations();
   }, []);
+  const fetchCurrency = async () => {
+    try {
+      const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
+      const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
+      console.log('Curr Month:', month);  
+      console.log('Curr Year:', year);  
+      const response = await fetch('/api/get_currency_MonthYear',{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Month: month,Year :  year}),
+      });
+      const data = await response.json();
+      if (data.result && data.result.length > 0) {
+        setUSD(parseFloat(data.result[0].USD));
+        setEUR(parseFloat(data.result[0].EURO));
+      } else {
+        setUSD(0);
+        setEUR(0);
+      }
+    } catch (error) {
+      console.error("Error fetching currency:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchCurrency = async () => {
-      try {
-        const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
-        const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
-        console.log('Curr Month:', month);  
-        console.log('Curr Year:', year);  
-        const response = await fetch('/api/get_currency_MonthYear',{
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ Month: month,Year :  year}),
-        });
-        const data = await response.json();
-        if (data.result && data.result.length > 0) {
-          setUSD(parseFloat(data.result[0].USD));
-          setEUR(parseFloat(data.result[0].EURO));
-        }
-      } catch (error) {
-        console.error("Error fetching currency:", error);
-      }
-    };
-
     fetchCurrency();
   }, []);
+
+  useEffect(() => {
+    fetchCurrency();
+  }, [selectedDate]);
 
   useEffect(() => {
     const currentDate = new Date();
