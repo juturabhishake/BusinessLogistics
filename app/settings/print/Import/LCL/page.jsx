@@ -482,7 +482,7 @@ const QuotationTable = () => {
 
     tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 18 }]);
 
-    tableBody.push([{ content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
+    tableBody.push([{ content: "Pickup Address (Shipper):", colSpan: 3, styles: { fontStyle: "bold" } },
         { content: deliveryAddress.replace(/\n/g, " "), colSpan: 18, styles: { fontSize: 6, whiteSpace: "nowrap" } }
     ]);
 
@@ -494,10 +494,11 @@ const QuotationTable = () => {
         { content: "", colSpan: 13,}
     ]);
 
-    tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: Dest_Port, colSpan: 4 },
+    tableBody.push([
+      // { content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } },
+      //   { content: Dest_Port, colSpan: 4 },
         { content: "Required Transit Days", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: transitDays, colSpan: 11 }
+        { content: transitDays, colSpan: 18 }
     ]);
 
     tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 18 }]);
@@ -777,7 +778,7 @@ const QuotationTable = () => {
                 <td colSpan="20" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Delivery Address</td>             
+                <td colSpan="2" className="py-1 px-3 border text-start">Pickup Address (Shipper):</td>             
                 <td colSpan="20" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>
@@ -791,10 +792,10 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
                 <td colSpan="20" className="py-1 px-3 border text-left">{transitDays}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="20" className="py-1 px-3 border text-left">{Dest_Port}</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
                 <td colSpan="20" className="py-1 px-3 border text-left"></td>
