@@ -188,8 +188,8 @@ export default function Home() {
     >
       <Card className="backdrop-blur-sm bg-white/20 shadow-lg rounded-lg p-6 w-full max-w-[350px] sm:max-w-[400px] md:max-w-[450px]">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl font-semibold text-white">Login</CardTitle>
-          <CardDescription className="text-sm text-white/70">Enter your credentials</CardDescription>
+          <CardTitle className="text-xl font-semibold text-white">Greentech Industries (India) Pvt. Ltd.</CardTitle>
+          <CardDescription className="text-sm text-white/70">Login</CardDescription>
         </CardHeader>
         <CardContent>
           <form
