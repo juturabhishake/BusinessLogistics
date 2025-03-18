@@ -450,10 +450,10 @@ const QuotationTable = () => {
   addChargesToBody(destinationCharges, currency+" / Shipmt");
   tableBody.push([
     { content: "", styles: { halign: "center" } },
-    { content: "Total Origin Charges", styles: { halign: "center" } },
+    { content: "Total Origin Charges", styles: { halign: "center" , fontStyle: "bold"} },
     { content: "INR", styles: { halign: "center" } },
     // ...totalC.map(val => ({ content: val, styles: { halign: "center" } })),
-    ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+    ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
     { content: "", styles: { halign: "center" } }
   ]);
 
@@ -461,10 +461,10 @@ const QuotationTable = () => {
     addChargesToBody(seaFreightCharges, "USD / Shipmt");
     tableBody.push([
       { content: "", styles: { halign: "center" } },
-      { content: "Total Sea Freight Charges", styles: { halign: "center" } },
+      { content: "Total Sea Freight Charges", styles: { halign: "center", fontStyle: "bold" } },
       { content: "INR", styles: { halign: "center" } },
       // ...totalB.map(val => ({ content: val, styles: { halign: "center" } })),
-      ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+      ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
       { content: "", styles: { halign: "center" } }
   ]);
 
@@ -472,19 +472,19 @@ const QuotationTable = () => {
     addChargesToBody(originCharges, "INR / Shipmt");
     tableBody.push([
       { content: "", styles: { halign: "center" } },
-      { content: "Total Destination Charges", styles: { halign: "center" } },
+      { content: "Total Destination Charges", styles: { halign: "center", fontStyle: "bold" } },
       { content: "INR", styles: { halign: "center" } },
       // ...totalA.map(val => ({ content: val, styles: { halign: "center" } })),
-      ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+      ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
       { content: "", styles: { halign: "center" } }
   ]);
 
   tableBody.push([
     { content: "", styles: { halign: "center" } },
-    { content: "TOTAL SHIPMENT COST (A + B + C)", styles: { halign: "center" } },
+    { content: "TOTAL SHIPMENT COST (A + B + C)", styles: { halign: "center" , fontStyle: "bold"} },
     { content: "INR", styles: { halign: "center" } },
     // ...total.map(val => ({ content: val, styles: { halign: "center" } })),
-    ...total.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+    ...total.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
     { content: "", styles: { halign: "center" } }
   ]);
 

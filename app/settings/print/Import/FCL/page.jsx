@@ -589,7 +589,7 @@ const QuotationTable = () => {
     tableBody.push([
         "",
         { content: "Total Destination Charges ("+currency+")", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+        ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" , fontStyle: "bold"} })),
         "",
     ]);
 
@@ -598,7 +598,7 @@ const QuotationTable = () => {
     tableBody.push([
         "",
         { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+        ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" , fontStyle: "bold"} })),
         "",
     ]);
 
@@ -607,14 +607,14 @@ const QuotationTable = () => {
     tableBody.push([
         "",
         { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+        ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
 
     tableBody.push([
         "",
         { content: "TOTAL SHIPMENT COST (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...total.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })),
+        ...total.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
 
