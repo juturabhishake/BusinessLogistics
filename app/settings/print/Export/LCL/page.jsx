@@ -524,7 +524,8 @@ const QuotationTable = () => {
 
     doc.setFontSize(8);
     doc.text(`RFQ Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 12);
-    doc.text(`Quote for GTI to ${locationName} shipment`, 5, 16);
+    const loc = locationName.split('|')[0].trim();
+    doc.text(`Quote for GTI to ${loc} LCL shipment`, 5, 16);
 
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
