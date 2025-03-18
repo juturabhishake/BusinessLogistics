@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Download } from "lucide-react"; // Importing the download icon
 //<strong>Copyright © 2024 GTI. </strong> All rights reserved.
 export function Footer() {
   return (
@@ -16,6 +17,17 @@ export function Footer() {
           </Link>
           . All rights reserved.
         </p>
+
+        <Link 
+          href="/UserManual.pdf" // Updated path to the manual
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-xs md:text-sm text-muted-foreground hover:text-primary transition"
+          download
+        >
+          <Download size={16} /> {/* Icon Size */}
+          Download Manual
+        </Link>
       </div>
     </div>
   );
