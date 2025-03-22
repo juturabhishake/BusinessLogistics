@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import secureLocalStorage from "react-secure-storage";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AnimatedNumber from "@/components/AnimatedNumber";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
@@ -70,6 +71,13 @@ const Page = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currency, setCurrency] = useState("");
   const [locationCode, setLocationCode] = useState("");
+  const [quoteCounts, setQuoteCounts] = useState({
+    Count_Export_FCL: 0,
+    Count_Export_LCL: 0,
+    Count_Import_FCL: 0,
+    Count_Import_LCL: 0,
+  });
+  
   let curr = "";
   useEffect(() => {
     const checkLogin = async () => {
@@ -121,6 +129,23 @@ const Page = () => {
       window.location.href = "/";
     }
   }, []);
+
+  useEffect(() => {
+    const fetchQuoteCounts = async () => {
+      try {
+        const response = await fetch("/api/admindashboard/get_count_quotes");
+        const result = await response.json();
+        if (result.result && result.result.length > 0) {
+          setQuoteCounts(result.result[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching quote counts:", error);
+      }
+    };
+  
+    fetchQuoteCounts();
+  }, []);
+  
 
   const fetchData = async (apiUrl, setData) => {
     try {
@@ -252,7 +277,7 @@ const Page = () => {
             />
           </LocalizationProvider>
         </div>
-        <div className="order-2 sm:order-1 w-full md:w-auto mb-4 md:mb-0">
+        <div className="order-2 sm:order-1 w-full md:w-auto mb-4 md:mb-0 flex flex-wrap gap-2 items-center">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
               <TabsTrigger value="exportFCL">E-FCL</TabsTrigger>
@@ -261,9 +286,16 @@ const Page = () => {
               <TabsTrigger value="importLCL">I-LCL</TabsTrigger>
             </TabsList>
           </Tabs>
+          <button
+            onClick={() => setActiveTab((prev) => (prev === "totalQuotes" ? "exportFCL" : "totalQuotes"))}
+            variant="outlined"
+            className="ml-2 px-3 py-[9px] border border-[green] text-primary text-sm rounded hover:bg-[black]-600"
+            style={{ backgroundColor: activeTab === "totalQuotes" ? "green" : "", }}
+          >
+            Total Quotes
+          </button>
         </div>
       </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsContent value="exportFCL">
           <DataTable data={exportFCLData} selectedDate={selectedDate} handleRowClick={handleRowClick} />
@@ -276,6 +308,24 @@ const Page = () => {
         </TabsContent>
         <TabsContent value="importLCL">
           <DataTable data={importLCLData} selectedDate={selectedDate} handleRowClick={handleRowClick} />
+        </TabsContent>
+        <TabsContent value="totalQuotes">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            {[
+              { label: "Export FCL", value: quoteCounts.Count_Export_FCL },
+              { label: "Import FCL", value: quoteCounts.Count_Import_FCL },
+              { label: "Export LCL", value: quoteCounts.Count_Export_LCL },
+              { label: "Import LCL", value: quoteCounts.Count_Import_LCL },
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg shadow p-6 flex flex-col items-center justify-center"
+              >
+                <h2 className="text-lg font-semibold mb-2">{item.label}</h2>
+                <AnimatedNumber value={item.value} />
+              </div>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
       {isAddModalOpen && (
