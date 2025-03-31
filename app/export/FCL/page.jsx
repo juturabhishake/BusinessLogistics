@@ -216,6 +216,7 @@ const QuotationTable = () => {
     // }, 2000);
   // };
   const saveQuote = async (containerSize) => {
+
     const filterCharges = (charges) =>
       charges.map((charge) => ({
         description: charge.description,
@@ -264,6 +265,29 @@ const QuotationTable = () => {
       alert("Please select a location before saving.");
       return;
     }
+
+    // if(incoterms==='DAP') {
+    //   console.log("incoterms : " , incoterms==='DAP');
+    //   if(totalShipmentCost[20] > 0 && totalDestination[20] <= 0) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    //   if(totalShipmentCost[40] > 0 && totalDestination[40] <= 0) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    //   if((totalShipmentCost[20] > 0 && totalShipmentCost[40] > 0) && (totalDestination[20] <= 0 || totalDestination[40] <= 0)) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    // }
+    // if(incoterms==='CIF') {
+    //   console.log("incoterms : " , incoterms==='DAP');
+    //   if(totalShipmentCost[20] !== 0 && totalShipmentCost[40] !== 0 ) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    // }
   
     setSaveState("saving");
   
