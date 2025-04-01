@@ -659,7 +659,7 @@ const QuotationTable = () => {
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
     const startY = 24;
-
+      
     doc.autoTable({
         head: tableHeaders,
         body: tableBody,
