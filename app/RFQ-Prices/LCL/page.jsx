@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-import { FaFilePdf } from "react-icons/fa";
+import { FaFilePdf, FaFileExport } from "react-icons/fa";
 import { Check, ChevronsUpDown, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -406,232 +406,8 @@ const QuotationTable = () => {
     "6CBM": (totals.seaFreight["6CBM"] * USD).toFixed(2),
   };
   const downloadPDF = () => {
-    console.log("Downloading PDF...");
-    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-
-    const now = moment().add(20, 'days');
-    const formattedDate = now.format("DD-MM-YYYY");
-    const startDate = now.clone().startOf("month").format("DD");
-    const endDate = now.clone().endOf("month").format("DD");
-    const selectedMonthYear = now.format("MMMM YYYY");
-
-    const tableHeaders = [
-        [
-            { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
-            { content: "Descriptions", rowSpan: 2, styles: { valign: "middle" } },
-            { content: "Currency in", rowSpan: 2, styles: { valign: "middle" } },
-            { content: `Quote for GTI to ${locationName || "{select location}"} shipment`, colSpan: 6, styles: { halign: "center" } },
-            { content: "Remarks", rowSpan: 2, styles: { valign: "middle" } },
-        ],
-        [
-            { content: "1 CBM", styles: { halign: "center" } },
-            { content: "2 CBM", styles: { halign: "center" } },
-            { content: "3 CBM", styles: { halign: "center" } },
-            { content: "4 CBM", styles: { halign: "center" } },
-            { content: "5 CBM", styles: { halign: "center" } },
-            { content: "6 CBM", styles: { halign: "center" } },
-        ]
-    ];
-
-    const tableBody = [];
-
-    const addSectionHeader = (sectionName) => {
-        tableBody.push([
-            { content: sectionName, colSpan: 12, styles: { halign: "left", fontStyle: "bold", fillColor: [255, 255, 255] } }
-        ]);
-    };
-
-    const originCharges = [
-      "Customs Clearance & Documentation",
-      "Local Transportation From Shipper -port",
-      "Terminal Handling Charges",
-      "Bill of Lading Charges",
-      "Loading/Unloading / SSR"
-    ];
-  
-    addSectionHeader("A) ORIGIN CHARGES");
-    originCharges.forEach((description, index) => {
-      tableBody.push([
-        index + 1,
-        description,
-        `${currency} / Shipment`,
-        destinationData[index]["1CBM"] || "",
-        destinationData[index]["2CBM"] || "",
-        destinationData[index]["3CBM"] || "",
-        destinationData[index]["4CBM"] || "",
-        destinationData[index]["5CBM"] || "",
-        destinationData[index]["6CBM"] || "",
-        description === "CFS Charges" ? "AT ACTUAL" : "",
-      ]);
-    });
-  
-    tableBody.push([
-      "",
-      { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalDestinationCostInINR["1CBM"],
-      totalDestinationCostInINR["2CBM"],
-      totalDestinationCostInINR["3CBM"],
-      totalDestinationCostInINR["4CBM"],
-      totalDestinationCostInINR["5CBM"],
-      totalDestinationCostInINR["6CBM"],
-      ""
-    ]);
-  
-    const seaFreightCharges = [
-      "Sea Freight",
-      "FSC (Fuel Surcharge)",
-      "SSC (Security Surcharge)"
-    ];
-  
-    addSectionHeader("B) SEA FREIGHT CHARGES");
-    seaFreightCharges.forEach((description, index) => {
-      tableBody.push([
-        index + 1,
-        description,
-        "USD / Shipment",
-        seaFreightData[index]["1CBM"] || "",
-        seaFreightData[index]["2CBM"] || "",
-        seaFreightData[index]["3CBM"] || "",
-        seaFreightData[index]["4CBM"] || "",
-        seaFreightData[index]["5CBM"] || "",
-        seaFreightData[index]["6CBM"] || "",
-        "",
-      ]);
-    });
-  
-    tableBody.push([
-      "",
-      { content: "Total Sea Freight Charges (USD)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalSeaFreightCostInINR["1CBM"],
-      totalSeaFreightCostInINR["2CBM"],
-      totalSeaFreightCostInINR["3CBM"],
-      totalSeaFreightCostInINR["4CBM"],
-      totalSeaFreightCostInINR["6CBM"],
-      totalSeaFreightCostInINR["5CBM"],
-      ""
-    ]);
-  
-    const destinationCharges = [
-      "Custom Clearance",
-      "CC Fee",
-      "D.O Charges per BL",
-      "CFS Charges",
-      "Loading/Unloading",
-      "Delivery"
-    ];
-  
-    addSectionHeader("C) DESTINATION CHARGES");
-    destinationCharges.forEach((description, index) => {
-      tableBody.push([
-        index + 1,
-        description,
-        "INR / Shipment",
-        originData[index]["1CBM"] || "",
-        originData[index]["2CBM"] || "",
-        originData[index]["3CBM"] || "",
-        originData[index]["4CBM"] || "",
-        originData[index]["5CBM"] || "",
-        originData[index]["6CBM"] || "",
-        description === "CFS Charges" ? "AT ACTUAL" : "",
-        "",
-      ]);
-    });
-  
-    tableBody.push([
-      "",
-      { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totals.origin["1CBM"].toFixed(2),
-      totals.origin["2CBM"].toFixed(2),
-      totals.origin["3CBM"].toFixed(2),
-      totals.origin["4CBM"].toFixed(2),
-      totals.origin["5CBM"].toFixed(2),
-      totals.origin["6CBM"].toFixed(2),
-      ""
-    ]);
-  
-    tableBody.push([
-      "",
-      { content: "TOTAL SHIPMENT COST (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalShipmentCost["1CBM"],
-      totalShipmentCost["2CBM"],
-      totalShipmentCost["3CBM"],
-      totalShipmentCost["4CBM"],
-      totalShipmentCost["5CBM"],
-      totalShipmentCost["6CBM"],
-      ""
-    ]);
-  
-
-    tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 9 }]);
-
-    const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
-    const maxDeliveryAddressLength = 50;
-    const trimmedAddress = cleanedDeliveryAddress.length > maxDeliveryAddressLength
-        ? cleanedDeliveryAddress.slice(0, maxDeliveryAddressLength) + '...'
-        : cleanedDeliveryAddress;
-
-    tableBody.push([
-        { content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: trimmedAddress, colSpan: 9, styles: { fontSize: 7 } }
-    ]);
-
-    tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: "USD", styles: { halign: "center" } },
-        { content: USD.toFixed(2), colSpan: 2, styles: { halign: "center" } },
-        { content: "EURO", styles: { halign: "center" } },
-        { content: EUR.toFixed(2), colSpan: 2, styles: { halign: "center" } }]);
-
-    tableBody.push([{ content: "Required Transit Days : ", colSpan: 3, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 9 }]);
-    tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: remarks, colSpan: 9 }]);
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
-
-    doc.setFontSize(8);
-    doc.text(`RFQ Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
-    const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} LCL shipment`, 5, 18, { align: "left" });
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
-    doc.setFontSize(8);
-
-    let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
-    let xPosition = doc.internal.pageSize.width - 10;
-    doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 10);
-    const approvalText = "Approved by:                                          Checked by:                                          Prepared by:                                  ";
-    let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
-    doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
-
-    const startY = 24;
-
-    doc.autoTable({
-        head: tableHeaders,
-        body: tableBody,
-        startY: startY,
-        styles: { fontSize: 7, cellPadding: 1.2, overflow: "linebreak", lineWidth: 0.05 },
-        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.05 },
-        columnStyles: {
-          0: { cellWidth: 10 },
-          1: { cellWidth: 60 },
-          2: { cellWidth: 25 },
-          3: { cellWidth: 25 },
-          4: { cellWidth: 25 },
-          5: { cellWidth: 25 },
-          6: { cellWidth: 25 },
-          7: { cellWidth: 25 },
-          8: { cellWidth: 25 },
-          9: { cellWidth: 30 },
-        },
-        margin: { left: 5, right: 5 },
-        theme: "grid",
-    });
-
-    doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
-
-    doc.save("quotation_print_ImportFCL.pdf");
-};
+    window.location.href = "/prints/RFQ-Prices/LCL";
+  };
   return (
     <div className="">
       <div className="card shadow rounded-lg bg-[var(--bgBody)]">
@@ -692,8 +468,8 @@ const QuotationTable = () => {
                   {saveState === "saving" && <FiLoader size={16} className="animate-spin" />}
                   {saveState === "saved" && <FiCheck size={16} />}
                 </button>
-                <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-red-500 text-white rounded">
-                  <FaFilePdf className="" />
+                <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-green-500 text-white rounded">
+                  <FaFileExport className="" />
                 </Button>
               </div>
             </div>

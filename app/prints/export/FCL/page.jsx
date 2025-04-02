@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-import { FaFilePdf, FaFileExport } from "react-icons/fa";
-import { Check, ChevronsUpDown, FileText } from "lucide-react";
+import { FaFilePdf } from "react-icons/fa";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +22,11 @@ import {
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+
 const QuotationTable = () => {
   const [currentDateInfo, setCurrentDateInfo] = useState("");
   const [sections, setSections] = useState({
@@ -29,7 +34,7 @@ const QuotationTable = () => {
     seaFreight: true,
     destination: true ,
   });
-  const [saveState, setSaveState] = useState("idle");
+  const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
     { description: "Customs Clearance & Documentation", 20: "", 40: "", remarks: "Per Container" },
@@ -70,6 +75,11 @@ const QuotationTable = () => {
   const [currency, setCurrency] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [remarks, setRemarks] = useState("");
+  const [Free_Days, setFree_Days] = useState(""); 
+  const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
+  const [HSN_Code, setHSN_Code] = useState(""); 
+  const [Pref_Liners, setPref_Liners] = useState(""); 
+  const [selectedDate, setSelectedDate] = useState(); 
 
   useEffect(() => {
     let flag = false
@@ -83,6 +93,42 @@ const QuotationTable = () => {
     }
   }, []);
   useEffect(() => {
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth(); 
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      
+      const formattedDate = `${monthNames[currentMonth]} ${currentYear}`;
+      setCurrentDateInfo(formattedDate);
+    }, []);
+  useEffect(() => {
+      const fetchLatestMonthYear = async () => {
+        try {
+          const response = await fetch("/api/get_latest_month_year");
+    
+          const result = await response.json();
+          if (result.result && result.result.length > 0) {
+            const { latest_month, latest_year } = result.result[0];
+            if (latest_month && latest_year) {
+              setSelectedDate(dayjs(`${latest_year}-${latest_month}-01`));
+            } else {
+              setSelectedDate(dayjs());
+            }
+          } else {
+            setSelectedDate(dayjs());
+          }
+        } catch (error) {
+          console.error("Error fetching latest month and year:", error);
+          setSelectedDate(dayjs());
+        }
+      };
+    
+      fetchLatestMonthYear();
+    }, []);
+  useEffect(() => {
     const fetchLocations = async () => {
       try {
         const response = await fetch('/api/get_locations_vendors' , {
@@ -90,7 +136,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCLImport',sc: secureLocalStorage.getItem("sc") }),
+          body: JSON.stringify({ RFQType: 'FCL',sc: secureLocalStorage.getItem("sc") }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -121,6 +167,7 @@ const QuotationTable = () => {
 
   useEffect(() => {
     const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 20); 
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth(); 
     const monthNames = [
@@ -130,28 +177,39 @@ const QuotationTable = () => {
     
     // const formattedDate = `${monthNames[currentMonth]} ${currentYear} - ${monthNames[currentMonth + 3]} ${currentYear}`;
     const formattedDate = `${monthNames[currentMonth]} ${currentYear}`;
-    console.log(formattedDate);
+    console.log(formattedDate, currentDate);
     setCurrentDateInfo(formattedDate);
   }, []);
   const fetchQuotationData = async (locationCode) => {
     try {
-      const response = await fetch("/api/get_Import_FCL_QUOTE", {
+      console.log("fetching Data...");
+      console.log("Location code:", locationCode);
+      console.log("sc", secureLocalStorage.getItem("sc"));
+      console.log("month and year", selectedDate);
+      const selectedMonth = dayjs(selectedDate).month() + 1;
+      const selectedYear = dayjs(selectedDate).year();
+      const response = await fetch("/api/userPrints/ExportFCL", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Loc_Code: locationCode, sc: secureLocalStorage.getItem("sc") || "Unknown Supplier" }),
+        body: JSON.stringify({
+          loc_code: locationCode,
+          sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
+          quote_month: selectedMonth,
+          quote_year: selectedYear,
+        }),
       });
-
-      const data = await response.json();
-
-      if (data.result && data.result.length > 0) {
+      const data = await response.json(); 
+      console.log("Fetched data:", data);   
+      if (data && data.length > 0) {
+        console.log("Usestates updating...");
         const updatedOriginCharges = [...originCharges];
         const updatedSeaFreightCharges = [...seaFreightCharges];
         const updatedDestinationCharges = [...destinationCharges];
-
-        const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
-        const fcl40 = data.result.find((item) => item.Cont_Feet === 40) || {};
+        
+        const fcl20 = data.find((item) => item.Cont_Feet === 20) || {};
+        const fcl40 = data.find((item) => item.Cont_Feet === 40) || {};
 
         updatedOriginCharges[0][20] = fcl20.O_CCD || "";
         updatedOriginCharges[0][40] = fcl40.O_CCD || "";
@@ -191,11 +249,15 @@ const QuotationTable = () => {
         updatedDestinationCharges[6][40] = fcl40.D_LOC || "";
 
         setRemarks(fcl20.remarks || "");
-
+        console.log("fetched successfully");
         setOriginCharges(updatedOriginCharges);
+        console.log("Updated Origin Charges:", updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
+        console.log("Updated Sea Freight Charges:", updatedSeaFreightCharges);
         setDestinationCharges(updatedDestinationCharges);
+        console.log("Updated Destination Charges:", updatedDestinationCharges);
       } else {
+        console.log("fetched failed");
         setOriginCharges(originCharges.map((item) => ({ ...item, 20: "", 40: "" })));
         setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, 20: "", 40: "" })));
         setDestinationCharges(destinationCharges.map((item) => ({ ...item, 20: "", 40: "" })));
@@ -215,6 +277,7 @@ const QuotationTable = () => {
     // }, 2000);
   // };
   const saveQuote = async (containerSize) => {
+
     const filterCharges = (charges) =>
       charges.map((charge) => ({
         description: charge.description,
@@ -241,7 +304,7 @@ const QuotationTable = () => {
   
     try {
       console.log(`Saving quote for ${containerSize}ft:`, quoteData);
-      const response = await fetch("/api/SaveImportFCLQuote", {
+      const response = await fetch("/api/SaveFCLQuote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -263,6 +326,29 @@ const QuotationTable = () => {
       alert("Please select a location before saving.");
       return;
     }
+
+    // if(incoterms==='DAP') {
+    //   console.log("incoterms : " , incoterms==='DAP');
+    //   if(totalShipmentCost[20] > 0 && totalDestination[20] <= 0) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    //   if(totalShipmentCost[40] > 0 && totalDestination[40] <= 0) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    //   if((totalShipmentCost[20] > 0 && totalShipmentCost[40] > 0) && (totalDestination[20] <= 0 || totalDestination[40] <= 0)) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    // }
+    // if(incoterms==='CIF') {
+    //   console.log("incoterms : " , incoterms==='DAP');
+    //   if(totalShipmentCost[20] !== 0 && totalShipmentCost[40] !== 0 ) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    // }
   
     setSaveState("saving");
   
@@ -357,6 +443,10 @@ const QuotationTable = () => {
         setDeliveryAddress(data.result[0].Delivery_Address);
         setDest_Port(data.result[0].Dest_Port);
         setCurrency(data.result[0].Currency);
+        setFree_Days(data.result[0].Free_Days);
+        setPref_Liners(data.result[0].Pref_Liners);
+        setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
+        setHSN_Code(data.result[0].HSN_Code);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -370,9 +460,177 @@ const QuotationTable = () => {
       fetchQuotationData(selectedLocation);
     }
   }, [selectedLocation]);
+  useEffect(() => {
+    if (selectedLocation && selectedDate) {
+      fetchSupplierDetails(selectedLocation);
+      fetchQuotationData(selectedLocation);
+    }
+  }, [selectedLocation, selectedDate]);
+  useEffect(() => {
+    if (selectedDate) {
+      fetchSupplierDetails(selectedLocation);
+      fetchQuotationData(selectedLocation);
+    }
+  }, [selectedDate]);
 
   const downloadPDF = () => {
-    window.location.href = "/prints/RFQ-Prices/FCL";
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  
+    const now = moment().add(20, 'days');
+    const formattedDate = now.format("DD-MM-YYYY");
+    const startDate = now.clone().startOf("month").format("DD");
+    const endDate = now.clone().endOf("month").format("DD");
+    const selectedMonthYear = now.format("MMMM YYYY");
+  
+    const tableHeaders = [
+      [
+        { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
+        { content: "Descriptions", rowSpan: 2, styles: { valign: "middle" } },
+        { content: "Currency in", rowSpan: 2, styles: { valign: "middle" } },
+        { content: "Quote for GTI to {locationName || \"{select location}\"} shipment", colSpan: 2, styles: { halign: "center" } },
+        { content: "Remarks", rowSpan: 2, styles: { valign: "middle" } },
+      ],
+      [
+        { content: "20 ft", styles: { halign: "center" } },
+        { content: "40 ft", styles: { halign: "center" } },
+      ]
+    ];
+  
+    const tableBody = [];
+  
+    const addSectionHeader = (sectionName) => {
+      tableBody.push([
+        { content: sectionName, colSpan: 10, styles: { halign: "left", fontStyle: "bold", fillColor: [255, 255, 255] } }
+      ]);
+    };
+  
+    const addChargesToBody = (charges, currency) => {
+      charges.forEach((charge, index) => {
+        tableBody.push([
+          index + 1,
+          charge.description,
+          `${currency} / Shipment`,
+          charge[20] || "", 
+          charge[40] || "", 
+          charge.remarks || "", 
+        ]);
+      });
+    };
+  
+  
+    addSectionHeader("A) ORIGIN CHARGES");
+    addChargesToBody(originCharges, "INR");
+    tableBody.push([
+      "",
+      { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      totalOrigin[20].toFixed(2),
+      totalOrigin[40].toFixed(2),
+      // "", "", ""
+    ]);
+  
+    addSectionHeader("B) SEA FREIGHT CHARGES");
+    addChargesToBody(seaFreightCharges, "USD");
+    tableBody.push([
+      "",
+      { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      totalSeaFreight[20].toFixed(2),
+      totalSeaFreight[40].toFixed(2),
+      // "", "", "",
+      ""
+    ]);
+  
+    addSectionHeader("C) DESTINATION CHARGES");
+    addChargesToBody(destinationCharges, currency);
+    tableBody.push([
+      "",
+      { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      totalDestination[20].toFixed(2),
+      totalDestination[40].toFixed(2),
+      // "", "", "",
+      ""
+    ]);
+  
+    tableBody.push([
+      "",
+      { content: "TOTAL SHIPMENT COST (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      totalShipmentCost[20],
+      totalShipmentCost[40],
+      // "", "", "",
+      ""
+    ]);
+  
+    tableBody.push([{ content: "INCO Term", colSpan: 2, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 8 }]);
+  
+    const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
+    const maxDeliveryAddressLength = 50;
+    const trimmedAddress = cleanedDeliveryAddress.length > maxDeliveryAddressLength
+      ? cleanedDeliveryAddress.slice(0, maxDeliveryAddressLength) + '...'
+      : cleanedDeliveryAddress;
+  
+    tableBody.push([
+      { content: "Delivery Address", colSpan: 2, styles: { fontStyle: "bold" } },
+      { content: trimmedAddress, colSpan: 8, styles: { fontSize: 7 } }
+    ]);
+  
+    tableBody.push([
+      { content: "FX Rate", colSpan: 2, styles: { fontStyle: "bold" } },
+      { content: "USD", styles: { halign: "center" } },
+      { content: USD.toFixed(2), colSpan: 1, styles: { halign: "center" } },
+      { content: "EURO", styles: { halign: "center" } },
+      { content: EUR.toFixed(2), colSpan: 1, styles: { halign: "center" } }
+    ]);
+  
+    tableBody.push([{ content: "Destination Port : ", colSpan: 2, styles: { fontStyle: "bold" } }, 
+      { content: Dest_Port, colSpan: 8 }]);
+    tableBody.push([{ content: "Required Transit Days : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 8 }]);
+    tableBody.push([{ content: "Free Days Requirement at Destination : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Free_Days, colSpan: 8 }]);
+    tableBody.push([{ content: "Preffered Liners : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Pref_Liners, colSpan: 8 }]);
+    tableBody.push([{ content: "HSN Code : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: HSN_Code, colSpan: 8 }]);
+    tableBody.push([{ content: "Avg. Containers per month : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Avg_Cont_Per_Mnth, colSpan: 8 }]);
+  
+    tableBody.push([{ content: "Remarks", colSpan: 2, styles: { fontStyle: "bold" } }, { content: remarks, colSpan: 8 }]);
+      
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
+  
+    doc.setFontSize(8);
+    doc.text(`RFQ Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    const loc = locationName.split('|')[0].trim();
+    doc.text(`Quote for GTI to ${loc} FCL shipment`, 5, 18, { align: "left" });
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.setFontSize(8);
+  
+    let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
+    let xPosition = doc.internal.pageSize.width - 10;
+    doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 10);
+    const approvalText = "Approved by:                                          Checked by:                                          Prepared by:                                  ";
+    // let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
+    doc.text(approvalText, 5, 36, { align: "left" });
+  
+    doc.autoTable({
+      head: tableHeaders,
+      body: tableBody,
+      startY: 42,
+      styles: { fontSize: 7, cellPadding: 1.2, overflow: "linebreak", lineWidth: 0.05 },
+      headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.05 },
+      columnStyles: {
+        0: { cellWidth: 10 },
+        1: { cellWidth: 60 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 30 },
+      },
+      margin: { left: 5, right: 5 },
+      theme: "grid",
+    });
+  
+    doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
+  
+    doc.save("quotation_print_ExportFCL.pdf");
   };
   
   return (
@@ -385,7 +643,33 @@ const QuotationTable = () => {
               <p className="text-xs text-gray-100">"RFQ Import rates for {currentDateInfo}"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
-            <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4">
+            <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4 sm:gap-0 lg:gap-4 mt-4 lg:mt-0">
+            <div>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                    label={<span style={{ color: "var(--borderclr)" }}>Select</span>}
+                    views={["year", "month"]}
+                    openTo="month"
+                    value={selectedDate}
+                    className="w-[200px] md:w-21"
+                    sx={{
+                        "& .MuiInputBase-root": {
+                          color: "var(--borderclr)",
+                          borderRadius: "8px",
+                          fontSize:"14px",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "var(--borderclr)"
+                        },
+                        "& .MuiSvgIcon-root": {
+                          color: "var(--borderclr)",
+                        },
+                      }}
+                    onChange={(newValue) => setSelectedDate(newValue)}
+                  />
+                </LocalizationProvider>
+              </div>
+              <div className="flex flex-row lg:flex-row items-center justify-start lg:justify-end gap-4">
               <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
@@ -425,8 +709,9 @@ const QuotationTable = () => {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="flex gap-2">
-                <button
+              <div>
+                {/* <button
+                  hidden
                   onClick={handleSave}
                   className="mt-0 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded"
                   style={{ minWidth: "80px" }}
@@ -434,10 +719,11 @@ const QuotationTable = () => {
                   {saveState === "idle" && <FiSave size={16} />}
                   {saveState === "saving" && <FiLoader size={16} className="animate-spin" />}
                   {saveState === "saved" && <FiCheck size={16} />}
-                </button>
-                <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-green-500 text-white rounded">
-                  <FaFileExport className="" />
+                </button> */}
+                <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-red-500 text-white rounded">
+                  <FaFilePdf className="" />
                 </Button>
+              </div>
               </div>
             </div>
           </div>
@@ -447,7 +733,7 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL Import</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -458,57 +744,65 @@ const QuotationTable = () => {
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">
-            <tr
+              <tr
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
-                onClick={() => toggleSection("destination")}
+                onClick={() => toggleSection("origin")}
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.destination ? "▼" : "▶"} Destination Charges
+                  {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
-              {sections.destination &&
-                destinationCharges.map((item, index) => (
-                  <tr key={index} className="border">
+            
+              {sections.origin &&
+                originCharges
+                .filter((item) => item.description !== "Halting")
+                .map((item, index) => {
+                  const isHalting = item.description === "Halting";
+                  return (
+                  <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">{currency} / Shipment</td>
+                    <td className="py-1 px-3 border">INR / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
-                        placeholder="0"
-                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        placeholder="0" 
+                        readOnly                    
+                        className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
                         value={item[20]}
-                        onChange={(e) => handleDestinationChange(index, 20, e.target.value)}
+                        onChange={(e) => handleOriginChange(index, 20, e.target.value)}
                       />
                     </td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
                         placeholder="0"
+                        readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-right"
                         value={item[40]}
-                        onChange={(e) => handleDestinationChange(index, 40, e.target.value)}
+                        onChange={(e) => handleOriginChange(index, 40, e.target.value)}
                       />
                     </td>
                     <td className="py-1 px-3 border">
-                      {item.remarks}
+                    {item.remarks}
                       {/* <input
                         type="text"
-                        readOnly
+                        readOnly={isHalting}
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
-                        onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
+                        onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
                       /> */}
                     </td>
                   </tr>
-                ))}
-              {sections.destination && (
+                  );
+              })}
+              {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border">{totalDestination[20].toFixed(2)}</td>
-                  <td className="py-1 px-3 border">{totalDestination[40].toFixed(2)}</td>
+                  <td className="py-1 px-3 border">{totalOrigin[20].toFixed(2)}</td>
+                  <td className="py-1 px-3 border">{totalOrigin[40].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -529,6 +823,7 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
+                        readOnly
                         type="number"
                         placeholder="0"
                         className="w-full bg-transparent border-none focus:outline-none text-right"
@@ -538,6 +833,7 @@ const QuotationTable = () => {
                     </td>
                     <td className="py-1 px-3 border">
                       <input
+                        readOnly
                         type="number"
                         placeholder="0"
                         className="w-full bg-transparent border-none focus:outline-none text-right"
@@ -546,7 +842,7 @@ const QuotationTable = () => {
                       />
                     </td>
                     <td className="py-1 px-3 border">
-                    {item.remarks}
+                      {item.remarks}
                       {/* <input
                         type="text"
                         readOnly
@@ -568,53 +864,57 @@ const QuotationTable = () => {
               )}
               <tr
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
-                onClick={() => toggleSection("origin")}
+                onClick={() => toggleSection("destination")}
               >
                 <td>C.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Origin Charges
+                  {sections.destination ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
-              {sections.origin &&
-                originCharges.map((item, index) => {
-                  const isHalting = item.description === "Halting";
-                  return (
-                  <tr key={index} className="border border border-[var(--bgBody)]">
+              {sections.destination &&
+                destinationCharges.map((item, index) => (
+                  <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 11}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">INR / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
+                        readOnly
                         type="number"
                         placeholder="0"
-                        readOnly={isHalting}      
-                        className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
+                        className="w-full bg-transparent border-none focus:outline-none text-right"
                         value={item[20]}
-                        onChange={(e) => handleOriginChange(index, 20, e.target.value)}
+                        onChange={(e) => handleDestinationChange(index, 20, e.target.value)}
                       />
                     </td>
                     <td className="py-1 px-3 border">
                       <input
+                        readOnly
                         type="number"
                         placeholder="0"
-                        readOnly={isHalting}      
                         className="w-full bg-transparent border-none focus:outline-none text-right"
                         value={item[40]}
-                        onChange={(e) => handleOriginChange(index, 40, e.target.value)}
+                        onChange={(e) => handleDestinationChange(index, 40, e.target.value)}
                       />
                     </td>
-                    <td className="py-1 px-3 border"> {item.remarks}
-                     
+                    <td className="py-1 px-3 border">
+                    {item.remarks}
+                      {/* <input
+                        type="text"
+                        readOnly
+                        className="w-full bg-transparent border-none focus:outline-none text-center"
+                        value={item.remarks}
+                        onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
+                      /> */}
                     </td>
                   </tr>
-                  )
-              })}
-              {sections.origin && (
+                ))}
+              {sections.destination && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td className="py-1 px-3 border">{totalOrigin[20].toFixed(2)}</td>
-                  <td className="py-1 px-3 border">{totalOrigin[40].toFixed(2)}</td>
+                  <td className="py-1 px-3 border">{totalDestination[20].toFixed(2)}</td>
+                  <td className="py-1 px-3 border">{totalDestination[40].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -641,16 +941,27 @@ const QuotationTable = () => {
                 <td className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
-                <td colSpan="4" className="py-1 px-3 border text-left">{transitDays}</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days :</td>
+                <td colSpan="1" className="py-1 px-3 border text-left">{transitDays}</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Free Days Requirement at Destination :</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{Free_Days}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
-                <td colSpan="4" className="py-1 px-3 border text-left">{Dest_Port}</td>
+                <td colSpan="1" className="py-1 px-3 border text-left">{Dest_Port}</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{Pref_Liners}</td>
+              </tr>
+             
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
+                <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
-              <td colSpan="4" className="py-1 px-3 border text-left">
+                <td colSpan="4" className="py-1 px-3 border text-left">
                     <input
                         type="text"
                         placeholder="..."                       
