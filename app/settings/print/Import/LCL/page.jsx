@@ -40,7 +40,7 @@ const QuotationTable = () => {
 
   const [destinationCharges, setDestinationCharges] = useState([
     { description: "Customs Clearance & Documentation", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
-    { description: "Local Transportation From GTI-Chennai", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
+    { description: "Pickup Charges", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
     { description: "Terminal Handling Charges - Origin", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
     { description: "Bill of Lading Charges", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
     { description: "Loading/Unloading / SSR", remarks: "", sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "", sc7: "", sc8: "", sc9: "", sc10: "", sc11: "", sc12: "", sc13: "", sc14: "", sc15: "", sc16: "", sc17: "", sc18: "" },
@@ -519,7 +519,7 @@ const QuotationTable = () => {
     doc.setFontSize(8);
     doc.text(`RFQ Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 12);
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} Import shipment`, 5, 16);
+    doc.text(`Quote for ${loc} to GTI Import shipment`, 5, 16);
 
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
@@ -539,8 +539,8 @@ const QuotationTable = () => {
         head: tableHeaders,
         body: tableBody,
         startY: startY,
-        styles: { fontSize: 7, cellPadding: 1.5, overflow: "linebreak",lineWidth: 0.05 },
-        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.05 },
+        styles: { fontSize: 7, cellPadding: 1.5, overflow: "linebreak",lineWidth: 0.15  ,lineColor: [0, 0, 0]},
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.15,lineColor: [0, 0, 0] },
         columnStyles: {
             0: { cellWidth: 8 },
             1: { cellWidth: 45 },
@@ -572,7 +572,7 @@ const QuotationTable = () => {
                   }`
               }
               </p>
-              <p className="text-xs text-gray-100">Quote for GTI to {locationName || "{select location}"} shipment</p>
+              <p className="text-xs text-gray-100">Quote for {locationName || "{select location}"} to GTI shipment</p>
             </div>
             <div className="flex flex-col lg:flex-row justify-end items-start lg:items-center lg:space-y-0 sm:space-x-2 space-y-2">
               <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">

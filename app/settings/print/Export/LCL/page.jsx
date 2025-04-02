@@ -545,8 +545,8 @@ const QuotationTable = () => {
         head: tableHeaders,
         body: tableBody,
         startY: startY,
-        styles: { fontSize: 7, cellPadding: 1.5, overflow: "linebreak",lineWidth: 0.05 },
-        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.05 },
+        styles: { fontSize: 7, cellPadding: 1.5, overflow: "linebreak",lineWidth: 0.15,lineColor: [0, 0, 0] },
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 7, lineWidth: 0.15,lineColor: [0, 0, 0] },
         columnStyles: {
             0: { cellWidth: 8 },
             1: { cellWidth: 45 },
