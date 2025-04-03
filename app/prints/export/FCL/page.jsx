@@ -131,7 +131,7 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_vendors' , {
+        const response = await fetch('/api/get_locations' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -487,7 +487,7 @@ const QuotationTable = () => {
         { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
         { content: "Descriptions", rowSpan: 2, styles: { valign: "middle" } },
         { content: "Currency in", rowSpan: 2, styles: { valign: "middle" } },
-        { content: "Quote for GTI to {locationName || \"{select location}\"} shipment", colSpan: 2, styles: { halign: "center" } },
+        { content: "Container", colSpan: 2, styles: { halign: "center" } },
         { content: "Remarks", rowSpan: 2, styles: { valign: "middle" } },
       ],
       [
@@ -510,8 +510,14 @@ const QuotationTable = () => {
           index + 1,
           charge.description,
           `${currency} / Shipment`,
-          charge[20] || "", 
-          charge[40] || "", 
+          { 
+            content: (charge[20] === 0 || charge[20] === '0.00' || charge[20] === '0' || charge[20] === 0.00) ? "" : (charge[20] || ""), 
+            styles: { halign: "center" } 
+          },
+          { 
+            content: (charge[40] === 0 || charge[40] === '0.00' || charge[40] === '0' || charge[40] === 0.00) ? "" : (charge[40] || ""), 
+            styles: { halign: "center" } 
+          },
           charge.remarks || "", 
         ]);
       });
@@ -523,8 +529,14 @@ const QuotationTable = () => {
     tableBody.push([
       "",
       { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalOrigin[20].toFixed(2),
-      totalOrigin[40].toFixed(2),
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalOrigin[20]) ? "" : (totalOrigin[20] ?? 0).toFixed(2), 
+        styles: { halign: "center" } 
+      },
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalOrigin[40]) ? "" : (totalOrigin[40] ?? 0).toFixed(2), 
+        styles: { halign: "center" } 
+      },
       // "", "", ""
     ]);
   
@@ -533,9 +545,14 @@ const QuotationTable = () => {
     tableBody.push([
       "",
       { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalSeaFreight[20].toFixed(2),
-      totalSeaFreight[40].toFixed(2),
-      // "", "", "",
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalSeaFreight[20]) ? "" : (totalSeaFreight[20] ?? 0).toFixed(2), 
+        styles: { halign: "center" } 
+      },
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalSeaFreight[40]) ? "" : (totalSeaFreight[40] ?? 0).toFixed(2), 
+        styles: { halign: "center" } 
+      },
       ""
     ]);
   
@@ -544,17 +561,22 @@ const QuotationTable = () => {
     tableBody.push([
       "",
       { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalDestination[20].toFixed(2),
-      totalDestination[40].toFixed(2),
-      // "", "", "",
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalDestination[20]) ? "" : (totalDestination[20] ?? 0).toFixed(2), 
+        styles: { halign: "center" } 
+      },
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalDestination[40]) ? "" : (totalDestination[40] ?? 0).toFixed(2), 
+        styles: { halign: "center" } 
+      },
       ""
     ]);
   
     tableBody.push([
       "",
       { content: "TOTAL SHIPMENT COST (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalShipmentCost[20],
-      totalShipmentCost[40],
+      {content: totalShipmentCost[20],  styles: { halign: "center" } },
+      {content: totalShipmentCost[40],  styles: { halign: "center" } },
       // "", "", "",
       ""
     ]);
@@ -592,7 +614,7 @@ const QuotationTable = () => {
       
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
+    doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
     doc.text(`RFQ Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
@@ -600,20 +622,17 @@ const QuotationTable = () => {
     doc.text(`Quote for GTI to ${loc} FCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
-    doc.setFontSize(8);
+   
   
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
     let xPosition = doc.internal.pageSize.width - 10;
     doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 10);
-    const approvalText = "Approved by:                                          Checked by:                                          Prepared by:                                  ";
-    // let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
-    doc.text(approvalText, 5, 36, { align: "left" });
+
   
     doc.autoTable({
       head: tableHeaders,
       body: tableBody,
-      startY: 42,
+      startY: 28,
       styles: { fontSize: 7, cellPadding: 1.2, overflow: "linebreak", lineWidth: 0.05 },
       headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.05 },
       columnStyles: {
@@ -624,11 +643,23 @@ const QuotationTable = () => {
         4: { cellWidth: 30 },
         5: { cellWidth: 30 },
       },
-      margin: { left: 5, right: 5 },
+      margin: { left: 10, right: 5 },
       theme: "grid",
     });
-  
-    doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
+
+//     const pageHeight = doc.internal.pageSize.height; // Get page height
+// const marginBottom = 20; // Adjust as needed
+
+// // Define positions
+// const marginLeft = 10;
+// const columnSpacing = 65; // Adjust based on required spacing
+// const textYPosition = pageHeight - marginBottom; // Position near bottom
+
+// // Draw text at bottom
+// doc.text("Approved by:", marginLeft, textYPosition);
+// doc.text("Checked by:", marginLeft + columnSpacing, textYPosition);
+// doc.text("Prepared by:", marginLeft + 2 * columnSpacing, textYPosition);
+
   
     doc.save("quotation_print_ExportFCL.pdf");
   };

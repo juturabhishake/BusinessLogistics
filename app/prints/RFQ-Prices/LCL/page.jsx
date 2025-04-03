@@ -111,7 +111,7 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_vendors', {
+        const response = await fetch('/api/get_locations', {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -513,12 +513,42 @@ const QuotationTable = () => {
         index + 1,
         description,
         `${currency} / Shipment`,
-        destinationData[index]["1CBM"] || "",
-        destinationData[index]["2CBM"] || "",
-        destinationData[index]["3CBM"] || "",
-        destinationData[index]["4CBM"] || "",
-        destinationData[index]["5CBM"] || "",
-        destinationData[index]["6CBM"] || "",
+        {
+          content: (destinationData[index]["1CBM"] === 0 || destinationData[index]["1CBM"] === '0.00' || destinationData[index]["1CBM"] === '0' || destinationData[index]["1CBM"] === 0.00) 
+            ? "" 
+            : (destinationData[index]["1CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (destinationData[index]["2CBM"] === 0 || destinationData[index]["2CBM"] === '0.00' || destinationData[index]["2CBM"] === '0' || destinationData[index]["2CBM"] === 0.00) 
+            ? "" 
+            : (destinationData[index]["2CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (destinationData[index]["3CBM"] === 0 || destinationData[index]["3CBM"] === '0.00' || destinationData[index]["3CBM"] === '0' || destinationData[index]["3CBM"] === 0.00) 
+            ? "" 
+            : (destinationData[index]["3CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (destinationData[index]["4CBM"] === 0 || destinationData[index]["4CBM"] === '0.00' || destinationData[index]["4CBM"] === '0' || destinationData[index]["4CBM"] === 0.00) 
+            ? "" 
+            : (destinationData[index]["4CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (destinationData[index]["5CBM"] === 0 || destinationData[index]["5CBM"] === '0.00' || destinationData[index]["5CBM"] === '0' || destinationData[index]["5CBM"] === 0.00) 
+            ? "" 
+            : (destinationData[index]["5CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (destinationData[index]["6CBM"] === 0 || destinationData[index]["6CBM"] === '0.00' || destinationData[index]["6CBM"] === '0' || destinationData[index]["6CBM"] === 0.00) 
+            ? "" 
+            : (destinationData[index]["6CBM"] || ""),
+          styles: { halign: "center" }
+        },
         description === "CFS Charges" ? "AT ACTUAL" : "",
       ]);
     });
@@ -526,12 +556,12 @@ const QuotationTable = () => {
     tableBody.push([
       "",
       { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalDestinationCostInINR["1CBM"],
-      totalDestinationCostInINR["2CBM"],
-      totalDestinationCostInINR["3CBM"],
-      totalDestinationCostInINR["4CBM"],
-      totalDestinationCostInINR["5CBM"],
-      totalDestinationCostInINR["6CBM"],
+      { content:totalDestinationCostInINR["1CBM"],  styles: { halign: "center" } },
+      { content:totalDestinationCostInINR["2CBM"],  styles: { halign: "center" } },
+      { content:totalDestinationCostInINR["3CBM"],  styles: { halign: "center" } },
+      { content:totalDestinationCostInINR["4CBM"],  styles: { halign: "center" } },
+      { content:totalDestinationCostInINR["5CBM"],  styles: { halign: "center" } },
+      { content:totalDestinationCostInINR["6CBM"],  styles: { halign: "center" } },
       ""
     ]);
   
@@ -547,12 +577,42 @@ const QuotationTable = () => {
         index + 1,
         description,
         "USD / Shipment",
-        seaFreightData[index]["1CBM"] || "",
-        seaFreightData[index]["2CBM"] || "",
-        seaFreightData[index]["3CBM"] || "",
-        seaFreightData[index]["4CBM"] || "",
-        seaFreightData[index]["5CBM"] || "",
-        seaFreightData[index]["6CBM"] || "",
+        {
+          content: (seaFreightData[index]["1CBM"] === 0 || seaFreightData[index]["1CBM"] === '0.00' || seaFreightData[index]["1CBM"] === '0' || seaFreightData[index]["1CBM"] === 0.00) 
+            ? "" 
+            : (seaFreightData[index]["1CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (seaFreightData[index]["2CBM"] === 0 || seaFreightData[index]["2CBM"] === '0.00' || seaFreightData[index]["2CBM"] === '0' || seaFreightData[index]["2CBM"] === 0.00) 
+            ? "" 
+            : (seaFreightData[index]["2CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (seaFreightData[index]["3CBM"] === 0 || seaFreightData[index]["3CBM"] === '0.00' || seaFreightData[index]["3CBM"] === '0' || seaFreightData[index]["3CBM"] === 0.00) 
+            ? "" 
+            : (seaFreightData[index]["3CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (seaFreightData[index]["4CBM"] === 0 || seaFreightData[index]["4CBM"] === '0.00' || seaFreightData[index]["4CBM"] === '0' || seaFreightData[index]["4CBM"] === 0.00) 
+            ? "" 
+            : (seaFreightData[index]["4CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (seaFreightData[index]["5CBM"] === 0 || seaFreightData[index]["5CBM"] === '0.00' || seaFreightData[index]["5CBM"] === '0' || seaFreightData[index]["5CBM"] === 0.00) 
+            ? "" 
+            : (seaFreightData[index]["5CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (seaFreightData[index]["6CBM"] === 0 || seaFreightData[index]["6CBM"] === '0.00' || seaFreightData[index]["6CBM"] === '0' || seaFreightData[index]["6CBM"] === 0.00) 
+            ? "" 
+            : (seaFreightData[index]["6CBM"] || ""),
+          styles: { halign: "center" }
+        },
         "",
       ]);
     });
@@ -560,12 +620,12 @@ const QuotationTable = () => {
     tableBody.push([
       "",
       { content: "Total Sea Freight Charges (USD)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalSeaFreightCostInINR["1CBM"],
-      totalSeaFreightCostInINR["2CBM"],
-      totalSeaFreightCostInINR["3CBM"],
-      totalSeaFreightCostInINR["4CBM"],
-      totalSeaFreightCostInINR["6CBM"],
-      totalSeaFreightCostInINR["5CBM"],
+      {content: totalDestinationCostInINR["1CBM"],  styles: { halign: "center" }},
+      {content: totalDestinationCostInINR["2CBM"],  styles: { halign: "center" }},
+      {content: totalDestinationCostInINR["3CBM"],  styles: { halign: "center" }},
+      {content: totalDestinationCostInINR["4CBM"],  styles: { halign: "center" }},
+      {content: totalDestinationCostInINR["5CBM"],  styles: { halign: "center" }},
+      {content: totalDestinationCostInINR["6CBM"],  styles: { halign: "center" }},
       ""
     ]);
   
@@ -584,12 +644,30 @@ const QuotationTable = () => {
         index + 1,
         description,
         "INR / Shipment",
-        originData[index]["1CBM"] || "",
-        originData[index]["2CBM"] || "",
-        originData[index]["3CBM"] || "",
-        originData[index]["4CBM"] || "",
-        originData[index]["5CBM"] || "",
-        originData[index]["6CBM"] || "",
+        {
+          content: (originData[index]["1CBM"] === 0 || originData[index]["1CBM"] === '0.00' || originData[index]["1CBM"] === '0' || originData[index]["1CBM"] === 0.00) ? "" : (originData[index]["1CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (originData[index]["2CBM"] === 0 || originData[index]["2CBM"] === '0.00' || originData[index]["2CBM"] === '0' || originData[index]["2CBM"] === 0.00) ? "" : (originData[index]["2CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (originData[index]["3CBM"] === 0 || originData[index]["3CBM"] === '0.00' || originData[index]["3CBM"] === '0' || originData[index]["3CBM"] === 0.00) ? "" : (originData[index]["3CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (originData[index]["4CBM"] === 0 || originData[index]["4CBM"] === '0.00' || originData[index]["4CBM"] === '0' || originData[index]["4CBM"] === 0.00) ? "" : (originData[index]["4CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (originData[index]["5CBM"] === 0 || originData[index]["5CBM"] === '0.00' || originData[index]["5CBM"] === '0' || originData[index]["5CBM"] === 0.00) ? "" : (originData[index]["5CBM"] || ""),
+          styles: { halign: "center" }
+        },
+        {
+          content: (originData[index]["6CBM"] === 0 || originData[index]["6CBM"] === '0.00' || originData[index]["6CBM"] === '0' || originData[index]["6CBM"] === 0.00) ? "" : (originData[index]["6CBM"] || ""),
+          styles: { halign: "center" }
+        },
         description === "CFS Charges" ? "AT ACTUAL" : "",
         "",
       ]);
@@ -598,24 +676,24 @@ const QuotationTable = () => {
     tableBody.push([
       "",
       { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totals.origin["1CBM"].toFixed(2),
-      totals.origin["2CBM"].toFixed(2),
-      totals.origin["3CBM"].toFixed(2),
-      totals.origin["4CBM"].toFixed(2),
-      totals.origin["5CBM"].toFixed(2),
-      totals.origin["6CBM"].toFixed(2),
+      {content: totals.origin["1CBM"].toFixed(2),styles: { halign: "center" }},
+      {content: totals.origin["2CBM"].toFixed(2),styles: { halign: "center" }},
+      {content: totals.origin["3CBM"].toFixed(2),styles: { halign: "center" }},
+      {content: totals.origin["4CBM"].toFixed(2),styles: { halign: "center" }},
+      {content: totals.origin["5CBM"].toFixed(2),styles: { halign: "center" }},
+      {content: totals.origin["6CBM"].toFixed(2),styles: { halign: "center" }},
       ""
     ]);
   
     tableBody.push([
       "",
       { content: "TOTAL SHIPMENT COST (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-      totalShipmentCost["1CBM"],
-      totalShipmentCost["2CBM"],
-      totalShipmentCost["3CBM"],
-      totalShipmentCost["4CBM"],
-      totalShipmentCost["5CBM"],
-      totalShipmentCost["6CBM"],
+      { content: totalShipmentCost["1CBM"],  styles: { halign: "center" } },
+        { content: totalShipmentCost["2CBM"],  styles: { halign: "center" } },
+        { content: totalShipmentCost["3CBM"],  styles: { halign: "center" } },
+        { content: totalShipmentCost["4CBM"],  styles: { halign: "center" } },
+        { content: totalShipmentCost["5CBM"],  styles: { halign: "center" } },
+        { content: totalShipmentCost["6CBM"],  styles: { halign: "center" } },
       ""
     ]);
   
@@ -644,7 +722,7 @@ const QuotationTable = () => {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
+    doc.text("Greentech Industries (India) Pvt. Ltd.", 5, 10, { align: "left" });
 
     doc.setFontSize(8);
     doc.text(`RFQ Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
@@ -652,17 +730,14 @@ const QuotationTable = () => {
     doc.text(`Quote for GTI to ${loc} LCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
-    doc.setFontSize(8);
+
 
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
     let xPosition = doc.internal.pageSize.width - 10;
     doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 10);
-    const approvalText = "Approved by:                                          Checked by:                                          Prepared by:                                  ";
-    let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
-    doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
 
-    const startY = 24;
+
+    const startY = 22;
 
     doc.autoTable({
         head: tableHeaders,
@@ -686,7 +761,6 @@ const QuotationTable = () => {
         theme: "grid",
     });
 
-    doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
 
     doc.save("quotation_print_ImportFCL.pdf");
 };
