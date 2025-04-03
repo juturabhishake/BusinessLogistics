@@ -10,6 +10,7 @@ import {
   LucideIcon,
   Database,
   NotepadText,
+  Currency,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
@@ -134,6 +135,11 @@ export function getMenuList(pathname: string): Group[] {
               href: "/account",
               label: "Account",
               icon: Settings
+            },
+            {
+              href: "/settings/currencyExchange",
+              label: "Currency Exchange",
+              icon: Currency
             },
             {
               href: "/terms_conditions",
