@@ -22,22 +22,24 @@ function runMiddleware(req, res, fn) {
 
 export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
-  if (req.method === "POST") {
-     
-    const { Month,Year } = req.body;
-    console.log('Curr Month:', Month);  
-    if (!Month) {
-        return res.status(400).json({ message: "Location code is required" });
-    }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+
+  const { month_no, year_no, usd, euro, created_by } = req.body;
+
+  if (!month_no || !year_no || !usd || !euro || !created_by) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
   try {
-    const result = await prisma.$queryRaw`EXEC [dbo].[Get_Currency_MonthYear] ${Month},${Year}`;
-    console.log('currecy Data:', result);
-    return res.status(200).json({ result });
+    const result = await prisma.$queryRaw`EXEC [dbo].[Insert_Currency_Exchange] ${month_no}, ${year_no}, ${usd}, ${euro}, ${created_by}`;
+    return res.status(200).json(result);
   } catch (error) {
-    console.error('Error fetching currency:', error);
+    console.error('Error executing Insert_Currency_Exchange:', error);
     return res.status(500).json({ message: 'Internal Server Error' });
   } finally {
     await prisma.$disconnect();
   }
-}
 }
