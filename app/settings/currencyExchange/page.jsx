@@ -15,6 +15,7 @@ const CurrencyPage = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);  
   const [success, setSuccess] = useState(null); 
+  const [status, setStatus] = useState(null);
 
   useEffect(() => {
     const check_sc = secureLocalStorage.getItem("sc");
@@ -40,9 +41,12 @@ const CurrencyPage = () => {
         if (data.result && data.result.length > 0) {
           setUsd(parseFloat(data.result[0].USD));
           setEuro(parseFloat(data.result[0].EURO));
+          setStatus(data.result[0].status);
+          console.log('Status:', status);
         } else {
           setUsd(0);
           setEuro(0);
+          setStatus(null);
         }
       } catch (error) {
         console.error("Error fetching currency:", error);
@@ -81,13 +85,16 @@ const CurrencyPage = () => {
       const data = await res.json();
       if (data) {
         setSuccess(true);
-        alert("Currency data saved successfully!");
+        // alert("Currency data saved successfully!");
       }
     } catch (error) {
       console.error("Error saving data:", error);
       setSuccess(false);
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
     }
   };
 
@@ -145,7 +152,8 @@ const CurrencyPage = () => {
           />
         </div>
 
-        <button
+        {status === 0 || status === null  && (
+          <button
           onClick={handleSave}
           disabled={loading}
           className={`mt-6 w-full py-2 px-4 ${loading ? 'bg-gray-400' : 'bg-blue-600'} text-white rounded-lg flex justify-center items-center hover:bg-blue-700`}
@@ -161,6 +169,7 @@ const CurrencyPage = () => {
           )}
           {loading ? 'Saving...' : success ? 'Saved!' : 'Save'}
         </button>
+        )}
       </div>
     </div>
     </div>
