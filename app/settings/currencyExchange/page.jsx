@@ -105,7 +105,7 @@ const CurrencyPage = () => {
       <div className="mt-6">
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
-            label={<span className="text-gray-800 dark:text-white">Select Month & Year</span>}
+            label={<span className="text-gray-800 dark:text-white">Select</span>}
             views={["year", "month"]}
             openTo="month"
             value={selectedDate}
