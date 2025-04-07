@@ -271,28 +271,33 @@ const QuotationTable = () => {
       return;
     }
 
-    // if(incoterms==='DAP') {
-    //   console.log("incoterms : " , incoterms==='DAP');
-    //   if(totalShipmentCost[20] > 0 && totalDestination[20] <= 0) {
-    //     alert("Destination charges are not available for DAP incoterms");
-    //     return;
-    //   }
-    //   if(totalShipmentCost[40] > 0 && totalDestination[40] <= 0) {
-    //     alert("Destination charges are not available for DAP incoterms");
-    //     return;
-    //   }
-    //   if((totalShipmentCost[20] > 0 && totalShipmentCost[40] > 0) && (totalDestination[20] <= 0 || totalDestination[40] <= 0)) {
-    //     alert("Destination charges are not available for DAP incoterms");
-    //     return;
-    //   }
-    // }
-    // if(incoterms==='CIF') {
-    //   console.log("incoterms : " , incoterms==='DAP');
-    //   if(totalShipmentCost[20] !== 0 && totalShipmentCost[40] !== 0 ) {
-    //     alert("Destination charges are not available for DAP incoterms");
-    //     return;
-    //   }
-    // }
+    if(incoterms==='DAP') {
+      console.log("incoterms : " , incoterms==='DAP');
+      if(totalShipmentCost[20] > 0 && totalDestination[20] <= 0) {
+        alert("Required Destination charges or DAP");
+        return;
+      }
+      if(totalShipmentCost[40] > 0 && totalDestination[40] <= 0) {
+        alert("Required Destination charges or DAP");
+        return;
+      }
+      // if((totalShipmentCost[20] > 0 && totalShipmentCost[40] > 0) && (totalDestination[20] <= 0 || totalDestination[40] <= 0)) {
+      //   alert("Destination charges are not available for DAP incoterms");
+      //   return;
+      // }
+    }
+    if(incoterms==='CIF') {
+      console.log("incoterms : " , incoterms==='DAP');
+      if(totalShipmentCost[20] > 0 && totalDestination[20] > 0) {
+        alert("Destination charges are not allowed for CIF");
+        return;
+      }
+      if(totalShipmentCost[40] > 0 && totalDestination[40] > 0) {
+        alert("Destination charges are not allowed for CIF");
+        return;
+      }
+    } 
+  
   
     setSaveState("saving");
   
