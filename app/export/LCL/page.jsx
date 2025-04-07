@@ -334,7 +334,35 @@ const QuotationTable = () => {
       alert("Please select a location before saving.");
       return;
     }
-  
+    if(incoterms==='DAP') {
+      console.log("incoterms : " , incoterms==='DAP');
+      if(totalShipmentCost["1CBM"] > 0 && totalDestinationCostInINR["1CBM"] <= 0) {
+        alert("Required Destination charges or DAP");
+        return;
+      }
+      if(totalShipmentCost["2CBM"] > 0 && totalDestinationCostInINR["2CBM"] <= 0) {
+        alert("Required Destination charges or DAP");
+        return;
+      }
+      if(totalShipmentCost["3CBM"] > 0 && totalDestinationCostInINR["3CBM"] <= 0) {
+        alert("Required Destination charges or DAP");
+        return;
+      }
+      if(totalShipmentCost["4CBM"] > 0 && totalDestinationCostInINR["4CBM"] <= 0) {
+        alert("Required Destination charges or DAP");
+        return;
+      }
+      if(totalShipmentCost["5CBM"] > 0 && totalDestinationCostInINR["5CBM"] <= 0) {
+        alert("Required Destination charges or DAP");
+        return;
+      }
+      if(totalShipmentCost["6CBM"] > 0 && totalDestinationCostInINR["6CBM"] <= 0) {
+        alert("Required Destination charges or DAP");
+        return;
+      }
+    
+    }
+
     setSaveState("saving");
   
     try {
