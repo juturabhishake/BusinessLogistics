@@ -152,7 +152,7 @@ const CurrencyPage = () => {
           />
         </div>
 
-        {status === 0 || status === null  && (
+        {(status === 0 || status === null)  && (
           <button
           onClick={handleSave}
           disabled={loading}
