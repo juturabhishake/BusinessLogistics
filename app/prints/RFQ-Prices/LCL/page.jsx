@@ -469,9 +469,9 @@ const QuotationTable = () => {
 
     const now = moment().add(20, 'days');
     const formattedDate = now.format("DD-MM-YYYY");
-    const startDate = now.clone().startOf("month").format("DD");
-    const endDate = now.clone().endOf("month").format("DD");
-    const selectedMonthYear = now.format("MMMM YYYY");
+    const startDate = selectedDate.clone().startOf("month").format("DD");
+    const endDate = selectedDate.clone().endOf("month").format("DD");
+    const selectedMonthYear = selectedDate.format("MMMM YYYY");
 
     const tableHeaders = [
         [
@@ -771,7 +771,7 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
-              <p className="text-xs text-gray-100">"RFQ Import rates for {currentDateInfo}"</p>
+              <p className="text-xs text-gray-100">"RFQ Import rates for {selectedDate.format("MMMM YYYY")}"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4 sm:gap-0 lg:gap-4 mt-4 lg:mt-0">

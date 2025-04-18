@@ -63,14 +63,14 @@ export default async function handler(req, res) {
                 return res.status(400).json({ message: 'Invalid or expired OTP' });
             }
 
-            const user = await prisma.$queryRaw`SELECT * FROM Web_Login WHERE Email = ${email}`;
+            const user = await prisma.$queryRaw`SELECT * FROM Web_Login WHERE Email = ${email} AND IS_Active=1`;
             if (!user || user.length === 0) {
                 console.log('User not found for email:', email);
                 return res.status(404).json({ message: 'User not found' });
             }
 
             const encodedPassword = encodePasswordToBase64(newPassword);
-            await prisma.$executeRaw`UPDATE Web_Login SET Password = ${encodedPassword} WHERE Email = ${email}`;
+            await prisma.$executeRaw`UPDATE Web_Login SET Password = ${encodedPassword} WHERE Email = ${email} AND IS_Active=1`;
             console.log(`Password updated successfully for email: ${email}`);
 
             delete otpStore[email]; 
