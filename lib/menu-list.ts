@@ -78,8 +78,8 @@ export function getMenuList(pathname: string): Group[] {
             submenus: [
               { href: "/RFQ-Prices/FCL", label: "FCL" },
               { href: "/RFQ-Prices/LCL", label: "LCL" },
-              { href: "/export/ADOC_FCL", label: "ADOC FCL" },
-              { href: "/export/ADOC_LCL", label: "ADOC LCL" },
+              { href: "/RFQ-Prices/ADOC_FCL", label: "ADOC FCL" },
+              { href: "/RFQ-Prices/ADOC_LCL", label: "ADOC LCL" },
             ],
           },
           {

@@ -39,21 +39,23 @@ const QuotationTable = () => {
     { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
     { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
     { description: "Halting", 20: "", remarks: "If any" },
-    { description: "CFS Charges", 20: "", remarks: "At Actual" },
   ]);
-
+  
   const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "Sea Freight", 20: "", remarks: "" },
-    { description: "FSC (Fuel Surcharge)", 20: "", remarks: "" },
+    { description: "Sea Freight", 20: "", remarks: "Per Container" },
+    { description: "ENS", 20: "", remarks: "Per BL" },
+    { description: "ISPS", 20: "", remarks: "Per Container" },
+    { description: "IT Transmission", 20: "", remarks: "Per Container" },
   ]);
   
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Custom Clearance", 20: "", remarks: "" },
-    { description: "CC Fee", 20: "", remarks: "Per BL" },
-    { description: "D.O Charges per BL", 20: "", remarks: "" },
-    { description: "AAI Charges", 20: "", remarks: "" },
-    { description: "Loading/Unloading", 20: "", remarks: "" },
-    { description: "Delivery", 20: "", remarks: "" },
+    { description: "Destination Terminal Handling Charges", 20: "", remarks: "Per Container" },
+    { description: "BL Fee", 20: "", remarks: "Per BL" },
+    { description: "Delivery by Barge/Road", 20: "", remarks: "Per Container" },
+    { description: "Delivery Order Fees", 20: "", remarks: "Per Container" },
+    { description: "Handling Charges", 20: "", remarks: "Per Container" },
+    { description: "T1 Doc", 20: "", remarks: "Per Container" },
+    { description: "LOLO Charges", 20: "", remarks: "Per Container" },
   ]);
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -477,52 +479,45 @@ const QuotationTable = () => {
             <tbody className="bg-[var(--bgBody3)]">
               <tr
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
-                onClick={() => toggleSection("origin")}
+                onClick={() => toggleSection("destination")}
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Origin Charges
+                  {sections.destination ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
-            
-              {sections.origin &&
-                originCharges
-                .filter((item) => item.description !== "Halting")
-                .map((item, index) => {
-                  const isHalting = item.description === "Halting";
-                  return (
-                  <tr key={index} className="border border border-[var(--bgBody)]">
+              {sections.destination &&
+                destinationCharges.map((item, index) => (
+                  <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">INR / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
-                        placeholder="0" 
-                        readOnly={isHalting}                      
-                        className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
+                        placeholder="0"
+                        className="w-full bg-transparent border-none focus:outline-none text-right"
                         value={item[20]}
-                        onChange={(e) => handleOriginChange(index, 20, e.target.value)}
+                        onChange={(e) => handleDestinationChange(index, 20, e.target.value)}
                       />
                     </td>
                     <td colSpan="2" className="py-1 px-3 border">
                     {item.remarks}
                       {/* <input
                         type="text"
-                        readOnly={isHalting}
+                        readOnly
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
-                        onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
+                        onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
                       /> */}
                     </td>
                   </tr>
-                  );
-              })}
-              {sections.origin && (
+                ))}
+              {sections.destination && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td colSpan="2" className="py-1 px-3 border">{totalOrigin[20].toFixed(2)}</td>
+                  <td colSpan="2" className="py-1 px-3 border">{totalDestination[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
@@ -572,45 +567,52 @@ const QuotationTable = () => {
               )}
               <tr
                 className="font-bold bg-[var(--bgBody)] border cursor-pointer"
-                onClick={() => toggleSection("destination")}
+                onClick={() => toggleSection("origin")}
               >
-                <td>C.</td>
+                <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.destination ? "▼" : "▶"} Destination Charges
+                  {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
-              {sections.destination &&
-                destinationCharges.map((item, index) => (
-                  <tr key={index} className="border">
-                    <td className="py-1 px-3 border">{index + 9}</td>
+            
+              {sections.origin &&
+                originCharges
+                // .filter((item) => item.description !== "Halting")
+                .map((item, index) => {
+                  // const isHalting = item.description === "Halting";
+                  return (
+                  <tr key={index} className="border border border-[var(--bgBody)]">
+                    <td className="py-1 px-3 border">{index + 11}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">{currency} / Shipment</td>
+                    <td className="py-1 px-3 border">INR / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
-                        placeholder="0"
-                        className="w-full bg-transparent border-none focus:outline-none text-right"
+                        placeholder="0" 
+                        // readOnly={isHalting}                      
+                        className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
                         value={item[20]}
-                        onChange={(e) => handleDestinationChange(index, 20, e.target.value)}
+                        onChange={(e) => handleOriginChange(index, 20, e.target.value)}
                       />
                     </td>
                     <td colSpan="2" className="py-1 px-3 border">
                     {item.remarks}
                       {/* <input
                         type="text"
-                        readOnly
+                        readOnly={isHalting}
                         className="w-full bg-transparent border-none focus:outline-none text-center"
                         value={item.remarks}
-                        onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
+                        onChange={(e) => handleOriginChange(index, "remarks", e.target.value)}
                       /> */}
                     </td>
                   </tr>
-                ))}
-              {sections.destination && (
+                  );
+              })}
+              {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
                   <td className="py-1 px-3 border">INR</td>
-                  <td colSpan="2" className="py-1 px-3 border">{totalDestination[20].toFixed(2)}</td>
+                  <td colSpan="2" className="py-1 px-3 border">{totalOrigin[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
                 </tr>
               )}
