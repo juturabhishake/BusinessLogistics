@@ -66,7 +66,9 @@ export function getMenuList(pathname: string): Group[] {
             icon: SquarePen,
             submenus: [
               { href: "/export/FCL", label: "FCL" },
-              { href: "/export/LCL", label: "LCL" }
+              { href: "/export/LCL", label: "LCL" },
+              { href: "/export/ADOC_FCL", label: "ADOC FCL" },
+              { href: "/export/ADOC_LCL", label: "ADOC LCL" },
             ],
           },
           {
@@ -75,7 +77,18 @@ export function getMenuList(pathname: string): Group[] {
             icon: SquarePen,
             submenus: [
               { href: "/RFQ-Prices/FCL", label: "FCL" },
-              { href: "/RFQ-Prices/LCL", label: "LCL" }
+              { href: "/RFQ-Prices/LCL", label: "LCL" },
+              { href: "/export/ADOC_FCL", label: "ADOC FCL" },
+              { href: "/export/ADOC_LCL", label: "ADOC LCL" },
+            ],
+          },
+          {
+            href: "",
+            label: "AirShipments",
+            icon: SquarePen,
+            submenus: [
+              { href: "/AirShipment/Export", label: "Export" },
+              { href: "/AirShipment/Import", label: "Import" }
             ],
           },
           {
