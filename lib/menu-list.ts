@@ -123,7 +123,9 @@ export function getMenuList(pathname: string): Group[] {
               icon: Database,
               submenus: [
                 { href: "/settings/print/Export/FCL", label: "FCL" },
-                { href: "/settings/print/Export/LCL", label: "LCL" }
+                { href: "/settings/print/Export/LCL", label: "LCL" },
+                { href: "/settings/print/Export/ADOC_LCL", label: "ADOC LCL" },
+                { href: "/settings/print/Export/ADOC_FCL", label: "ADOC FCL" }
               ]
             },
             {
@@ -132,7 +134,18 @@ export function getMenuList(pathname: string): Group[] {
               icon: Database,
               submenus: [
                 { href: "/settings/print/Import/FCL", label: "FCL" },
-                { href: "/settings/print/Import/LCL", label: "LCL" }
+                { href: "/settings/print/Import/LCL", label: "LCL" },
+                { href: "/settings/print/Import/ADOC_LCL", label: "ADOC LCL" },
+                { href: "/settings/print/Import/ADOC_FCL", label: "ADOC FCL" }
+              ]
+            },
+            {
+              href: "",
+              label: "Prints(AirShipment)",
+              icon: Database,
+              submenus: [
+                { href: "/settings/print/AirShipment/Export", label: "Export" },
+                { href: "/settings/print/AirShipment/Import", label: "Import" }
               ]
             },
             {
