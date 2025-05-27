@@ -38,7 +38,7 @@ const QuotationTable = () => {
     { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Container" },
     { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
     { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
-    { description: "Halting", 20: "", remarks: "If any" },
+    // { description: "Halting", 20: "", remarks: "If any" },
     { description: "CFS Charges", 20: "", remarks: "At Actual" },
   ]);
 
@@ -88,7 +88,7 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_vendors' , {
+        const response = await fetch('/api/get_locations' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -139,7 +139,7 @@ const QuotationTable = () => {
   }, []);
   const fetchQuotationData = async (locationCode) => {
     try {
-      const response = await fetch("", {
+      const response = await fetch("/api/ADOC/get/get_adoc_export_lcl_quote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,29 +154,26 @@ const QuotationTable = () => {
         const updatedSeaFreightCharges = [...seaFreightCharges];
         const updatedDestinationCharges = [...destinationCharges];
         
-        const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
+        // const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
 
-        updatedOriginCharges[0][20] = fcl20.O_CCD || "";
-        updatedOriginCharges[1][20] = fcl20.O_LTG || "";
-        updatedOriginCharges[2][20] = fcl20.O_THC || "";
-        updatedOriginCharges[3][20] = fcl20.O_BLC || "";
-        updatedOriginCharges[4][20] = fcl20.O_LUS || "";
-        updatedOriginCharges[5][20] = fcl20.O_Halt || "";
+        updatedOriginCharges[0][20] = data.result[0].O_CCD || "";
+        updatedOriginCharges[1][20] = data.result[0].O_LTG || "";
+        updatedOriginCharges[2][20] = data.result[0].O_THC || "";
+        updatedOriginCharges[3][20] = data.result[0].O_BLC || "";
+        updatedOriginCharges[4][20] = data.result[0].O_LUS || "";
+        updatedOriginCharges[5][20] = data.result[0].O_CFS || "";
 
-        updatedSeaFreightCharges[0][20] = fcl20.S_SeaFre || "";
-        updatedSeaFreightCharges[1][20] = fcl20.S_ENS || "";
-        updatedSeaFreightCharges[2][20] = fcl20.S_ISPS || "";
-        updatedSeaFreightCharges[3][20] = fcl20.S_ITT || "";
+        updatedSeaFreightCharges[0][20] = data.result[0].S_SeaFre || "";
+        updatedSeaFreightCharges[1][20] = data.result[0].S_FSC || "";
 
-        updatedDestinationCharges[0][20] = fcl20.D_DTH || "";
-        updatedDestinationCharges[1][20] = fcl20.D_BLF || "";
-        updatedDestinationCharges[2][20] = fcl20.D_DBR || "";
-        updatedDestinationCharges[3][20] = fcl20.D_DOF || "";
-        updatedDestinationCharges[4][20] = fcl20.D_HC || "";
-        updatedDestinationCharges[5][20] = fcl20.D_TDO || "";
-        updatedDestinationCharges[6][20] = fcl20.D_LOC || "";
+        updatedDestinationCharges[0][20] = data.result[0].D_CUC || "";
+        updatedDestinationCharges[1][20] = data.result[0].D_CCF || "";
+        updatedDestinationCharges[2][20] = data.result[0].D_DOC || "";
+        updatedDestinationCharges[3][20] = data.result[0].D_AAI || "";
+        updatedDestinationCharges[4][20] = data.result[0].D_LU || "";
+        updatedDestinationCharges[5][20] = data.result[0].D_Del || "";
 
-        setRemarks(fcl20.remarks || "");
+        setRemarks(data.result[0].remarks || "");
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
@@ -214,21 +211,20 @@ const QuotationTable = () => {
       locationCode: selectedLocation,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
-      containerSize,
       originData: filterCharges(originCharges),
       seaFreightData: filterCharges(seaFreightCharges),
       destinationData: filterCharges(destinationCharges),
-      totalShipmentCost: totalShipmentCost[containerSize],
-      totalOrigin: totalOrigin[containerSize],
-      totalSeaFreight: totalSeaFreight[containerSize],
-      totalDestination: totalDestination[containerSize],
+      totalShipmentCost: totalShipmentCost,
+      totalOrigin: totalOrigin,
+      totalSeaFreight: totalSeaFreight,
+      totalDestination: totalDestination,
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
     };
     console.log("Quote Data:", quoteData);
     try {
-      console.log(`Saving quote for ${containerSize}ft:`, quoteData);
-      const response = await fetch("", {
+      console.log(`Saving quote : `, quoteData);
+      const response = await fetch("/api/ADOC/save/save_adoc_export_lcl_qoute", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -266,17 +262,17 @@ const QuotationTable = () => {
       //   return;
       // }
     }
-    if(incoterms==='CIF') {
-      console.log("incoterms : " , incoterms==='DAP');
-      if(totalShipmentCost[20] > 0 && totalDestination[20] > 0) {
-        alert("Destination charges are not allowed for CIF");
-        return;
-      }
-      // if(totalShipmentCost[40] > 0 && totalDestination[40] > 0) {
-      //   alert("Destination charges are not allowed for CIF");
-      //   return;
-      // }
-    } 
+    // if(incoterms==='CIF') {
+    //   console.log("incoterms : " , incoterms==='DAP');
+    //   if(totalShipmentCost[20] > 0 && totalDestination[20] > 0) {
+    //     alert("Destination charges are not allowed for CIF");
+    //     return;
+    //   }
+    //   // if(totalShipmentCost[40] > 0 && totalDestination[40] > 0) {
+    //   //   alert("Destination charges are not allowed for CIF");
+    //   //   return;
+    //   // }
+    // } 
   
   
     setSaveState("saving");
