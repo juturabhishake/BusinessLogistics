@@ -33,27 +33,28 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Container" },
-    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Container" },
-    { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
-    { description: "Halting", 20: "", remarks: "If any" },
-    { description: "CFS Charges", 20: "", remarks: "At Actual" },
+    { description: "Customs Clearance & Documentation", 20: "", remarks: "" },
+    { description: "Local Transportation From Shipper -port", 20: "", remarks: "Per BL" },
+    { description: "Terminal Handling Charges", 20: "", remarks: "" },
+    { description: "Bill of Lading Charges", 20: "", remarks: "" },
+    { description: "Loading/Unloading / SSR", 20: "", remarks: "" },
+    // { description: "Delivery", 20: "", remarks: "" },
   ]);
 
   const [seaFreightCharges, setSeaFreightCharges] = useState([
     { description: "Sea Freight", 20: "", remarks: "" },
     { description: "FSC (Fuel Surcharge)", 20: "", remarks: "" },
+    { description: "SSC (Security Surcharge))", 20: "", remarks: "" },
   ]);
   
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Custom Clearance", 20: "", remarks: "" },
-    { description: "CC Fee", 20: "", remarks: "Per BL" },
-    { description: "D.O Charges per BL", 20: "", remarks: "" },
-    { description: "AAI Charges", 20: "", remarks: "" },
-    { description: "Loading/Unloading", 20: "", remarks: "" },
-    { description: "Delivery", 20: "", remarks: "" },
+    { description: "Custom Clearance", 20: "", remarks: "Per Container" },
+    { description: "CC Fee", 20: "", remarks: "Per Container" },
+    { description: "D.O Charges per BL", 20: "", remarks: "Per Container" },
+    { description: "CFS Charges", 20: "", remarks: "Per BL" },
+    { description: "Loading/Unloading", 20: "", remarks: "Per Container" },
+    { description: "Delivery", 20: "", remarks: "If any" },
+    // { description: "CFS Charges", 20: "", remarks: "At Actual" },
   ]);
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -88,7 +89,7 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_vendors' , {
+        const response = await fetch('/api/get_locations' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -139,7 +140,7 @@ const QuotationTable = () => {
   }, []);
   const fetchQuotationData = async (locationCode) => {
     try {
-      const response = await fetch("", {
+      const response = await fetch("/api/ADOC/get/get_adoc_import_lcl_quote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,29 +155,29 @@ const QuotationTable = () => {
         const updatedSeaFreightCharges = [...seaFreightCharges];
         const updatedDestinationCharges = [...destinationCharges];
         
-        const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
+        // const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
 
-        updatedOriginCharges[0][20] = fcl20.O_CCD || "";
-        updatedOriginCharges[1][20] = fcl20.O_LTG || "";
-        updatedOriginCharges[2][20] = fcl20.O_THC || "";
-        updatedOriginCharges[3][20] = fcl20.O_BLC || "";
-        updatedOriginCharges[4][20] = fcl20.O_LUS || "";
-        updatedOriginCharges[5][20] = fcl20.O_Halt || "";
+        updatedOriginCharges[0][20] = data.result[0].O_CCD || "";
+        updatedOriginCharges[1][20] = data.result[0].O_LTG || "";
+        updatedOriginCharges[2][20] = data.result[0].O_THC || "";
+        updatedOriginCharges[3][20] = data.result[0].O_BLC || "";
+        updatedOriginCharges[4][20] = data.result[0].O_LUS || "";
+        // updatedOriginCharges[5][20] = data.result[0].O_Halt || "";
 
-        updatedSeaFreightCharges[0][20] = fcl20.S_SeaFre || "";
-        updatedSeaFreightCharges[1][20] = fcl20.S_ENS || "";
-        updatedSeaFreightCharges[2][20] = fcl20.S_ISPS || "";
-        updatedSeaFreightCharges[3][20] = fcl20.S_ITT || "";
+        updatedSeaFreightCharges[0][20] = data.result[0].S_SeaFre || "";
+        updatedSeaFreightCharges[1][20] = data.result[0].S_FSC || "";
+        updatedSeaFreightCharges[2][20] = data.result[0].S_SSC || "";
+        // updatedSeaFreightCharges[3][20] = data.result[0].S_ITT || "";
 
-        updatedDestinationCharges[0][20] = fcl20.D_DTH || "";
-        updatedDestinationCharges[1][20] = fcl20.D_BLF || "";
-        updatedDestinationCharges[2][20] = fcl20.D_DBR || "";
-        updatedDestinationCharges[3][20] = fcl20.D_DOF || "";
-        updatedDestinationCharges[4][20] = fcl20.D_HC || "";
-        updatedDestinationCharges[5][20] = fcl20.D_TDO || "";
-        updatedDestinationCharges[6][20] = fcl20.D_LOC || "";
+        updatedDestinationCharges[0][20] = data.result[0].D_CC || "";
+        updatedDestinationCharges[1][20] = data.result[0].D_CCF || "";
+        updatedDestinationCharges[2][20] = data.result[0].D_DOC || "";
+        updatedDestinationCharges[3][20] = data.result[0].D_CFS || "";
+        updatedDestinationCharges[4][20] = data.result[0].D_LU || "";
+        updatedDestinationCharges[5][20] = data.result[0].D_Del || "";
+        // updatedDestinationCharges[6][20] = data.result[0].D_LOC || "";
 
-        setRemarks(fcl20.remarks || "");
+        setRemarks(data.result[0].remarks || "");
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
@@ -214,21 +215,20 @@ const QuotationTable = () => {
       locationCode: selectedLocation,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
-      containerSize,
       originData: filterCharges(originCharges),
       seaFreightData: filterCharges(seaFreightCharges),
       destinationData: filterCharges(destinationCharges),
-      totalShipmentCost: totalShipmentCost[containerSize],
-      totalOrigin: totalOrigin[containerSize],
-      totalSeaFreight: totalSeaFreight[containerSize],
-      totalDestination: totalDestination[containerSize],
+      totalShipmentCost: totalShipmentCost,
+      totalOrigin: totalOrigin,
+      totalSeaFreight: totalSeaFreight,
+      totalDestination: totalDestination,
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
     };
     console.log("Quote Data:", quoteData);
     try {
-      console.log(`Saving quote for ${containerSize}ft:`, quoteData);
-      const response = await fetch("", {
+      console.log(`Saving quote ...`);
+      const response = await fetch("/api/ADOC/save/save_adoc_import_lcl_quote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
