@@ -90,7 +90,7 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_vendors' , {
+        const response = await fetch('/api/get_locations' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

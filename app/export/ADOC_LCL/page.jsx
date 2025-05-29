@@ -386,7 +386,7 @@ const QuotationTable = () => {
   }, [selectedLocation]);
 
   const downloadPDF = () => {
-    window.location.href = "/prints/export/FCL";
+    window.location.href = "/prints/ADOC/export/lcl";
   };
   
   return (

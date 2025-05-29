@@ -390,7 +390,7 @@ const QuotationTable = () => {
   }, [selectedLocation]);
 
   const downloadPDF = () => {
-    window.location.href = "/prints/export/FCL";
+    window.location.href = "/prints/ADOC/import/lcl";
   };
   
   return (
@@ -538,7 +538,7 @@ const QuotationTable = () => {
               {sections.seaFreight &&
                 seaFreightCharges.map((item, index) => (
                   <tr key={index} className="border">
-                    <td className="py-1 px-3 border">{index + 7}</td>
+                    <td className="py-1 px-3 border">{index + 6}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     <td className="py-1 px-3 border">

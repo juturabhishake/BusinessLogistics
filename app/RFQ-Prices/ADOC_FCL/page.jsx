@@ -391,7 +391,7 @@ const QuotationTable = () => {
   }, [selectedLocation]);
 
   const downloadPDF = () => {
-    window.location.href = "/prints/export/FCL";
+    window.location.href = "/prints/ADOC/import/fcl";
   };
   
   return (
@@ -532,7 +532,7 @@ const QuotationTable = () => {
               {sections.seaFreight &&
                 seaFreightCharges.map((item, index) => (
                   <tr key={index} className="border">
-                    <td className="py-1 px-3 border">{index + 7}</td>
+                    <td className="py-1 px-3 border">{index + 8}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">USD / Shipment</td>
                     <td className="py-1 px-3 border">
@@ -581,7 +581,7 @@ const QuotationTable = () => {
                   // const isHalting = item.description === "Halting";
                   return (
                   <tr key={index} className="border border border-[var(--bgBody)]">
-                    <td className="py-1 px-3 border">{index + 11}</td>
+                    <td className="py-1 px-3 border">{index + 12}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">INR / Shipment</td>
                     <td className="py-1 px-3 border">
