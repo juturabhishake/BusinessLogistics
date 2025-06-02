@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-import { FaFilePdf, FaFileExport } from "react-icons/fa";
+import { FaFilePdf } from "react-icons/fa";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,10 @@ import {
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 const QuotationTable = () => {
   const [currentDateInfo, setCurrentDateInfo] = useState("");
@@ -33,31 +37,31 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Pickup", 20: "", remarks: "Per Container" },
-    { description: "Custom Clearance", 20: "", remarks: "Per Container" },
-    { description: "Handling / DO/ ", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charge", 20: "", remarks: "Per BL" },
-    { description: "Documentation ", 20: "", remarks: "Per Container" },
-  ]);
-  
-  const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "AIR freight", 20: "", remarks: "Per Container" },
-    { description: "FSC (Fuel Surcharges)", 20: "", remarks: "Per BL" },
-    { description: "SSC (Security Sucharge)", 20: "", remarks: "Per Container" },
-    { description: "ISS Surcharge", 20: "", remarks: "Per Container" },
-    { description: "X-Ray", 20: "", remarks: "Per Container" },
-    { description: "AAI CHARGES", 20: "", remarks: "Per Container" },
-  ]);
-  
-  const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Customs Clearence", 20: "", remarks: "Per Container" },
-    { description: "CC Fee", 20: "", remarks: "Per BL" },
-    { description: "D.O Charges", 20: "", remarks: "Per Container" },
-    { description: "LINER CHARGES", 20: "", remarks: "Per Container" },
-    { description: "Loading / Unloading", 20: "", remarks: "Per Container" },
-    { description: "Delivery", 20: "", remarks: "Per Container" },
-    // { description: "LOLO Charges", 20: "", remarks: "Per Container" },
-  ]);
+      { description: "Pickup", 20: "", remarks: "Per Container" },
+      { description: "Custom Clearance", 20: "", remarks: "Per Container" },
+      { description: "Handling / DO/ ", 20: "", remarks: "Per Container" },
+      { description: "Terminal Handling Charge", 20: "", remarks: "Per BL" },
+      { description: "Documentation ", 20: "", remarks: "Per Container" },
+    ]);
+    
+    const [seaFreightCharges, setSeaFreightCharges] = useState([
+      { description: "AIR freight", 20: "", remarks: "Per Container" },
+      { description: "FSC (Fuel Surcharges)", 20: "", remarks: "Per BL" },
+      { description: "SSC (Security Sucharge)", 20: "", remarks: "Per Container" },
+      { description: "ISS Surcharge", 20: "", remarks: "Per Container" },
+      { description: "X-Ray", 20: "", remarks: "Per Container" },
+      { description: "AAI CHARGES", 20: "", remarks: "Per Container" },
+    ]);
+    
+    const [destinationCharges, setDestinationCharges] = useState([
+      { description: "Customs Clearence", 20: "", remarks: "Per Container" },
+      { description: "CC Fee", 20: "", remarks: "Per BL" },
+      { description: "D.O Charges", 20: "", remarks: "Per Container" },
+      { description: "LINER CHARGES", 20: "", remarks: "Per Container" },
+      { description: "Loading / Unloading", 20: "", remarks: "Per Container" },
+      { description: "Delivery", 20: "", remarks: "Per Container" },
+      // { description: "LOLO Charges", 20: "", remarks: "Per Container" },
+    ]);
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
@@ -76,6 +80,7 @@ const QuotationTable = () => {
   const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
+  const [selectedDate, setSelectedDate] = useState(); 
 
   useEffect(() => {
     let flag = false
@@ -88,6 +93,42 @@ const QuotationTable = () => {
       window.location.href = "/";
     }
   }, []);
+  useEffect(() => {
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth(); 
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      
+      const formattedDate = `${monthNames[currentMonth]} ${currentYear}`;
+      setCurrentDateInfo(formattedDate);
+    }, []);
+  useEffect(() => {
+      const fetchLatestMonthYear = async () => {
+        try {
+          const response = await fetch("/api/get_latest_month_year");
+    
+          const result = await response.json();
+          if (result.result && result.result.length > 0) {
+            const { latest_month, latest_year } = result.result[0];
+            if (latest_month && latest_year) {
+              setSelectedDate(dayjs(`${latest_year}-${latest_month}-01`));
+            } else {
+              setSelectedDate(dayjs());
+            }
+          } else {
+            setSelectedDate(dayjs());
+          }
+        } catch (error) {
+          console.error("Error fetching latest month and year:", error);
+          setSelectedDate(dayjs());
+        }
+      };
+    
+      fetchLatestMonthYear();
+    }, []);
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -142,53 +183,69 @@ const QuotationTable = () => {
   }, []);
   const fetchQuotationData = async (locationCode) => {
     try {
-      const response = await fetch("/api/Air/get/import", {
+      console.log("fetching Data...");
+      console.log("Location code:", locationCode);
+      console.log("sc", secureLocalStorage.getItem("sc"));
+      console.log("month and year", selectedDate);
+      const selectedMonth = dayjs(selectedDate).month() + 1;
+      const selectedYear = dayjs(selectedDate).year();
+      const response = await fetch("/api/userPrints/airImport", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Loc_Code: locationCode, sc: secureLocalStorage.getItem("sc") || "Unknown Supplier", }),
+        body: JSON.stringify({
+          loc_code: locationCode,
+          sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
+          quote_month: selectedMonth,
+          quote_year: selectedYear,
+        }),
       });
-
-      const data = await response.json();    
-      console.log("Quotation ADOC Data:", data);
-      if (data.result && data.result.length > 0) {
+      const data = await response.json(); 
+      console.log("Fetched data:", data);   
+      if (data && data.length > 0) {
+        console.log("Usestates updating...");
         const updatedOriginCharges = [...originCharges];
         const updatedSeaFreightCharges = [...seaFreightCharges];
         const updatedDestinationCharges = [...destinationCharges];
         
-        // const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
+        // const fcl20 = data.find((item) => item.Cont_Feet === 20) || {};
+        // const fcl40 = data.find((item) => item.Cont_Feet === 40) || {};
 
-        updatedOriginCharges[0][20] = data.result[0].O_PU || "";
-        updatedOriginCharges[1][20] = data.result[0].O_CC || "";
-        updatedOriginCharges[2][20] = data.result[0].O_HDO || "";
-        updatedOriginCharges[3][20] = data.result[0].O_THC || "";
-        updatedOriginCharges[4][20] = data.result[0].O_DOC || "";
+        updatedOriginCharges[0][20] = data[0].O_PU || "";
+        updatedOriginCharges[1][20] = data[0].O_CC || "";
+        updatedOriginCharges[2][20] = data[0].O_HDO || "";
+        updatedOriginCharges[3][20] = data[0].O_THC || "";
+        updatedOriginCharges[4][20] = data[0].O_DOC || "";
 
-        updatedSeaFreightCharges[0][20] = data.result[0].S_AirFre || "";
-        updatedSeaFreightCharges[1][20] = data.result[0].S_FSC || "";
-        updatedSeaFreightCharges[2][20] = data.result[0].S_SSC || "";
-        updatedSeaFreightCharges[3][20] = data.result[0].S_ISS || "";
-        updatedSeaFreightCharges[4][20] = data.result[0].S_Xray || "";
-        updatedSeaFreightCharges[5][20] = data.result[0].S_AAI || "";
+        updatedSeaFreightCharges[0][20] = data[0].S_AirFre || "";
+        updatedSeaFreightCharges[1][20] = data[0].S_FSC || "";
+        updatedSeaFreightCharges[2][20] = data[0].S_SSC || "";
+        updatedSeaFreightCharges[3][20] = data[0].S_ISS || "";
+        updatedSeaFreightCharges[4][20] = data[0].S_Xray || "";
+        updatedSeaFreightCharges[5][20] = data[0].S_AAI || "";
 
 
-        updatedDestinationCharges[0][20] = data.result[0].D_CC || "";
-        updatedDestinationCharges[1][20] = data.result[0].D_CCF || "";
-        updatedDestinationCharges[2][20] = data.result[0].D_DOC || "";
-        updatedDestinationCharges[3][20] = data.result[0].D_LC || "";
-        updatedDestinationCharges[4][20] = data.result[0].D_LU || "";
-        updatedDestinationCharges[5][20] = data.result[0].D_DEL || "";
+        updatedDestinationCharges[0][20] = data[0].D_CC || "";
+        updatedDestinationCharges[1][20] = data[0].D_CCF || "";
+        updatedDestinationCharges[2][20] = data[0].D_DOC || "";
+        updatedDestinationCharges[3][20] = data[0].D_LC || "";
+        updatedDestinationCharges[4][20] = data[0].D_LU || "";
+        updatedDestinationCharges[5][20] = data[0].D_DEL || "";
 
-        setRemarks(data.result[0].remarks || "");
-
+        setRemarks(data[0].remarks || "");
+        console.log("fetched successfully");
         setOriginCharges(updatedOriginCharges);
+        console.log("Updated Origin Charges:", updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
+        console.log("Updated Sea Freight Charges:", updatedSeaFreightCharges);
         setDestinationCharges(updatedDestinationCharges);
+        console.log("Updated Destination Charges:", updatedDestinationCharges);
       } else {
-        setOriginCharges(originCharges.map((item) => ({ ...item, 20: "" })));
-        setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, 20: "" })));
-        setDestinationCharges(destinationCharges.map((item) => ({ ...item, 20: "" })));
+        console.log("fetched failed");
+        setOriginCharges(originCharges.map((item) => ({ ...item, 20: ""})));
+        setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, 20: ""})));
+        setDestinationCharges(destinationCharges.map((item) => ({ ...item, 20: ""})));
       }
     } catch (error) {
       console.error("Error fetching quotation data:", error);
@@ -218,20 +275,21 @@ const QuotationTable = () => {
       locationCode: selectedLocation,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
+      containerSize,
       originData: filterCharges(originCharges),
       seaFreightData: filterCharges(seaFreightCharges),
       destinationData: filterCharges(destinationCharges),
-      totalShipmentCost: totalShipmentCost,
-      totalOrigin: totalOrigin,
-      totalSeaFreight: totalSeaFreight,
-      totalDestination: totalDestination,
+      totalShipmentCost: totalShipmentCost[containerSize],
+      totalOrigin: totalOrigin[containerSize],
+      totalSeaFreight: totalSeaFreight[containerSize],
+      totalDestination: totalDestination[containerSize],
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
     };
-    console.log("Quote Data:", quoteData);
+  
     try {
-      console.log(`Saving quote : `, quoteData);
-      const response = await fetch("/api/Air/save/import", {
+      console.log(`Saving quote for ${containerSize}ft:`, quoteData);
+      const response = await fetch("/api/SaveFCLQuote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -240,12 +298,12 @@ const QuotationTable = () => {
       });
   
       if (!response.ok) {
-        throw new Error(`Failed to save quote`);
+        throw new Error(`Failed to save quote for ${containerSize}ft`);
       }
-      console.log(`Quote saved successfully.`);
+      console.log(`Quote for ${containerSize}ft saved successfully.`);
     } catch (error) {
-      console.error(`Error saving quote :`, error);
-    //   alert(`Error saving quote`);
+      console.error(`Error saving quote for ${containerSize}ft:`, error);
+      alert(`Error saving quote for ${containerSize}ft`);
     }
   };
   const handleSave = async () => {
@@ -254,33 +312,28 @@ const QuotationTable = () => {
       return;
     }
 
-    if(incoterms==='DAP') {
-      console.log("incoterms : " , incoterms==='DAP');
-      if(totalShipmentCost[20] > 0 && totalDestination[20] <= 0) {
-        alert("Required Destination charges or DAP");
-        return;
-      }
-      // if(totalShipmentCost[40] > 0 && totalDestination[40] <= 0) {
-      //   alert("Required Destination charges or DAP");
-      //   return;
-      // }
-      // if((totalShipmentCost[20] > 0 && totalShipmentCost[40] > 0) && (totalDestination[20] <= 0 || totalDestination[40] <= 0)) {
-      //   alert("Destination charges are not available for DAP incoterms");
-      //   return;
-      // }
-    }
-    if(incoterms==='CIF') {
-      console.log("incoterms : " , incoterms==='DAP');
-      if(totalShipmentCost[20] > 0 && totalDestination[20] > 0) {
-        alert("Destination charges are not allowed for CIF");
-        return;
-      }
-      // if(totalShipmentCost[40] > 0 && totalDestination[40] > 0) {
-      //   alert("Destination charges are not allowed for CIF");
-      //   return;
-      // }
-    } 
-  
+    // if(incoterms==='DAP') {
+    //   console.log("incoterms : " , incoterms==='DAP');
+    //   if(totalShipmentCost[20] > 0 && totalDestination[20] <= 0) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    //   if(totalShipmentCost[40] > 0 && totalDestination[40] <= 0) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    //   if((totalShipmentCost[20] > 0 && totalShipmentCost[40] > 0) && (totalDestination[20] <= 0 || totalDestination[40] <= 0)) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    // }
+    // if(incoterms==='CIF') {
+    //   console.log("incoterms : " , incoterms==='DAP');
+    //   if(totalShipmentCost[20] !== 0 && totalShipmentCost[40] !== 0 ) {
+    //     alert("Destination charges are not available for DAP incoterms");
+    //     return;
+    //   }
+    // }
   
     setSaveState("saving");
   
@@ -321,20 +374,20 @@ const QuotationTable = () => {
     return charges.reduce(
       (acc, charge) => {
         acc[20] += parseFloat(charge[20] || 0);
-        // acc[40] += parseFloat(charge[40] || 0);
+        acc[40] += parseFloat(charge[40] || 0);
         return acc;
       },
-      { 20: 0 }
+      { 20: 0, 40: 0 }
     );
   };
   const calculateUSDTotal = (charges) => {
     return charges.reduce(
       (acc, charge) => {       
         acc[20] += parseFloat(charge[20]*(currency === "EURO" ? EUR : USD) || 0);
-        // acc[40] += parseFloat(charge[40]*(currency === "EURO" ? EUR : USD) || 0);
+        acc[40] += parseFloat(charge[40]*(currency === "EURO" ? EUR : USD) || 0);
         return acc;
       },
-      { 20: 0 }
+      { 20: 0, 40: 0 }
     );
   };
 
@@ -342,10 +395,10 @@ const QuotationTable = () => {
     return charges.reduce(
       (acc, charge) => {       
         acc[20] += parseFloat(charge[20]*USD || 0);
-        // acc[40] += parseFloat(charge[40]*USD || 0);
+        acc[40] += parseFloat(charge[40]*USD || 0);
         return acc;
       },
-      { 20: 0}
+      { 20: 0, 40: 0 }
     );
   };
 
@@ -355,7 +408,7 @@ const QuotationTable = () => {
 
   const totalShipmentCost = {
     20: (totalOrigin[20] + totalSeaFreight[20] + totalDestination[20]).toFixed(2),
-    // 40: (totalOrigin[40] + totalSeaFreight[40] + totalDestination[40]).toFixed(2),
+    40: (totalOrigin[40] + totalSeaFreight[40] + totalDestination[40]).toFixed(2),
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
@@ -391,9 +444,194 @@ const QuotationTable = () => {
       fetchQuotationData(selectedLocation);
     }
   }, [selectedLocation]);
+  useEffect(() => {
+    if (selectedLocation && selectedDate) {
+      fetchSupplierDetails(selectedLocation);
+      fetchQuotationData(selectedLocation);
+    }
+  }, [selectedLocation, selectedDate]);
+  useEffect(() => {
+    if (selectedDate) {
+      fetchSupplierDetails(selectedLocation);
+      fetchQuotationData(selectedLocation);
+    }
+  }, [selectedDate]);
 
   const downloadPDF = () => {
-    window.location.href = "/prints/air/import";
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  
+    const now = moment().add(20, 'days');
+    const formattedDate = now.format("DD-MM-YYYY");
+    const startDate = selectedDate.clone().startOf("month").format("DD");
+    const endDate = selectedDate.clone().endOf("month").format("DD");
+    const selectedMonthYear = selectedDate.format("MMMM YYYY");
+  
+    const tableHeaders = [
+      [
+        { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
+        { content: "Descriptions", rowSpan: 2, styles: { valign: "middle" } },
+        { content: "Currency in", rowSpan: 2, styles: { valign: "middle" } },
+        { content: `Quote for GTI to ${locationName || "{select location}"}`, colSpan: 2, styles: { halign: "center" } },
+        { content: "Remarks",  rowSpan: 2, styles: { valign: "middle" } },
+      ],
+      [
+        { content: "Air Shipment", colSpan: 2, styles: { halign: "center" } },
+      ]
+    ];
+  
+    const tableBody = [];
+  
+    const addSectionHeader = (sectionName) => {
+      tableBody.push([
+        { content: sectionName, colSpan: 10, styles: { halign: "left", fontStyle: "bold", fillColor: [255, 255, 255] } }
+      ]);
+    };
+  
+    const addChargesToBody = (charges, currency) => {
+      charges.forEach((charge, index) => {
+        tableBody.push([
+          index + 1,
+          charge.description,
+          `${currency} / Shipment`,
+          { 
+            content: (charge[20] === 0 || charge[20] === '0.00' || charge[20] === '0' || charge[20] === 0.00) ? "" : (charge[20] || ""), 
+            colSpan: 2,
+            styles: { halign: "center" } 
+          },
+          charge.remarks || "", 
+        ]);
+      });
+    };
+  
+  
+    addSectionHeader("A) ORIGIN CHARGES");
+    addChargesToBody(originCharges, currency);
+    tableBody.push([
+      "",
+      { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalOrigin[20]) ? "" : (totalOrigin[20] ?? 0).toFixed(2), 
+        colSpan: 2,
+        styles: { halign: "center" } 
+      },
+      // "", "", ""
+    ]);
+  
+    addSectionHeader("B) SEA FREIGHT CHARGES");
+    addChargesToBody(seaFreightCharges, currency);
+    tableBody.push([
+      "",
+      { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalSeaFreight[20]) ? "" : (totalSeaFreight[20] ?? 0).toFixed(2), 
+        colSpan: 2,
+        styles: { halign: "center" } 
+      },
+      ""
+    ]);
+  
+    addSectionHeader("C) DESTINATION CHARGES");
+    addChargesToBody(destinationCharges, "INR");
+    tableBody.push([
+      "",
+      { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      { 
+        content: [0, "0.00", "0", 0.0].includes(totalDestination[20]) ? "" : (totalDestination[20] ?? 0).toFixed(2), 
+        colSpan: 2,
+        styles: { halign: "center" } 
+      },
+      ""
+    ]);
+  
+    tableBody.push([
+      "",
+      { content: "TOTAL SHIPMENT COST (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      {content: totalShipmentCost[20], colSpan: 2,  styles: { halign: "center" } },
+      // "", "", "",
+      ""
+    ]);
+  
+    tableBody.push([{ content: "INCO Term", colSpan: 2, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 8 }]);
+  
+    const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
+    const maxDeliveryAddressLength = 50;
+    const trimmedAddress = cleanedDeliveryAddress.length > maxDeliveryAddressLength
+      ? cleanedDeliveryAddress.slice(0, maxDeliveryAddressLength) + '...'
+      : cleanedDeliveryAddress;
+  
+    tableBody.push([
+      { content: "Delivery Address", colSpan: 2, styles: { fontStyle: "bold" } },
+      { content: trimmedAddress, colSpan: 8, styles: { fontSize: 7 } }
+    ]);
+  
+    tableBody.push([
+      { content: "FX Rate", colSpan: 2, styles: { fontStyle: "bold" } },
+      { content: "USD", styles: { halign: "center" } },
+      { content: USD.toFixed(2), colSpan: 1, styles: { halign: "center" } },
+      { content: "EURO", styles: { halign: "center" } },
+      { content: EUR.toFixed(2), colSpan: 1, styles: { halign: "center" } }
+    ]);
+  
+    tableBody.push([{ content: "Destination Port : ", colSpan: 2, styles: { fontStyle: "bold" } }, 
+      { content: Dest_Port, colSpan: 8 }]);
+    tableBody.push([{ content: "Required Transit Days : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 8 }]);
+    tableBody.push([{ content: "Free Days Requirement at Destination : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Free_Days, colSpan: 8 }]);
+    tableBody.push([{ content: "Preffered Liners : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Pref_Liners, colSpan: 8 }]);
+    tableBody.push([{ content: "HSN Code : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: HSN_Code, colSpan: 8 }]);
+    tableBody.push([{ content: "Avg. Containers per month : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Avg_Cont_Per_Mnth, colSpan: 8 }]);
+  
+    tableBody.push([{ content: "Remarks", colSpan: 2, styles: { fontStyle: "bold" } }, { content: remarks, colSpan: 8 }]);
+      
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
+  
+    doc.setFontSize(8);
+    doc.text(`Air Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    const loc = locationName.split('|')[0].trim();
+    doc.text(`Quote for GTI to ${loc} Air shipment`, 5, 18, { align: "left" });
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+   
+  
+    let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
+    let xPosition = doc.internal.pageSize.width - 10;
+    doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 10);
+
+  
+    doc.autoTable({
+      head: tableHeaders,
+      body: tableBody,
+      startY: 28,
+      styles: { fontSize: 7, cellPadding: 1.2, overflow: "linebreak", lineWidth: 0.05 },
+      headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.05 },
+      columnStyles: {
+        0: { cellWidth: 10 },
+        1: { cellWidth: 60 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 30 },
+      },
+      margin: { left: 10, right: 5 },
+      theme: "grid",
+    });
+
+//     const pageHeight = doc.internal.pageSize.height; // Get page height
+// const marginBottom = 20; // Adjust as needed
+
+// // Define positions
+// const marginLeft = 10;
+// const columnSpacing = 65; // Adjust based on required spacing
+// const textYPosition = pageHeight - marginBottom; // Position near bottom
+
+// // Draw text at bottom
+// doc.text("Approved by:", marginLeft, textYPosition);
+// doc.text("Checked by:", marginLeft + columnSpacing, textYPosition);
+// doc.text("Prepared by:", marginLeft + 2 * columnSpacing, textYPosition);
+
+  
+    doc.save("quotation_print_ADOCExportFCL.pdf");
   };
   
   return (
@@ -403,10 +641,36 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
-              <p className="text-xs text-gray-100">"Air shipment Import rates for {currentDateInfo}"</p>
+              <p className="text-xs text-gray-100">"Air Import rates for { dayjs(selectedDate).format("MMMM YYYY")}"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
-            <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4">
+            <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4 sm:gap-0 lg:gap-4 mt-4 lg:mt-0">
+            <div>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                    label={<span style={{ color: "var(--borderclr)" }}>Select</span>}
+                    views={["year", "month"]}
+                    openTo="month"
+                    value={selectedDate}
+                    className="w-[200px] md:w-21"
+                    sx={{
+                        "& .MuiInputBase-root": {
+                          color: "var(--borderclr)",
+                          borderRadius: "8px",
+                          fontSize:"14px",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "var(--borderclr)"
+                        },
+                        "& .MuiSvgIcon-root": {
+                          color: "var(--borderclr)",
+                        },
+                      }}
+                    onChange={(newValue) => setSelectedDate(newValue)}
+                  />
+                </LocalizationProvider>
+              </div>
+              <div className="flex flex-row lg:flex-row items-center justify-start lg:justify-end gap-4">
               <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
@@ -446,8 +710,9 @@ const QuotationTable = () => {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="flex gap-2">
-                <button
+              <div>
+                {/* <button
+                  hidden
                   onClick={handleSave}
                   className="mt-0 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded"
                   style={{ minWidth: "80px" }}
@@ -455,10 +720,11 @@ const QuotationTable = () => {
                   {saveState === "idle" && <FiSave size={16} />}
                   {saveState === "saving" && <FiLoader size={16} className="animate-spin" />}
                   {saveState === "saved" && <FiCheck size={16} />}
-                </button>
-                <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-green-500 text-white rounded">
-                  <FaFileExport className="" />
+                </button> */}
+                <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-red-500 text-white rounded">
+                  <FaFilePdf className="" />
                 </Button>
+              </div>
               </div>
             </div>
           </div>
@@ -470,11 +736,12 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
-                <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
-                <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
+                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} Air shipment</th>
+                <th colSpan="2" rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">Air shipment</th>
+                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Air Shipment</th>
+                {/* <th className="py-1 px-2 border border-[var(--bgBody)]">40 ft</th> */}
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">
@@ -484,7 +751,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} EX Works Charges
+                  {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
             
@@ -498,11 +765,11 @@ const QuotationTable = () => {
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">{currency} / Shipment</td>
-                    <td className="py-1 px-3 border">
+                    <td colSpan="2" className="py-1 px-3 border">
                       <input
                         type="number"
                         placeholder="0" 
-                        readOnly={isHalting}                      
+                        readOnly                    
                         className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
                         value={item[20]}
                         onChange={(e) => handleOriginChange(index, 20, e.target.value)}
@@ -535,17 +802,18 @@ const QuotationTable = () => {
               >
                 <td>B.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.seaFreight ? "▼" : "▶"} AIR freight Charges
+                  {sections.seaFreight ? "▼" : "▶"} Sea Freight Charges
                 </td>
               </tr>
               {sections.seaFreight &&
                 seaFreightCharges.map((item, index) => (
                   <tr key={index} className="border">
-                    <td className="py-1 px-3 border">{index + 6}</td>
+                    <td className="py-1 px-3 border">{index + 7}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">{currency} / Shipment</td>
-                    <td className="py-1 px-3 border">
+                    <td colSpan="2" className="py-1 px-3 border">
                       <input
+                        readOnly
                         type="number"
                         placeholder="0"
                         className="w-full bg-transparent border-none focus:outline-none text-right"
@@ -585,11 +853,12 @@ const QuotationTable = () => {
               {sections.destination &&
                 destinationCharges.map((item, index) => (
                   <tr key={index} className="border">
-                    <td className="py-1 px-3 border">{index + 12}</td>
+                    <td className="py-1 px-3 border">{index + 11}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
                     <td className="py-1 px-3 border">INR / Shipment</td>
-                    <td className="py-1 px-3 border">
+                    <td colSpan="2" className="py-1 px-3 border">
                       <input
+                        readOnly
                         type="number"
                         placeholder="0"
                         className="w-full bg-transparent border-none focus:outline-none text-right"
