@@ -631,7 +631,7 @@ const QuotationTable = () => {
 // doc.text("Prepared by:", marginLeft + 2 * columnSpacing, textYPosition);
 
   
-    doc.save("quotation_print_ADOCExportFCL.pdf");
+    doc.save("quotation_print_AirImport.pdf");
   };
   
   return (

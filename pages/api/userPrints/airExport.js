@@ -30,7 +30,7 @@ export default async function handler(req, res) {
  
     const { loc_code, sc, quote_month, quote_year } = req.body;
 
-    console.log('Request Body (get_UserPrint_Air_Import_FCL_QUOTE) :', req.body);
+    console.log('Request Body (get_UserPrint_Air_Export_FCL_QUOTE) :', req.body);
 
     if (!quote_month || !quote_year || !sc || !loc_code) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -39,11 +39,11 @@ export default async function handler(req, res) {
     
       try {
         console.log('Dashboard Data:', quote_month); 
-          const result = await prisma.$queryRaw`exec [dbo].[get_UserPrint_Air_Import_QUOTE] ${loc_code}, ${sc}, ${quote_month}, ${quote_year}`;
+          const result = await prisma.$queryRaw`exec [dbo].[get_UserPrint_Air_Export_QUOTE] ${loc_code}, ${sc}, ${quote_month}, ${quote_year}`;
            console.log('Dashboard Data:', result);        
           return res.status(200).json(result);
       } catch (error) {
-          console.error('Error fetching get_UserPrint_Air_Import_FCL_QUOTE:', error);
+          console.error('Error fetching get_UserPrint_Air_Export_FCL_QUOTE:', error);
           return res.status(500).json({ message: 'Internal Server Error' });
       } finally {
           await prisma.$disconnect();

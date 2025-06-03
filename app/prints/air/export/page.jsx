@@ -37,30 +37,31 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Container" },
-    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Container" },
-    { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
-    { description: "Halting", 20: "", remarks: "If any" },
-  ]);
-  
-  const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "Sea Freight", 20: "", remarks: "Per Container" },
-    { description: "ENS", 20: "", remarks: "Per BL" },
-    { description: "ISPS", 20: "", remarks: "Per Container" },
-    { description: "IT Transmission", 20: "", remarks: "Per Container" },
-  ]);
-  
-  const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Destination Terminal Handling Charges", 20: "", remarks: "Per Container" },
-    { description: "BL Fee", 20: "", remarks: "Per BL" },
-    { description: "Delivery by Barge/Road", 20: "", remarks: "Per Container" },
-    { description: "Delivery Order Fees", 20: "", remarks: "Per Container" },
-    { description: "Handling Charges", 20: "", remarks: "Per Container" },
-    { description: "T1 Doc", 20: "", remarks: "Per Container" },
-    { description: "LOLO Charges", 20: "", remarks: "Per Container" },
-  ]);
+      { description: "Pickup", 20: "", remarks: "Per Container" },
+      { description: "Custom Clearance", 20: "", remarks: "Per Container" },
+      { description: "Handling / DO/ ", 20: "", remarks: "Per Container" },
+      { description: "Terminal Handling Charge", 20: "", remarks: "Per BL" },
+      { description: "Documentation ", 20: "", remarks: "Per Container" },
+    ]);
+    
+    const [seaFreightCharges, setSeaFreightCharges] = useState([
+      { description: "AIR freight", 20: "", remarks: "Per Container" },
+      { description: "FSC (Fuel Surcharges)", 20: "", remarks: "Per BL" },
+      { description: "SSC (Security Sucharge)", 20: "", remarks: "Per Container" },
+      { description: "ISS Surcharge", 20: "", remarks: "Per Container" },
+      { description: "X-Ray", 20: "", remarks: "Per Container" },
+      { description: "AAI CHARGES", 20: "", remarks: "Per Container" },
+    ]);
+    
+    const [destinationCharges, setDestinationCharges] = useState([
+      { description: "Customs Clearence", 20: "", remarks: "Per Container" },
+      { description: "CC Fee", 20: "", remarks: "Per BL" },
+      { description: "D.O Charges", 20: "", remarks: "Per Container" },
+      { description: "LINER CHARGES", 20: "", remarks: "Per Container" },
+      { description: "Loading / Unloading", 20: "", remarks: "Per Container" },
+      { description: "Delivery", 20: "", remarks: "Per Container" },
+      // { description: "LOLO Charges", 20: "", remarks: "Per Container" },
+    ]);
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
@@ -188,7 +189,7 @@ const QuotationTable = () => {
       console.log("month and year", selectedDate);
       const selectedMonth = dayjs(selectedDate).month() + 1;
       const selectedYear = dayjs(selectedDate).year();
-      const response = await fetch("/api/userPrints/ADOC_Export_FCL", {
+      const response = await fetch("/api/userPrints/airExport", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -211,25 +212,26 @@ const QuotationTable = () => {
         // const fcl20 = data.find((item) => item.Cont_Feet === 20) || {};
         // const fcl40 = data.find((item) => item.Cont_Feet === 40) || {};
 
-        updatedOriginCharges[0][20] = data[0].O_CCD || "";
-        updatedOriginCharges[1][20] = data[0].O_LTG || "";
-        updatedOriginCharges[2][20] = data[0].O_THC || "";
-        updatedOriginCharges[3][20] = data[0].O_BLC || "";
-        updatedOriginCharges[4][20] = data[0].O_LUS || "";
-        updatedOriginCharges[5][20] = data[0].O_Halt || "";
+        updatedOriginCharges[0][20] = data[0].O_PU || "";
+        updatedOriginCharges[1][20] = data[0].O_CC || "";
+        updatedOriginCharges[2][20] = data[0].O_HDO || "";
+        updatedOriginCharges[3][20] = data[0].O_THC || "";
+        updatedOriginCharges[4][20] = data[0].O_DOC || "";
 
-        updatedSeaFreightCharges[0][20] = data[0].S_SeaFre || "";
-        updatedSeaFreightCharges[1][20] = data[0].S_ENS || "";
-        updatedSeaFreightCharges[2][20] = data[0].S_ISPS || "";
-        updatedSeaFreightCharges[3][20] = data[0].S_ITT || "";
+        updatedSeaFreightCharges[0][20] = data[0].S_AirFre || "";
+        updatedSeaFreightCharges[1][20] = data[0].S_FSC || "";
+        updatedSeaFreightCharges[2][20] = data[0].S_SSC || "";
+        updatedSeaFreightCharges[3][20] = data[0].S_ISS || "";
+        updatedSeaFreightCharges[4][20] = data[0].S_Xray || "";
+        updatedSeaFreightCharges[5][20] = data[0].S_AAI || "";
 
-        updatedDestinationCharges[0][20] = data[0].D_DTH || "";
-        updatedDestinationCharges[1][20] = data[0].D_BLF || "";
-        updatedDestinationCharges[2][20] = data[0].D_DBR || "";
-        updatedDestinationCharges[3][20] = data[0].D_DOF || "";
-        updatedDestinationCharges[4][20] = data[0].D_HC || "";
-        updatedDestinationCharges[5][20] = data[0].D_TDO || "";
-        updatedDestinationCharges[6][20] = data[0].D_LOC || "";
+
+        updatedDestinationCharges[0][20] = data[0].D_CC || "";
+        updatedDestinationCharges[1][20] = data[0].D_CCF || "";
+        updatedDestinationCharges[2][20] = data[0].D_DOC || "";
+        updatedDestinationCharges[3][20] = data[0].D_LC || "";
+        updatedDestinationCharges[4][20] = data[0].D_LU || "";
+        updatedDestinationCharges[5][20] = data[0].D_DEL || "";
 
         setRemarks(data[0].remarks || "");
         console.log("fetched successfully");
@@ -401,7 +403,7 @@ const QuotationTable = () => {
   };
 
   const totalOrigin = calculateTotal(originCharges);
-  const totalSeaFreight = calculateShipUSDTotal(seaFreightCharges);
+  const totalSeaFreight = calculateTotal(seaFreightCharges);
   const totalDestination = calculateUSDTotal(destinationCharges);
 
   const totalShipmentCost = {
@@ -516,7 +518,7 @@ const QuotationTable = () => {
     ]);
   
     addSectionHeader("B) SEA FREIGHT CHARGES");
-    addChargesToBody(seaFreightCharges, "USD");
+    addChargesToBody(seaFreightCharges, "INR");
     tableBody.push([
       "",
       { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
@@ -585,9 +587,9 @@ const QuotationTable = () => {
     doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
-    doc.text(`ADOC Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Air Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} FCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Quote for GTI to ${loc} Air shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
    
@@ -629,7 +631,7 @@ const QuotationTable = () => {
 // doc.text("Prepared by:", marginLeft + 2 * columnSpacing, textYPosition);
 
   
-    doc.save("quotation_print_ADOCExportFCL.pdf");
+    doc.save("quotation_print_AirExport.pdf");
   };
   
   return (
@@ -639,7 +641,7 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
-              <p className="text-xs text-gray-100">"RFQ Import rates for { dayjs(selectedDate).format("MMMM YYYY")}"</p>
+              <p className="text-xs text-gray-100">"Air Export rates for { dayjs(selectedDate).format("MMMM YYYY")}"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4 sm:gap-0 lg:gap-4 mt-4 lg:mt-0">
@@ -808,7 +810,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 7}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">USD / Shipment</td>
+                    <td className="py-1 px-3 border">INR / Shipment</td>
                     <td colSpan="2" className="py-1 px-3 border">
                       <input
                         readOnly
