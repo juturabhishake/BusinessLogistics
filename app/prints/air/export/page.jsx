@@ -552,6 +552,7 @@ const QuotationTable = () => {
     ]);
   
     tableBody.push([{ content: "INCO Term", colSpan: 2, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 8 }]);
+    tableBody.push([{ content: "Location", colSpan: 2, styles: { fontStyle: "bold" } }, { content: locationName, colSpan: 8 }]);
   
     const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
     const maxDeliveryAddressLength = 50;
@@ -575,10 +576,16 @@ const QuotationTable = () => {
     tableBody.push([{ content: "Destination Port : ", colSpan: 2, styles: { fontStyle: "bold" } }, 
       { content: Dest_Port, colSpan: 8 }]);
     tableBody.push([{ content: "Required Transit Days : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 8 }]);
+    tableBody.push([{ content: "Weight of cargo", colSpan: 2, styles: { fontStyle: "bold" } }, { content: "", colSpan: 8 }]);
+
+    tableBody.push([{ content: "Total Cost", colSpan: 2, styles: { fontStyle: "bold" } }, { content: totalShipmentCost[20], colSpan: 8 }]);
+    tableBody.push([{ content: "Payment Terms", colSpan: 2, styles: { fontStyle: "bold" } }, { content: "Monthly Basis", colSpan: 8 }]);
+    tableBody.push([{ content: "Proposed Cost", colSpan: 2, styles: { fontStyle: "bold" } }, { content: totalShipmentCost[20], colSpan: 8 }]);
+
     tableBody.push([{ content: "Free Days Requirement at Destination : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Free_Days, colSpan: 8 }]);
     tableBody.push([{ content: "Preffered Liners : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Pref_Liners, colSpan: 8 }]);
-    tableBody.push([{ content: "HSN Code : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: HSN_Code, colSpan: 8 }]);
-    tableBody.push([{ content: "Avg. Containers per month : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Avg_Cont_Per_Mnth, colSpan: 8 }]);
+    // tableBody.push([{ content: "HSN Code : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: HSN_Code, colSpan: 8 }]);
+    // tableBody.push([{ content: "Avg. Containers per month : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Avg_Cont_Per_Mnth, colSpan: 8 }]);
   
     tableBody.push([{ content: "Remarks", colSpan: 2, styles: { fontStyle: "bold" } }, { content: remarks, colSpan: 8 }]);
       
@@ -897,6 +904,10 @@ const QuotationTable = () => {
                 <td colSpan="4" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Location</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{locationName}</td>
+              </tr>
+              <tr>
                 <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
                 <td colSpan="4" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
@@ -914,18 +925,34 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-left">{Free_Days}</td>
               </tr>
               <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs : </td>
+                <td colSpan="4" className="py-1 px-3 border text-left"></td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Total Cost :</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{totalShipmentCost[20]}</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Payment Terms :</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">Monthly Basis</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Proposed Cost :</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{totalShipmentCost[20]}</td>
+              </tr>
+              <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{Dest_Port}</td>
                 <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Pref_Liners}</td>
               </tr>
              
-              <tr>
+              {/* <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
                 <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">

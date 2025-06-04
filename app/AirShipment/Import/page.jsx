@@ -628,6 +628,10 @@ const QuotationTable = () => {
                 <td colSpan="4" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Location</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{locationName}</td>
+              </tr>
+              <tr>
                 <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
                 <td colSpan="4" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
@@ -645,18 +649,34 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-left">{Free_Days}</td>
               </tr>
               <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs : </td>
+                <td colSpan="4" className="py-1 px-3 border text-left"></td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Total Cost :</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{totalShipmentCost[20]}</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Payment Terms :</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">Monthly Basis</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Proposed Cost :</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{totalShipmentCost[20]}</td>
+              </tr>
+              <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{Dest_Port}</td>
                 <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Pref_Liners}</td>
               </tr>
              
-              <tr>
+              {/* <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
                 <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">
