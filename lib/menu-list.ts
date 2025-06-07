@@ -141,7 +141,7 @@ export function getMenuList(pathname: string): Group[] {
             },
             {
               href: "",
-              label: "Prints(AirShipment)",
+              label: "Prints(AirShip)",
               icon: Database,
               submenus: [
                 { href: "/settings/print/AirShipment/Export", label: "Export" },

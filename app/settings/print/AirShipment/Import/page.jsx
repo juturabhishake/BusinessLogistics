@@ -40,30 +40,32 @@ const QuotationTable = () => {
   });
 
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Local Transportation From GTI-Chennai", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Terminal Handling Charges - Origin", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Bill of Lading Charges", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
-    // { description: "CFS Charges (At Actual)", remarks: "At Actual", sc1: "", sc2: "", sc3: "" },
-  ]);
-
-  const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "Sea Freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "FSC (Fuel Surcharge)", remarks: "", sc1: "", sc2: "", sc3: "" },
-    // { description: "ISPS", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    // { description: "Seal Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-  ]);
-
-  const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Custom Clearance", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "CC Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "AAI Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Deliver", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    // { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-  ]);
+      { description: "Pickup", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "Custom Clearance", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "Handling / DO/ ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "Terminal Handling Charge", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+      { description: "Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+      // { description: "Halting", remarks: "If any", sc1: "", sc2: "", sc3: "" },
+    ]);
+  
+    const [seaFreightCharges, setSeaFreightCharges] = useState([
+      { description: "AIR freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "FSC (Fuel Surcharges)", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+      { description: "SSC (Security Sucharge)", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "ISS Surcharge", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "X-Ray", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "AAI CHARGES", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    ]);
+  
+    const [destinationCharges, setDestinationCharges] = useState([
+      { description: "Customs Clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "CC Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+      { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "LINER CHARGES", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "Delivery", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      // { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    ]);
 
   const [suppliers, setSuppliers] = useState(["", "", "", "", "", ""]);
 
@@ -216,7 +218,7 @@ const QuotationTable = () => {
 
   const fetchQuotationData = async (locationCode, month, year, contFeet) => {
     try {
-      const response = await fetch("/api/prints/ExportFCL", {
+      const response = await fetch("/api/prints/AirImport", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -235,14 +237,14 @@ const QuotationTable = () => {
 
       // console.log("Fetched Data : ", data);
       if (data.length <= 0) {
-        setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: ""})));
-        setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
-        setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
-        setSuppliers(["", "", "", "", "", ""]);
-        setTotalA(["", "", "", "", "", ""]);
-        setTotalB(["", "", "", "", "", ""]);
-        setTotalC(["", "", "", "", "", ""]);
-        setTotal(["", "", "", "", "", ""]);
+        setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
+        setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
+        setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
+        setSuppliers(["", "", ""]);
+        setTotalA(["", "", ""]);
+        setTotalB(["", "", ""]);
+        setTotalC(["", "", ""]);
+        setTotal(["", "", ""]);
         return
       }
       if (data && data.length > 0) {
@@ -254,104 +256,95 @@ const QuotationTable = () => {
           setSuppliers([
             data.find(item => item.Attribute === "Vendor_Name").Supplier_1,
             data.find(item => item.Attribute === "Vendor_Name").Supplier_2,
-            data.find(item => item.Attribute === "Vendor_Name").Supplier_3,,
-            "",
-            "",
-            "",
+            data.find(item => item.Attribute === "Vendor_Name").Supplier_3,
           ]);
-          updatedOriginCharges[0].sc1 = data.find(item => item.Attribute === "O_CCD").Supplier_1 || "";
-          updatedOriginCharges[1].sc1 = data.find(item => item.Attribute === "O_LTG").Supplier_1 || "";
-          updatedOriginCharges[2].sc1 = data.find(item => item.Attribute === "O_THC").Supplier_1 || "";
-          updatedOriginCharges[3].sc1 = data.find(item => item.Attribute === "O_BLC").Supplier_1 || "";
-          updatedOriginCharges[4].sc1 = data.find(item => item.Attribute === "O_LUS").Supplier_1 || "";
+          updatedOriginCharges[0].sc1 = data.find(item => item.Attribute === "O_PU").Supplier_1 || "";
+          updatedOriginCharges[1].sc1 = data.find(item => item.Attribute === "O_CC").Supplier_1 || "";
+          updatedOriginCharges[2].sc1 = data.find(item => item.Attribute === "O_HDO").Supplier_1 || "";
+          updatedOriginCharges[3].sc1 = data.find(item => item.Attribute === "O_THC").Supplier_1 || "";
+          updatedOriginCharges[4].sc1 = data.find(item => item.Attribute === "O_DOC").Supplier_1 || "";
           // updatedOriginCharges[5].sc1 = data.find(item => item.Attribute === "O_Halt").Supplier_1 || "";
 
-          updatedSeaFreightCharges[0].sc1 = data.find(item => item.Attribute === "S_SeaFre").Supplier_1 || "";
-          updatedSeaFreightCharges[1].sc1 = data.find(item => item.Attribute === "S_ENS").Supplier_1 || "";
-          updatedSeaFreightCharges[2].sc1 = data.find(item => item.Attribute === "S_ISPS").Supplier_1 || "";
-          updatedSeaFreightCharges[3].sc1 = data.find(item => item.Attribute === "S_ITT").Supplier_1 || "";
+          updatedSeaFreightCharges[0].sc1 = data.find(item => item.Attribute === "S_AirFre").Supplier_1 || "";
+          updatedSeaFreightCharges[1].sc1 = data.find(item => item.Attribute === "S_FSC").Supplier_1 || "";
+          updatedSeaFreightCharges[2].sc1 = data.find(item => item.Attribute === "S_SSC").Supplier_1 || "";
+          updatedSeaFreightCharges[3].sc1 = data.find(item => item.Attribute === "S_ISS").Supplier_1 || "";
+          updatedSeaFreightCharges[4].sc1 = data.find(item => item.Attribute === "S_Xray").Supplier_1 || "";
+          updatedSeaFreightCharges[5].sc1 = data.find(item => item.Attribute === "S_AAI").Supplier_1 || "";
 
-          updatedDestinationCharges[0].sc1 = data.find(item => item.Attribute === "D_DTH").Supplier_1 || "";
-          updatedDestinationCharges[1].sc1 = data.find(item => item.Attribute === "D_BLF").Supplier_1 || "";
-          updatedDestinationCharges[2].sc1 = data.find(item => item.Attribute === "D_DBR").Supplier_1 || "";
-          updatedDestinationCharges[3].sc1 = data.find(item => item.Attribute === "D_DOF").Supplier_1 || "";
-          updatedDestinationCharges[4].sc1 = data.find(item => item.Attribute === "D_HC").Supplier_1 || "";
-          updatedDestinationCharges[5].sc1 = data.find(item => item.Attribute === "D_TDO").Supplier_1 || "";
-          updatedDestinationCharges[6].sc1 = data.find(item => item.Attribute === "D_LOC").Supplier_1 || "";
+          updatedDestinationCharges[0].sc1 = data.find(item => item.Attribute === "D_CC").Supplier_1 || "";
+          updatedDestinationCharges[1].sc1 = data.find(item => item.Attribute === "D_CCF").Supplier_1 || "";
+          updatedDestinationCharges[2].sc1 = data.find(item => item.Attribute === "D_DOC").Supplier_1 || "";
+          updatedDestinationCharges[3].sc1 = data.find(item => item.Attribute === "D_LC").Supplier_1 || "";
+          updatedDestinationCharges[4].sc1 = data.find(item => item.Attribute === "D_LU").Supplier_1 || "";
+          updatedDestinationCharges[5].sc1 = data.find(item => item.Attribute === "D_DEL").Supplier_1 || "";
+          // updatedDestinationCharges[6].sc1 = data.find(item => item.Attribute === "D_LOC").Supplier_1 || "";
 
-          updatedOriginCharges[0].sc2 = data.find(item => item.Attribute === "O_CCD").Supplier_2 || "";
-          updatedOriginCharges[1].sc2 = data.find(item => item.Attribute === "O_LTG").Supplier_2 || "";
-          updatedOriginCharges[2].sc2 = data.find(item => item.Attribute === "O_THC").Supplier_2 || "";
-          updatedOriginCharges[3].sc2 = data.find(item => item.Attribute === "O_BLC").Supplier_2 || "";
-          updatedOriginCharges[4].sc2 = data.find(item => item.Attribute === "O_LUS").Supplier_2 || "";
+          updatedOriginCharges[0].sc2 = data.find(item => item.Attribute === "O_PU").Supplier_2 || "";
+          updatedOriginCharges[1].sc2 = data.find(item => item.Attribute === "O_CC").Supplier_2 || "";
+          updatedOriginCharges[2].sc2 = data.find(item => item.Attribute === "O_HDO").Supplier_2 || "";
+          updatedOriginCharges[3].sc2 = data.find(item => item.Attribute === "O_THC").Supplier_2 || "";
+          updatedOriginCharges[4].sc2 = data.find(item => item.Attribute === "O_DOC").Supplier_2 || "";
           // updatedOriginCharges[5].sc2 = data.find(item => item.Attribute === "O_Halt").Supplier_2 || "";
 
           
-          updatedSeaFreightCharges[0].sc2 = data.find(item => item.Attribute === "S_SeaFre").Supplier_2 || "";
-          updatedSeaFreightCharges[1].sc2 = data.find(item => item.Attribute === "S_ENS").Supplier_2 || "";
-          updatedSeaFreightCharges[2].sc2 = data.find(item => item.Attribute === "S_ISPS").Supplier_2 || "";
-          updatedSeaFreightCharges[3].sc2 = data.find(item => item.Attribute === "S_ITT").Supplier_2 || "";
+          updatedSeaFreightCharges[0].sc2 = data.find(item => item.Attribute === "S_AirFre").Supplier_2 || "";
+          updatedSeaFreightCharges[1].sc2 = data.find(item => item.Attribute === "S_FSC").Supplier_2 || "";
+          updatedSeaFreightCharges[2].sc2 = data.find(item => item.Attribute === "S_SSC").Supplier_2 || "";
+          updatedSeaFreightCharges[3].sc2 = data.find(item => item.Attribute === "S_ISS").Supplier_2 || "";
+          updatedSeaFreightCharges[4].sc2 = data.find(item => item.Attribute === "S_Xray").Supplier_2 || "";
+          updatedSeaFreightCharges[5].sc2 = data.find(item => item.Attribute === "S_AAI").Supplier_2 || "";
 
-          updatedDestinationCharges[0].sc2 = data.find(item => item.Attribute === "D_DTH").Supplier_2 || "";
-          updatedDestinationCharges[1].sc2 = data.find(item => item.Attribute === "D_BLF").Supplier_2 || "";
-          updatedDestinationCharges[2].sc2 = data.find(item => item.Attribute === "D_DBR").Supplier_2 || "";
-          updatedDestinationCharges[3].sc2 = data.find(item => item.Attribute === "D_DOF").Supplier_2 || "";
-          updatedDestinationCharges[4].sc2 = data.find(item => item.Attribute === "D_HC").Supplier_2 || "";
-          updatedDestinationCharges[5].sc2 = data.find(item => item.Attribute === "D_TDO").Supplier_2 || "";
-          updatedDestinationCharges[6].sc2 = data.find(item => item.Attribute === "D_LOC").Supplier_2 || "";
+          updatedDestinationCharges[0].sc2 = data.find(item => item.Attribute === "D_CC").Supplier_2 || "";
+          updatedDestinationCharges[1].sc2 = data.find(item => item.Attribute === "D_CCF").Supplier_2 || "";
+          updatedDestinationCharges[2].sc2 = data.find(item => item.Attribute === "D_DOC").Supplier_2 || "";
+          updatedDestinationCharges[3].sc2 = data.find(item => item.Attribute === "D_LC").Supplier_2 || "";
+          updatedDestinationCharges[4].sc2 = data.find(item => item.Attribute === "D_LU").Supplier_2 || "";
+          updatedDestinationCharges[5].sc2 = data.find(item => item.Attribute === "D_DEL").Supplier_2 || "";
+          // updatedDestinationCharges[6].sc2 = data.find(item => item.Attribute === "D_LOC").Supplier_2 || "";
 
-          updatedOriginCharges[0].sc3 = data.find(item => item.Attribute === "O_CCD").Supplier_3 || "";
-          updatedOriginCharges[1].sc3 = data.find(item => item.Attribute === "O_LTG").Supplier_3 || "";
-          updatedOriginCharges[2].sc3 = data.find(item => item.Attribute === "O_THC").Supplier_3 || "";
-          updatedOriginCharges[3].sc3 = data.find(item => item.Attribute === "O_BLC").Supplier_3 || "";
-          updatedOriginCharges[4].sc3 = data.find(item => item.Attribute === "O_LUS").Supplier_3 || "";
+          updatedOriginCharges[0].sc3 = data.find(item => item.Attribute === "O_PU").Supplier_3 || "";
+          updatedOriginCharges[1].sc3 = data.find(item => item.Attribute === "O_CC").Supplier_3 || "";
+          updatedOriginCharges[2].sc3 = data.find(item => item.Attribute === "O_HDO").Supplier_3 || "";
+          updatedOriginCharges[3].sc3 = data.find(item => item.Attribute === "O_THC").Supplier_3 || "";
+          updatedOriginCharges[4].sc3 = data.find(item => item.Attribute === "O_DOC").Supplier_3 || "";
           // updatedOriginCharges[5].sc3 = data.find(item => item.Attribute === "O_Halt").Supplier_3 || "";
 
           
-          updatedSeaFreightCharges[0].sc3 = data.find(item => item.Attribute === "S_SeaFre").Supplier_3 || "";
-          updatedSeaFreightCharges[1].sc3 = data.find(item => item.Attribute === "S_ENS").Supplier_3 || "";
-          updatedSeaFreightCharges[2].sc3 = data.find(item => item.Attribute === "S_ISPS").Supplier_3 || "";
-          updatedSeaFreightCharges[3].sc3 = data.find(item => item.Attribute === "S_ITT").Supplier_3 || "";
+          updatedSeaFreightCharges[0].sc3 = data.find(item => item.Attribute === "S_AirFre").Supplier_3 || "";
+          updatedSeaFreightCharges[1].sc3 = data.find(item => item.Attribute === "S_FSC").Supplier_3 || "";
+          updatedSeaFreightCharges[2].sc3 = data.find(item => item.Attribute === "S_SSC").Supplier_3 || "";
+          updatedSeaFreightCharges[3].sc2 = data.find(item => item.Attribute === "S_ISS").Supplier_2 || "";
+          updatedSeaFreightCharges[4].sc2 = data.find(item => item.Attribute === "S_Xray").Supplier_2 || "";
+          updatedSeaFreightCharges[5].sc3 = data.find(item => item.Attribute === "S_AAI").Supplier_3 || "";
 
-          updatedDestinationCharges[0].sc3 = data.find(item => item.Attribute === "D_DTH").Supplier_3 || "";
-          updatedDestinationCharges[1].sc3 = data.find(item => item.Attribute === "D_BLF").Supplier_3 || "";
-          updatedDestinationCharges[2].sc3 = data.find(item => item.Attribute === "D_DBR").Supplier_3 || "";
-          updatedDestinationCharges[3].sc3 = data.find(item => item.Attribute === "D_DOF").Supplier_3 || "";
-          updatedDestinationCharges[4].sc3 = data.find(item => item.Attribute === "D_HC").Supplier_3 || "";
-          updatedDestinationCharges[5].sc3 = data.find(item => item.Attribute === "D_TDO").Supplier_3 || "";
-          updatedDestinationCharges[6].sc3 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
+          updatedDestinationCharges[0].sc3 = data.find(item => item.Attribute === "D_CC").Supplier_3 || "";
+          updatedDestinationCharges[1].sc3 = data.find(item => item.Attribute === "D_CCF").Supplier_3 || "";
+          updatedDestinationCharges[2].sc3 = data.find(item => item.Attribute === "D_DOC").Supplier_3 || "";
+          updatedDestinationCharges[3].sc3 = data.find(item => item.Attribute === "D_LC").Supplier_3 || "";
+          updatedDestinationCharges[4].sc3 = data.find(item => item.Attribute === "D_LU").Supplier_3 || "";
+          updatedDestinationCharges[5].sc3 = data.find(item => item.Attribute === "D_DEL").Supplier_3 || "";
+          // updatedDestinationCharges[6].sc3 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
 
           setTotalA([
             data.find(item => item.Attribute === "O_Total_Chg").Supplier_1 || "",
             data.find(item => item.Attribute === "O_Total_Chg").Supplier_2 || "",
-            data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || "",
-            "",
-            "",
-            ""
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || ""
           ])
           setTotalB([
             data.find(item => item.Attribute === "S_Total_Chg").Supplier_1 || "",
             data.find(item => item.Attribute === "S_Total_Chg").Supplier_2 || "",
-            data.find(item => item.Attribute === "S_Total_Chg").Supplier_3 || "",
-            "",
-            "",
-            ""
+            data.find(item => item.Attribute === "S_Total_Chg").Supplier_3 || ""
           ])
           setTotalC([
             data.find(item => item.Attribute === "D_Total_Chg").Supplier_1 || "",
             data.find(item => item.Attribute === "D_Total_Chg").Supplier_2 || "",
-            data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || "",
-            "",
-            "",
-            ""
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || ""
           ])
           setTotal([
             data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_1 || "",
             data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_2 || "",
-            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || "",
-            "",
-            "",
-            ""
+            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || ""
           ])
 
         } 
@@ -481,11 +474,11 @@ const QuotationTable = () => {
       setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
       setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "" })));
       setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
-      setSuppliers(["", "", "", "", "", ""]);
-      setTotalA(["", "", "", "", "", ""]);
-      setTotalB(["", "", "", "", "", ""]);
-      setTotalC(["", "", "", "", "", ""]);
-      setTotal(["", "", "", "", "", ""]);
+      setSuppliers(["", "", ""]);
+      setTotalA(["", "", ""]);
+      setTotalB(["", "", ""]);
+      setTotalC(["", "", ""]);
+      setTotal(["", "", ""]);
       fetchSupplierDetails(selectedLocation);
       const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
       const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
@@ -583,7 +576,7 @@ const QuotationTable = () => {
     };
 
     addSectionHeader("A) ORIGIN CHARGES");
-    addChargesToBody(originCharges, "INR");
+    addChargesToBody(originCharges, currency);
     tableBody.push([
         "",
         { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
@@ -592,7 +585,7 @@ const QuotationTable = () => {
     ]);
 
     addSectionHeader("B) SEA FREIGHT CHARGES");
-    addChargesToBody(seaFreightCharges, "USD");
+    addChargesToBody(seaFreightCharges, currency);
     tableBody.push([
         "",
         { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
@@ -601,7 +594,7 @@ const QuotationTable = () => {
     ]);
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, currency);
+    addChargesToBody(destinationCharges, "INR");
     tableBody.push([
         "",
         { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
@@ -617,6 +610,7 @@ const QuotationTable = () => {
     ]);
 
     tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 7 }]);
+    tableBody.push([{ content: "Location", colSpan: 3, styles: { fontStyle: "bold" } }, { content: locationName, colSpan: 7 }]);
     
     const maxDeliveryAddressLength = 50;
     const truncatedDeliveryAddress = deliveryAddress.length > maxDeliveryAddressLength 
@@ -631,13 +625,32 @@ const QuotationTable = () => {
     ]);
     tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } }, 
         { content: "USD", styles: { halign: "center" } }, 
-        { content: USD.toFixed(2), colSpan: 2, styles: { halign: "center" } }, 
+        { content: USD.toFixed(2),  styles: { halign: "center" } }, 
         { content: "EURO", styles: { halign: "center" } }, 
-        { content: EUR.toFixed(2), colSpan: 3, styles: { halign: "center" } }]); 
+        { content: EUR.toFixed(2),  styles: { halign: "center" } }]); 
     tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } }, 
         { content: Dest_Port, colSpan: 2 }, 
         { content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 3 }]);
+    tableBody.push([
+        { content: "Weight of cargo", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: "", colSpan: 7, styles: { whiteSpace: "nowrap", fontSize: 7 } }
+    ]);
+    tableBody.push([{ content: "Total Cost", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: total[0], styles: { halign: "center" } },
+        { content: total[1], styles: { halign: "center" } },
+        { content: total[2], styles: { halign: "center" } },
+        { content: "", styles: { halign: "center" } }]);
+    tableBody.push([{ content: "Payment Terms", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: "Basis", styles: { halign: "center" } },
+        { content: "Monthly Basis", styles: { halign: "center" } },
+        { content: "Basis", styles: { halign: "center" } },
+        { content: "", styles: { halign: "center" } }]);
+    tableBody.push([{ content: "Proposed Cost", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: total[0], styles: { halign: "center" } },
+        { content: total[1], styles: { halign: "center" } },
+        { content: total[2], styles: { halign: "center" } },
+        { content: "", styles: { halign: "center" } }]);
     tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 7 }]);
 
     doc.setFont("helvetica", "bold");
@@ -645,7 +658,7 @@ const QuotationTable = () => {
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
     doc.setFontSize(8);
-    doc.text(`RFQ Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Air Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
     doc.text(`Quote for GTI to ${loc} ADOC LCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
@@ -686,7 +699,7 @@ const QuotationTable = () => {
 
     doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
 
-    doc.save("quotation_print_ExportFCL.pdf");
+    doc.save("quotation_print_AirImport.pdf");
   };
   
   return (
@@ -697,7 +710,7 @@ const QuotationTable = () => {
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparative Statement of quotations</h2>
               <p className="text-xs text-gray-100">
-                {`Export Print ADOC LCL rates for 
+                {`Air Import Print rates for 
                   ${selectedDate 
                     ? `${selectedDate.format("MMMM YYYY")} (${selectedDate.startOf("month").format("DD")}.${selectedDate.format("MMMM YYYY")} - ${selectedDate.endOf("month").format("DD")}.${selectedDate.format("MMMM YYYY")})` 
                     : "Loading..."
@@ -827,7 +840,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">INR / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">{item.sc1}</td>
                     <td className="py-1 px-3 border">{item.sc2}</td>
                     <td className="py-1 px-3 border">{item.sc3}</td>
@@ -864,7 +877,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 7}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">USD / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">{item.sc1}</td>
                     <td className="py-1 px-3 border">{item.sc2}</td>
                     <td className="py-1 px-3 border">{item.sc3}</td>
@@ -901,7 +914,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 9}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">{currency} / Shipment</td>
+                    <td className="py-1 px-3 border">INR / Shipment</td>
                     <td className="py-1 px-3 border">{item.sc1}</td>
                     <td className="py-1 px-3 border">{item.sc2}</td>
                     <td className="py-1 px-3 border">{item.sc3}</td>
@@ -940,6 +953,10 @@ const QuotationTable = () => {
                 <td colSpan="8" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Location</td>
+                <td colSpan="8" className="py-1 px-3 border text-left">{locationName}</td>
+              </tr>
+              <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Delivery Address</td>             
                 <td colSpan="8" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
@@ -957,6 +974,30 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="8" className="py-1 px-3 border text-left">{Dest_Port}</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Total Cost : </td>
+                <td className="py-1 px-3 border text-left"></td>
+                <td colSpan="1" className="py-1 px-3 border text-center">{total[0]}</td>
+                <td colSpan="1" className="py-1 px-3 border text-center">{total[1]}</td>
+                <td colSpan="1" className="py-1 px-3 border text-center">{total[2]}</td>
+                <td colSpan="3" className="py-1 px-3 border text-left"></td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Payment Terms : </td>
+                <td className="py-1 px-3 border text-left"></td>
+                <td colSpan="1" className="py-1 px-3 border text-center">Basis</td>
+                <td colSpan="1" className="py-1 px-3 border text-center">Monthly Basis</td>
+                <td colSpan="1" className="py-1 px-3 border text-center">Basis</td>
+                <td colSpan="3" className="py-1 px-3 border text-left"></td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Proposed Cost : </td>
+                <td className="py-1 px-3 border text-left"></td>
+                <td colSpan="1" className="py-1 px-3 border text-center">{total[0]}</td>
+                <td colSpan="1" className="py-1 px-3 border text-center">{total[1]}</td>
+                <td colSpan="1" className="py-1 px-3 border text-center">{total[2]}</td>
+                <td colSpan="3" className="py-1 px-3 border text-center"></td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>

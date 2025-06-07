@@ -216,7 +216,7 @@ const QuotationTable = () => {
 
   const fetchQuotationData = async (locationCode, month, year, contFeet) => {
     try {
-      const response = await fetch("/api/prints/ExportFCL", {
+      const response = await fetch("/api/prints/ADOCImportFCL", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -235,14 +235,14 @@ const QuotationTable = () => {
 
       // console.log("Fetched Data : ", data);
       if (data.length <= 0) {
-        setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: ""})));
-        setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
-        setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "", sc4: "", sc5: "", sc6: "" })));
-        setSuppliers(["", "", "", "", "", ""]);
-        setTotalA(["", "", "", "", "", ""]);
-        setTotalB(["", "", "", "", "", ""]);
-        setTotalC(["", "", "", "", "", ""]);
-        setTotal(["", "", "", "", "", ""]);
+        setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
+        setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
+        setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
+        setSuppliers(["", "", ""]);
+        setTotalA(["", "", ""]);
+        setTotalB(["", "", ""]);
+        setTotalC(["", "", ""]);
+        setTotal(["", "", ""]);
         return
       }
       if (data && data.length > 0) {
@@ -254,17 +254,14 @@ const QuotationTable = () => {
           setSuppliers([
             data.find(item => item.Attribute === "Vendor_Name").Supplier_1,
             data.find(item => item.Attribute === "Vendor_Name").Supplier_2,
-            data.find(item => item.Attribute === "Vendor_Name").Supplier_3,,
-            "",
-            "",
-            "",
+            data.find(item => item.Attribute === "Vendor_Name").Supplier_3,
           ]);
           updatedOriginCharges[0].sc1 = data.find(item => item.Attribute === "O_CCD").Supplier_1 || "";
           updatedOriginCharges[1].sc1 = data.find(item => item.Attribute === "O_LTG").Supplier_1 || "";
           updatedOriginCharges[2].sc1 = data.find(item => item.Attribute === "O_THC").Supplier_1 || "";
           updatedOriginCharges[3].sc1 = data.find(item => item.Attribute === "O_BLC").Supplier_1 || "";
           updatedOriginCharges[4].sc1 = data.find(item => item.Attribute === "O_LUS").Supplier_1 || "";
-          // updatedOriginCharges[5].sc1 = data.find(item => item.Attribute === "O_Halt").Supplier_1 || "";
+          updatedOriginCharges[5].sc1 = data.find(item => item.Attribute === "O_Halt").Supplier_1 || "";
 
           updatedSeaFreightCharges[0].sc1 = data.find(item => item.Attribute === "S_SeaFre").Supplier_1 || "";
           updatedSeaFreightCharges[1].sc1 = data.find(item => item.Attribute === "S_ENS").Supplier_1 || "";
@@ -284,7 +281,7 @@ const QuotationTable = () => {
           updatedOriginCharges[2].sc2 = data.find(item => item.Attribute === "O_THC").Supplier_2 || "";
           updatedOriginCharges[3].sc2 = data.find(item => item.Attribute === "O_BLC").Supplier_2 || "";
           updatedOriginCharges[4].sc2 = data.find(item => item.Attribute === "O_LUS").Supplier_2 || "";
-          // updatedOriginCharges[5].sc2 = data.find(item => item.Attribute === "O_Halt").Supplier_2 || "";
+          updatedOriginCharges[5].sc2 = data.find(item => item.Attribute === "O_Halt").Supplier_2 || "";
 
           
           updatedSeaFreightCharges[0].sc2 = data.find(item => item.Attribute === "S_SeaFre").Supplier_2 || "";
@@ -305,7 +302,7 @@ const QuotationTable = () => {
           updatedOriginCharges[2].sc3 = data.find(item => item.Attribute === "O_THC").Supplier_3 || "";
           updatedOriginCharges[3].sc3 = data.find(item => item.Attribute === "O_BLC").Supplier_3 || "";
           updatedOriginCharges[4].sc3 = data.find(item => item.Attribute === "O_LUS").Supplier_3 || "";
-          // updatedOriginCharges[5].sc3 = data.find(item => item.Attribute === "O_Halt").Supplier_3 || "";
+          updatedOriginCharges[5].sc3 = data.find(item => item.Attribute === "O_Halt").Supplier_3 || "";
 
           
           updatedSeaFreightCharges[0].sc3 = data.find(item => item.Attribute === "S_SeaFre").Supplier_3 || "";
@@ -324,34 +321,22 @@ const QuotationTable = () => {
           setTotalA([
             data.find(item => item.Attribute === "O_Total_Chg").Supplier_1 || "",
             data.find(item => item.Attribute === "O_Total_Chg").Supplier_2 || "",
-            data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || "",
-            "",
-            "",
-            ""
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || ""
           ])
           setTotalB([
             data.find(item => item.Attribute === "S_Total_Chg").Supplier_1 || "",
             data.find(item => item.Attribute === "S_Total_Chg").Supplier_2 || "",
-            data.find(item => item.Attribute === "S_Total_Chg").Supplier_3 || "",
-            "",
-            "",
-            ""
+            data.find(item => item.Attribute === "S_Total_Chg").Supplier_3 || ""
           ])
           setTotalC([
             data.find(item => item.Attribute === "D_Total_Chg").Supplier_1 || "",
             data.find(item => item.Attribute === "D_Total_Chg").Supplier_2 || "",
-            data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || "",
-            "",
-            "",
-            ""
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || ""
           ])
           setTotal([
             data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_1 || "",
             data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_2 || "",
-            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || "",
-            "",
-            "",
-            ""
+            data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || ""
           ])
 
         } 
@@ -481,11 +466,11 @@ const QuotationTable = () => {
       setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
       setSeaFreightCharges(seaFreightCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: "" })));
       setDestinationCharges(destinationCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
-      setSuppliers(["", "", "", "", "", ""]);
-      setTotalA(["", "", "", "", "", ""]);
-      setTotalB(["", "", "", "", "", ""]);
-      setTotalC(["", "", "", "", "", ""]);
-      setTotal(["", "", "", "", "", ""]);
+      setSuppliers(["", "", ""]);
+      setTotalA(["", "", ""]);
+      setTotalB(["", "", ""]);
+      setTotalC(["", "", ""]);
+      setTotal(["", "", ""]);
       fetchSupplierDetails(selectedLocation);
       const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
       const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
@@ -645,7 +630,7 @@ const QuotationTable = () => {
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
     doc.setFontSize(8);
-    doc.text(`RFQ Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`ADOC Import FCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
     doc.text(`Quote for GTI to ${loc} ADOC FCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
