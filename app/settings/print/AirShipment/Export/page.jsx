@@ -314,8 +314,8 @@ const QuotationTable = () => {
           updatedSeaFreightCharges[0].sc3 = data.find(item => item.Attribute === "S_AirFre").Supplier_3 || "";
           updatedSeaFreightCharges[1].sc3 = data.find(item => item.Attribute === "S_FSC").Supplier_3 || "";
           updatedSeaFreightCharges[2].sc3 = data.find(item => item.Attribute === "S_SSC").Supplier_3 || "";
-          updatedSeaFreightCharges[3].sc2 = data.find(item => item.Attribute === "S_ISS").Supplier_2 || "";
-          updatedSeaFreightCharges[4].sc2 = data.find(item => item.Attribute === "S_Xray").Supplier_2 || "";
+          updatedSeaFreightCharges[3].sc3 = data.find(item => item.Attribute === "S_ISS").Supplier_3 || "";
+          updatedSeaFreightCharges[4].sc3 = data.find(item => item.Attribute === "S_Xray").Supplier_3 || "";
           updatedSeaFreightCharges[5].sc3 = data.find(item => item.Attribute === "S_AAI").Supplier_3 || "";
 
           updatedDestinationCharges[0].sc3 = data.find(item => item.Attribute === "D_CC").Supplier_3 || "";
@@ -609,8 +609,10 @@ const QuotationTable = () => {
         "",
     ]);
 
-    tableBody.push([{ content: "INCO Term", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 7 }]);
-    tableBody.push([{ content: "Location", colSpan: 3, styles: { fontStyle: "bold" } }, { content: locationName, colSpan: 7 }]);
+    tableBody.push([
+      { content: "INCO Term : ", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 2 },
+      { content: "Location : ", colSpan: 1, styles: { fontStyle: "bold" } }, { content: locationName, colSpan: 1 }
+    ]);
     
     const maxDeliveryAddressLength = 50;
     const truncatedDeliveryAddress = deliveryAddress.length > maxDeliveryAddressLength 
@@ -630,27 +632,27 @@ const QuotationTable = () => {
         { content: EUR.toFixed(2),  styles: { halign: "center" } }]); 
     tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } }, 
         { content: Dest_Port, colSpan: 2 }, 
-        { content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, 
-        { content: transitDays, colSpan: 3 }]);
-    tableBody.push([
-        { content: "Weight of cargo", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: "", colSpan: 7, styles: { whiteSpace: "nowrap", fontSize: 7 } }
-    ]);
-    tableBody.push([{ content: "Total Cost", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: total[0], styles: { halign: "center" } },
-        { content: total[1], styles: { halign: "center" } },
-        { content: total[2], styles: { halign: "center" } },
-        { content: "", styles: { halign: "center" } }]);
-    tableBody.push([{ content: "Payment Terms", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: "Basis", styles: { halign: "center" } },
-        { content: "Monthly Basis", styles: { halign: "center" } },
-        { content: "Basis", styles: { halign: "center" } },
-        { content: "", styles: { halign: "center" } }]);
-    tableBody.push([{ content: "Proposed Cost", colSpan: 3, styles: { fontStyle: "bold" } },
-        { content: total[0], styles: { halign: "center" } },
-        { content: total[1], styles: { halign: "center" } },
-        { content: total[2], styles: { halign: "center" } },
-        { content: "", styles: { halign: "center" } }]);
+        { content: "Required Transit Days", colSpan: 1, styles: { fontStyle: "bold" } }, 
+        { content: transitDays, colSpan: 1 }]);
+    // tableBody.push([
+    //     { content: "Weight of cargo", colSpan: 3, styles: { fontStyle: "bold" } },
+    //     { content: "", colSpan: 7, styles: { whiteSpace: "nowrap", fontSize: 7 } }
+    // ]);
+    // tableBody.push([{ content: "Total Cost", colSpan: 3, styles: { fontStyle: "bold" } },
+    //     { content: total[0], styles: { halign: "center" } },
+    //     { content: total[1], styles: { halign: "center" } },
+    //     { content: total[2], styles: { halign: "center" } },
+    //     { content: "", styles: { halign: "center" } }]);
+    // tableBody.push([{ content: "Payment Terms", colSpan: 3, styles: { fontStyle: "bold" } },
+    //     { content: "Basis", styles: { halign: "center" } },
+    //     { content: "Monthly Basis", styles: { halign: "center" } },
+    //     { content: "Basis", styles: { halign: "center" } },
+    //     { content: "", styles: { halign: "center" } }]);
+    // tableBody.push([{ content: "Proposed Cost", colSpan: 3, styles: { fontStyle: "bold" } },
+    //     { content: total[0], styles: { halign: "center" } },
+    //     { content: total[1], styles: { halign: "center" } },
+    //     { content: total[2], styles: { halign: "center" } },
+    //     { content: "", styles: { halign: "center" } }]);
     tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 7 }]);
 
     doc.setFont("helvetica", "bold");
@@ -962,9 +964,9 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">FX Rate</td>
-                <td colSpan="2" className="py-1 px-3 border">USD</td>
-                <td colSpan="2" className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td>
-                <td colSpan="2" className="py-1 px-3 border">EURO</td>
+                <td colSpan="1" className="py-1 px-3 border">USD</td>
+                <td colSpan="1" className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td>
+                <td colSpan="1" className="py-1 px-3 border">EURO</td>
                 <td colSpan="2" className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
               </tr>
               <tr>

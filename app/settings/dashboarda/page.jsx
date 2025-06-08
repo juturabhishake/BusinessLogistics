@@ -650,8 +650,8 @@ const DataTable = ({ data, selectedDate, handleRowClick }) => {
                 );
               })
             ) : (
-              <tr>
-                <td colSpan={filteredData.length > 0 ? Object.keys(filteredData[0]).length - 1 : 1} className="text-center py-4">
+              <tr>    
+                <td colSpan={filteredData.length > 0 ? Object.keys(filteredData[0]).length - 1 : 1} className="text-right py-4">
                   No results found.
                 </td>
               </tr>
