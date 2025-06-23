@@ -115,8 +115,8 @@ export default function PremiumTransportFormFixed() {
     setIsSaved(false);
     setError(null);
 
-    const finalFrom = transportType === 'export' ? { Location_Code: 'STATIC_GTI_NAIDUPETA', Location: STATIC_LOCATION_VALUE } : fromLocation;
-    const finalTo = transportType === 'import' ? { Location_Code: 'STATIC_GTI_NAIDUPETA', Location: STATIC_LOCATION_VALUE } : toLocation;
+    const finalFrom = transportType === 'export' ? { Location_Code: 'GTI_NAIDUPETA', Location: STATIC_LOCATION_VALUE } : fromLocation;
+    const finalTo = transportType === 'import' ? { Location_Code: 'GTI_NAIDUPETA', Location: STATIC_LOCATION_VALUE } : toLocation;
     
     const payload = {
       requestDate: format(selectedDate, 'yyyy-MM-dd'),
