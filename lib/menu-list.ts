@@ -11,6 +11,7 @@ import {
   Database,
   NotepadText,
   Currency,
+  FilePlus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
@@ -147,6 +148,11 @@ export function getMenuList(pathname: string): Group[] {
                 { href: "/settings/print/AirShipment/Export", label: "Export" },
                 { href: "/settings/print/AirShipment/Import", label: "Import" }
               ]
+            },
+            {
+              href: "/settings/req_transport",
+              label: "Request Transport",
+              icon: FilePlus 
             },
             {
               href: "",
