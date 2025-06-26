@@ -151,8 +151,12 @@ export function getMenuList(pathname: string): Group[] {
             },
             {
               href: "/settings/req_transport",
-              label: "Request Transport",
-              icon: FilePlus 
+              label: "Req. Transport",
+              icon: FilePlus, 
+              submenus: [
+                { href: "/settings/req_transport", label: "Create" },
+                { href: "/settings/req_transport/view", label: "View/Edit" }
+              ]
             },
             {
               href: "",

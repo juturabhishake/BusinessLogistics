@@ -30,6 +30,7 @@ export default async function handler(req, res) {
     transportType,
     shipmentType,
     containerSize,
+    weight,
     fromLocation,
     toLocation,
     Commodity,
@@ -44,10 +45,11 @@ export default async function handler(req, res) {
     Pref_Service,
     Pref_Liners,
     Avg_Cont_Per_Mnth,
+    Remarks,
     createdBy,
   } = req.body;
 
-  if (!requestDate || !transportType || !shipmentType || !containerSize) {
+  if (!requestDate || !transportType || !shipmentType || !containerSize || !weight) {
     return res.status(400).json({ error: "Missing required selection fields" });
   }
   
@@ -56,6 +58,7 @@ export default async function handler(req, res) {
     Transport_Type: transportType,
     Shipment_Type: shipmentType,
     Container_Size: containerSize,
+    weight: weight || 0,
     From_Location_Code: fromLocation?.Location_Code || null,
     From_Location_Name: fromLocation?.Location || null,
     To_Location_Code: toLocation?.Location_Code || null,
@@ -72,15 +75,12 @@ export default async function handler(req, res) {
     Pref_Service: Pref_Service || null,
     Pref_Liners: Pref_Liners || null,
     Avg_Cont_Per_Mnth: Avg_Cont_Per_Mnth || null,
+    Remarks: Remarks || null,
     Created_By: createdBy || "Unknown",
   };
 
-  console.log("Payload:", payload);
-
   try {
     const result = await prisma.$queryRaw`EXEC [dbo].[sp_CreateTransportRequest] @jsonData = ${JSON.stringify(payload)}`;
-
-    console.log("Stored Procedure Result:", result);
 
     if (result && result[0] && result[0].Status === 'Success') {
       res.status(201).json({ message: result[0].Message });

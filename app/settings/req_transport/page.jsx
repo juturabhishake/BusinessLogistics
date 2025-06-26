@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Textarea } from '@/components/ui/textarea';
 import secureLocalStorage from 'react-secure-storage';
 
 const initialFormData = {
@@ -27,6 +28,7 @@ const initialFormData = {
   Pref_Service: '',
   Pref_Liners: '',
   Avg_Cont_Per_Mnth: '',
+  Remarks: '',
 };
 
 const STATIC_LOCATION_VALUE = "GTI, Naidupeta";
@@ -39,6 +41,7 @@ export default function PremiumTransportFormFixed() {
   const [transportType, setTransportType] = React.useState('');
   const [shipmentType, setShipmentType] = React.useState('');
   const [containerSize, setContainerSize] = React.useState('');
+  const [weight, setWeight] = React.useState('');
 
   const [fromLocation, setFromLocation] = React.useState(null);
   const [toLocation, setToLocation] = React.useState(null);
@@ -103,6 +106,7 @@ export default function PremiumTransportFormFixed() {
     setTransportType('');
     setShipmentType('');
     setContainerSize('');
+    setWeight('');
     setFromLocation(null);
     setToLocation(null);
     setFormData(initialFormData);
@@ -123,6 +127,7 @@ export default function PremiumTransportFormFixed() {
       transportType,
       shipmentType,
       containerSize,
+      weight: parseFloat(weight) || 0,
       fromLocation: finalFrom,
       toLocation: finalTo,
       ...formData,
@@ -156,7 +161,7 @@ export default function PremiumTransportFormFixed() {
     }
   };
 
-  const allSelectionsComplete = !!selectedDate && !!transportType && !!shipmentType && !!containerSize;
+  const allSelectionsComplete = !!selectedDate && !!transportType && !!shipmentType && !!containerSize && !!weight;
   const locationIsSelected = transportType === 'import' ? !!fromLocation : transportType === 'export' ? !!toLocation : false;
   const allFieldsComplete = allSelectionsComplete && locationIsSelected;
 
@@ -172,35 +177,31 @@ export default function PremiumTransportFormFixed() {
             <div className="space-y-8">
               <div>
                 <h3 className="text-lg font-semibold mb-4 border-b pb-2">Request Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                   <div className="space-y-2">
-                    <Label>Request Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}>
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {selectedDate ? format(selectedDate, "dd-MM-yyyy") : <span>dd-mm-yyyy</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <div className="p-4 bg-background rounded-md shadow-lg">
-                          <input
-                            type="date"
-                            className="bg-transparent w-full"
-                            onChange={(e) => {
-                                const date = e.target.value ? new Date(e.target.value + 'T00:00:00') : null;
-                                setSelectedDate(date);
-                                setTransportType('');
-                                setShipmentType('');
-                                setContainerSize('');
-                                setFromLocation(null);
-                                setToLocation(null);
-                              }}
-                          />
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    <Label htmlFor="requestDate">Request Date</Label>
+                    <div className="relative">
+                      <Input
+                        id="requestDate"
+                        type="date"
+                        value={selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''}
+                        onChange={(e) => {
+                            const dateValue = e.target.value;
+                            const date = dateValue ? new Date(dateValue + 'T00:00:00') : null;
+                            setSelectedDate(date);
+                            setTransportType('');
+                            setShipmentType('');
+                            setContainerSize('');
+                            setWeight('');
+                            setFromLocation(null);
+                            setToLocation(null);
+                        }}
+                        className="w-full pr-8"
+                      />
+                      <CalendarIcon className="absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    </div>
                   </div>
+                  
                   <div className="space-y-2">
                     <Label>Transport Type</Label>
                     <Popover open={transportOpen} onOpenChange={setTransportOpen}>
@@ -222,6 +223,7 @@ export default function PremiumTransportFormFixed() {
                                   setTransportType(newType);
                                   setShipmentType('');
                                   setContainerSize('');
+                                  setWeight('');
                                   setFromLocation(null);
                                   setToLocation(null);
                                   setTransportOpen(false);
@@ -236,6 +238,7 @@ export default function PremiumTransportFormFixed() {
                       </PopoverContent>
                     </Popover>
                   </div>
+
                   <div className="space-y-2">
                     <Label>Shipment Type</Label>
                     <Popover open={shipmentOpen} onOpenChange={setShipmentOpen}>
@@ -255,6 +258,7 @@ export default function PremiumTransportFormFixed() {
                                 <CommandItem key={type} value={type} onSelect={(currentValue) => {
                                   setShipmentType(currentValue === shipmentType ? '' : currentValue);
                                   setContainerSize('');
+                                  setWeight('');
                                   setShipmentOpen(false);
                                 }}>
                                   <Check className={cn("mr-2 h-4 w-4", shipmentType === type ? "opacity-100" : "opacity-0")} />
@@ -267,6 +271,7 @@ export default function PremiumTransportFormFixed() {
                       </PopoverContent>
                     </Popover>
                   </div>
+
                   <div className="space-y-2">
                     <Label>Container Size</Label>
                     <Popover open={containerOpen} onOpenChange={setContainerOpen}>
@@ -297,6 +302,21 @@ export default function PremiumTransportFormFixed() {
                       </PopoverContent>
                     </Popover>
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="weight">Weight (KG)</Label>
+                    <Input
+                      id="weight"
+                      type="number"
+                      value={weight}
+                      onChange={(e) => setWeight(e.target.value)}
+                      placeholder="e.g., 22000.50"
+                      disabled={!containerSize}
+                      autoComplete="off"
+                      step="0.01"
+                    />
+                  </div>
+
                 </div>
               </div>
 
@@ -401,10 +421,20 @@ export default function PremiumTransportFormFixed() {
                       <Input id={input.id} name={input.id} value={formData[input.id]} onChange={handleInputChange} placeholder={input.placeholder} autoComplete="off" />
                     </div>
                   ))}
-                  <div className="space-y-2">
-                    <Label htmlFor="created_by">Created By</Label>
-                    <Input id="created_by" value={createdBy} readOnly disabled className="bg-muted" />
+                  
+                  <div className="space-y-2 sm:col-span-2 lg:col-span-3">
+                    <Label htmlFor="Remarks">Remarks</Label>
+                    <Textarea
+                      id="Remarks"
+                      name="Remarks"
+                      value={formData.Remarks}
+                      onChange={handleInputChange}
+                      placeholder="Add any additional comments or instructions here..."
+                      rows={3}
+                      autoComplete="off"
+                    />
                   </div>
+
                 </fieldset>
               </div>
             </div>
