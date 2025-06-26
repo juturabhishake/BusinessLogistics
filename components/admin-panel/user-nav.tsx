@@ -31,9 +31,12 @@ export function UserNav() {
   const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
   const [vendorName, setVendorName] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
     const checkLogin = async () => {
       const user = secureLocalStorage.getItem("un");
+      const sc = secureLocalStorage.getItem("sc");
+      setIsAdmin(sc === 'admin');
       if (typeof user === "string") {
         setUser(user);
       }
@@ -108,7 +111,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/dashboard" className="flex items-center">
+            <Link href={isAdmin ? "/settings/dashboarda" : "/dashboard"} className="flex items-center">
               <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
               Dashboard
             </Link>
