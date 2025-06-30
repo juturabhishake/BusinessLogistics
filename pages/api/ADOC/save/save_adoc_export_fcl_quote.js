@@ -98,7 +98,6 @@ export default async function handler(req, res) {
     await prisma.$executeRaw`EXEC [dbo].[SaveADOCExportFCLQuote] @jsonval = ${JSON.stringify(
       quoteData
     )}`;
-    console.log("Quote saved successfully");
     res.status(200).json({ message: `Quote saved successfully` });
   } catch (error) {
     console.error("Database error:", error.message);

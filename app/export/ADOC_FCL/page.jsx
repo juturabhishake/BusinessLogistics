@@ -193,6 +193,8 @@ const QuotationTable = () => {
         setOriginCharges(originCharges.map((item) => ({ ...item, 20: "" })));
         setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, 20: "" })));
         setDestinationCharges(destinationCharges.map((item) => ({ ...item, 20: "" })));
+        setRemarks("");
+        setUploadedPdfPath("");
       }
     } catch (error) {
       console.error("Error fetching quotation data:", error);

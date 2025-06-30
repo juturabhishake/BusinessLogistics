@@ -13,7 +13,7 @@ const runMiddleware = (req, res, fn) =>
         return reject(result);
       }
       return resolve(result);
-    });
+    }); 
   });
 
 export default async function handler(req, res) {
