@@ -39,6 +39,7 @@ export default async function handler(req, res) {
     totalDestination,
     createdBy,
     remarks,
+    uploaded_pdf_path,
   } = req.body;
 
   if (
@@ -88,14 +89,16 @@ export default async function handler(req, res) {
     Created_Date: new Date(),
     Created_By: createdBy || "Unknown",
     remarks: remarks || "",
+    uploaded_pdf_path: uploaded_pdf_path || "",
   };
-
+  console.log("Payload:", quoteData);
   try {
     console.log("Payload:", quoteData);
 
     await prisma.$executeRaw`EXEC [dbo].[SaveADOCExportFCLQuote] @jsonval = ${JSON.stringify(
       quoteData
     )}`;
+    console.log("Quote saved successfully");
     res.status(200).json({ message: `Quote saved successfully` });
   } catch (error) {
     console.error("Database error:", error.message);

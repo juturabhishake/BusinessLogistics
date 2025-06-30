@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-import { FaFilePdf, FaFileExport } from "react-icons/fa";
+import { FaFilePdf, FaFileExport, FaUpload, FaFilePdf as FaFilePdfIcon } from "react-icons/fa";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import moment from "moment";
+import axios from "axios";
 
 const QuotationTable = () => {
   const [currentDateInfo, setCurrentDateInfo] = useState("");
@@ -75,6 +76,10 @@ const QuotationTable = () => {
   const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileStatus, setFileStatus] = useState({ status: 'idle', message: '' });
+  const [uploadedPdfPath, setUploadedPdfPath] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     let flag = false
@@ -179,6 +184,7 @@ const QuotationTable = () => {
         updatedDestinationCharges[6][20] = data.result[0].D_LOC || "";
 
         setRemarks(data.result[0].remarks || "");
+        setUploadedPdfPath(data.result[0].uploaded_pdf_path || "");
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
@@ -193,6 +199,19 @@ const QuotationTable = () => {
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.type === "application/pdf") {
+        setSelectedFile(file);
+        setFileStatus({ status: 'success', message: file.name });
+      } else {
+        setSelectedFile(null);
+        setFileStatus({ status: 'error', message: 'Invalid format. Only PDF is allowed.' });
+      }
+    }
+  };
+
   // const handleSave = () => {
   //   setSaveState("saving");
     // setTimeout(() => {
@@ -202,7 +221,7 @@ const QuotationTable = () => {
     //   }, 5000);
     // }, 2000);
   // };
-  const saveQuote = async (containerSize) => {
+  const saveQuote = async (containerSize, pdfPath) => {
 
     const filterCharges = (charges) =>
       charges.map((charge) => ({
@@ -225,6 +244,7 @@ const QuotationTable = () => {
       totalDestination: totalDestination,
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
+      uploaded_pdf_path: pdfPath || "",
     };
     console.log("Quote Data:", quoteData);
     try {
@@ -244,6 +264,7 @@ const QuotationTable = () => {
     } catch (error) {
       console.error(`Error saving quote :`, error);
     //   alert(`Error saving quote`);
+      throw error;
     }
   };
   const handleSave = async () => {
@@ -282,10 +303,40 @@ const QuotationTable = () => {
   
     setSaveState("saving");
   
+    let finalPdfPath = uploadedPdfPath;
+
+    if (selectedFile) {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      if (uploadedPdfPath) {
+        formData.append('oldFilePath', uploadedPdfPath);
+      }
+      try {
+        const response = await axios.post('/api/ADOC/upload_fcl_pdf', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        finalPdfPath = response.data.filePath;
+        setIsUploading(false);
+        console.log("File uploaded successfully:", finalPdfPath);
+      } catch (error) {
+        console.error("File upload failed:", error);
+        alert("File upload failed. Please try again.");
+        setSaveState("idle");
+        setIsUploading(false);
+        return;
+      }
+    }
+
     try {
-      await saveQuote(20);
-  
+      await saveQuote(20, finalPdfPath);
       setSaveState("saved");
+      setUploadedPdfPath(finalPdfPath);
+      setSelectedFile(null);
+      setFileStatus({ status: 'idle', message: '' });
+
       setTimeout(() => {
         setSaveState("idle");
       }, 5000);
@@ -654,6 +705,29 @@ const QuotationTable = () => {
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
                 <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+                <td colSpan="4" className="py-1 px-3 border text-left">
+                  <div className="flex items-center gap-4">
+                    <label htmlFor="pdf-upload" className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md text-xs flex items-center gap-2 hover:bg-blue-600 transition-colors">
+                      <FaUpload />
+                      <span>Choose File</span>
+                    </label>
+                    <input id="pdf-upload" type="file" className="hidden" accept="application/pdf" onChange={handleFileChange} />
+                    {fileStatus.message && (
+                      <span className={`text-xs font-semibold transition-all duration-300 ${fileStatus.status === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                        {fileStatus.message}
+                      </span>
+                    )}
+                    {!selectedFile && uploadedPdfPath && (
+                      <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                        <FaFilePdfIcon />
+                        View Uploaded PDF
+                      </a>
+                    )}
+                  </div>
+                </td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>

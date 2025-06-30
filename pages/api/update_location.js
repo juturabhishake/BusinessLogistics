@@ -6,7 +6,7 @@ const cors = Cors({
   methods: ["POST", "OPTIONS"],
 });
 
-const runMiddleware = (req, res, fn) =>
+const runMiddleware = (req, res, fn) => ///assets/files/exportADOCFCL
   new Promise((resolve, reject) => {
     fn(req, res, (result) => {
       if (result instanceof Error) {
