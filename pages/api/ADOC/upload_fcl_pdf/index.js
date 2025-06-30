@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// File Path: pages/api/ADOC/upload_fcl_pdf.js
+
 import { formidable } from 'formidable';
 import fs from 'fs';
 import path from 'path';
@@ -9,10 +10,11 @@ export const config = {
     bodyParser: false,
   },
 };
+const isVercel = process.env.VERCEL === '1';
 
-const uploadDir = path.join(process.cwd(), 'public', 'assets', 'files', 'exportADOCFCL');
-
-fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = isVercel
+  ? path.join('/tmp')
+  : path.join(process.cwd(), 'public', 'assets', 'files', 'exportADOCFCL');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -20,54 +22,53 @@ export default async function handler(req, res) {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
   const form = formidable({
     uploadDir: uploadDir,
     keepExtensions: true,
     maxFileSize: 10 * 1024 * 1024,
-    filename: (name, ext, part, form) => {
-        const uniqueSuffix = uuidv4();
-        const originalName = part.originalFilename.replace(/[^a-zA-Z0-9._-]/g, '_');
-        return `${uniqueSuffix}_${originalName}`;
-    }
+    filename: (name, ext, part) => {
+      const uniqueSuffix = uuidv4();
+      const sanitizedOriginalName = part.originalFilename.replace(/[^a-zA-Z0-9._-]/g, '_');
+      return `${uniqueSuffix}_${sanitizedOriginalName}`;
+    },
   });
 
-  form.parse(req, (err, fields, files) => {
+  form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error('Error parsing form:', err);
-      return res.status(500).json({ error: 'Error uploading file.', details: err.message });
+      console.error('Error parsing form data:', err);
+      return res.status(500).json({ error: 'Failed to parse form data.', details: err.message });
     }
-    
+
     const file = files.file?.[0];
-
     if (!file) {
-        return res.status(400).json({ error: 'No file uploaded.' });
-    }
-    console.log(file);
-    if (file.mimetype !== 'application/pdf') {
-        fs.unlink(file.filepath, (unlinkErr) => {
-            if (unlinkErr) console.error("Error deleting invalid file:", unlinkErr);
-        });
-        return res.status(400).json({ error: 'Invalid file type. Only PDF is allowed.' });
+      return res.status(400).json({ error: 'No file was uploaded.' });
     }
 
-    const oldFilePath = fields.oldFilePath?.[0];
-    if (oldFilePath) {
-      const fullOldPath = path.join(process.cwd(), 'public', oldFilePath);
-      
-      if (fs.existsSync(fullOldPath)) {
-        fs.unlink(fullOldPath, (unlinkErr) => {
-          if (unlinkErr) {
-            console.error(`Failed to delete old file: ${fullOldPath}`, unlinkErr);
-          } else {
-            console.log(`Successfully deleted old file: ${fullOldPath}`);
-          }
-        });
+    const oldFilePathUrl = fields.oldFilePath?.[0];
+    if (oldFilePathUrl) {
+      try {
+        const oldFilename = path.basename(oldFilePathUrl);
+        const oldFileServerPath = path.join(uploadDir, oldFilename);
+        if (fs.existsSync(oldFileServerPath)) {
+          fs.unlinkSync(oldFileServerPath);
+          console.log('Successfully deleted old file:', oldFileServerPath);
+        }
+      } catch (deleteError) {
+        console.error('Failed to delete old file:', deleteError.message);
       }
     }
-    
-    const serverRelativePath = path.join('/assets/files/exportADOCFCL', file.newFilename).replace(/\\/g, '/');
-    console.log(serverRelativePath);
 
-    res.status(200).json({ success: true, filePath: serverRelativePath });
+    if (file.mimetype !== 'application/pdf') {
+      fs.unlinkSync(file.filepath);
+      return res.status(400).json({ error: 'Invalid file type. Only PDF is allowed.' });
+    }
+    const publicPath = `/assets/files/exportADOCFCL/${file.newFilename}`;
+
+    console.log('File uploaded. Storing this path in DB:', publicPath);
+    res.status(200).json({ success: true, filePath: publicPath });
   });
 }

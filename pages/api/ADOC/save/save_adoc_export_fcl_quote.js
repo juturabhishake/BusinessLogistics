@@ -1,6 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 import Cors from "cors";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
+
 const prisma = new PrismaClient();
 const cors = Cors({
   methods: ["POST", "OPTIONS"],
