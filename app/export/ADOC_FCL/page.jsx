@@ -184,7 +184,7 @@ const QuotationTable = () => {
         updatedDestinationCharges[6][20] = data.result[0].D_LOC || "";
 
         setRemarks(data.result[0].remarks || "");
-        setUploadedPdfPath(data.result[0].uploaded_pdf_path || "");
+        setUploadedPdfPath(data.result[0].UploadedPDF || "");
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
@@ -305,40 +305,10 @@ const QuotationTable = () => {
   
     setSaveState("saving");
   
-    let finalPdfPath = uploadedPdfPath;
-
-    if (selectedFile) {
-      setIsUploading(true);
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      if (uploadedPdfPath) {
-        formData.append('oldFilePath', uploadedPdfPath);
-      }
-      try {
-        const response = await axios.post('/api/ADOC/upload_fcl_pdf', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        finalPdfPath = response.data.filePath;
-        setIsUploading(false);
-        console.log("File uploaded successfully:", finalPdfPath);
-      } catch (error) {
-        console.error("File upload failed:", error);
-        alert("File upload failed. Please try again.");
-        setSaveState("idle");
-        setIsUploading(false);
-        return;
-      }
-    }
-
     try {
-      await saveQuote(20, finalPdfPath);
+      await saveQuote(20);
+  
       setSaveState("saved");
-      setUploadedPdfPath(finalPdfPath);
-      setSelectedFile(null);
-      setFileStatus({ status: 'idle', message: '' });
-
       setTimeout(() => {
         setSaveState("idle");
       }, 5000);
@@ -711,12 +681,12 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">
-                  <div className="flex items-center gap-4">
+                  {/* <div className="flex items-center gap-4">
                     <label htmlFor="pdf-upload" className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md text-xs flex items-center gap-2 hover:bg-blue-600 transition-colors">
                       <FaUpload />
                       <span>Choose File</span>
                     </label>
-                    <input id="pdf-upload" type="file" className="hidden" accept="application/pdf" onChange={handleFileChange} />
+                    <input hidden id="pdf-upload" type="file" className="hidden" accept="application/pdf" onChange={handleFileChange} />
                     {fileStatus.message && (
                       <span className={`text-xs font-semibold transition-all duration-300 ${fileStatus.status === 'success' ? 'text-green-500' : 'text-red-500'}`}>
                         {fileStatus.message}
@@ -728,7 +698,14 @@ const QuotationTable = () => {
                         View Uploaded PDF
                       </a>
                     )}
-                  </div>
+                  </div> */}
+                  {uploadedPdfPath ? 
+                  <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                        <FaFilePdfIcon />
+                        {uploadedPdfPath.split('/').pop()}
+                      </a>
+                  :<span>No PDF Uploaded</span>
+                  }
                 </td>
               </tr>
               <tr>

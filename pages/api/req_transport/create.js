@@ -46,6 +46,7 @@ export default async function handler(req, res) {
     Pref_Liners,
     Avg_Cont_Per_Mnth,
     Remarks,
+    uploadedPdf,
     createdBy,
   } = req.body;
 
@@ -76,6 +77,7 @@ export default async function handler(req, res) {
     Pref_Liners: Pref_Liners || null,
     Avg_Cont_Per_Mnth: Avg_Cont_Per_Mnth || null,
     Remarks: Remarks || null,
+    UploadedPDF: uploadedPdf || null,
     Created_By: createdBy || "Unknown",
   };
 
@@ -94,3 +96,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Failed to save the request", details: error.message });
   }
 }
+

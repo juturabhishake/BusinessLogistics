@@ -63,7 +63,8 @@ const TransportRequestsTable = () => {
     "Preferred Liners": "Pref_Liners",
     "Avg. Containers/Month": "Avg_Cont_Per_Mnth",
     "Remarks": "Remarks",
-    "Created By": "Created_By"
+    "Created By": "Created_By",
+    "uploadedPdf": "UploadedPDF",
   };
 
   const handleSort = (column) => {
@@ -248,7 +249,26 @@ const TransportRequestsTable = () => {
                         </td>
                         {Object.values(columnKeyMap).map((key) => (
                           <td key={key} className="px-4 py-2 border">
-                            {key === 'Request_Date' ? new Date(item[key]).toLocaleDateString('en-GB') : item[key]}
+                            {(() => {
+                              const value = item[key];
+                              if (key === 'Request_Date') {
+                                return value ? new Date(value).toLocaleDateString('en-GB') : 'N/A';
+                              }
+                              if (key === 'UploadedPDF' && value) {
+                                const fileName = value.split('/').pop();
+                                return (
+                                  <a 
+                                    href={value} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="text-blue-500 hover:underline"
+                                  >
+                                    {fileName}
+                                  </a>
+                                );
+                              }
+                              return value ?? 'N/A';
+                            })()}
                           </td>
                         ))}
                       </tr>

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, Loader2, Info, ArrowRight } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, Loader2, Info, ArrowRight, FileUp, XCircle } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -58,12 +58,18 @@ export default function PremiumTransportFormFixed() {
   const [error, setError] = React.useState(null);
   const [isAdmin, setIsAdmin] = React.useState(false);
 
+  const [selectedFile, setSelectedFile] = React.useState(null);
+  const [fileStatus, setFileStatus] = React.useState('idle');
+  const [fileError, setFileError] = React.useState('');
+  const fileInputRef = React.useRef(null);
+
+
   React.useEffect(() => {
-      const check_sc = secureLocalStorage.getItem("sc");
-      setIsAdmin(check_sc === 'admin');
-      if (check_sc !== 'admin') {
-        window.location.href = "/";
-      }
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    if (check_sc !== 'admin') {
+      window.location.href = "/";
+    }
   }, []);
 
   React.useEffect(() => {
@@ -93,6 +99,31 @@ export default function PremiumTransportFormFixed() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setFileError('');
+    setError(null);
+
+    if (file.type !== 'application/pdf') {
+      setFileError('Invalid file type. Only PDF is allowed.');
+      setFileStatus('error');
+      setSelectedFile(null);
+      return;
+    }
+
+    if (file.size > 1.5 * 1024 * 1024) {
+      setFileError('File is too large. Maximum size is 1.5MB.');
+      setFileStatus('error');
+      setSelectedFile(null);
+      return;
+    }
+
+    setSelectedFile(file);
+    setFileStatus('success');
+  };
+
   const transportTypeOptions = React.useMemo(() => [...new Set(apiData.map(item => item.transport_types))], [apiData]);
   const shipmentTypeOptions = React.useMemo(() => !transportType ? [] : [...new Set(apiData.filter(item => item.transport_types === transportType).map(item => item.Shipment_types))], [apiData, transportType]);
   const containerSizeOptions = React.useMemo(() => {
@@ -110,6 +141,12 @@ export default function PremiumTransportFormFixed() {
     setFromLocation(null);
     setToLocation(null);
     setFormData(initialFormData);
+    setSelectedFile(null);
+    setFileStatus('idle');
+    setFileError('');
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
     setIsSaved(false);
     setError(null);
   };
@@ -119,32 +156,56 @@ export default function PremiumTransportFormFixed() {
     setIsSaved(false);
     setError(null);
 
+    if (!selectedFile || fileStatus !== 'success') {
+      setError("Please upload a valid PDF document.");
+      setFileStatus('error');
+      setIsSaving(false);
+      return;
+    }
+
     const finalFrom = transportType === 'export' ? { Location_Code: 'GTI_NAIDUPETA', Location: STATIC_LOCATION_VALUE } : fromLocation;
     const finalTo = transportType === 'import' ? { Location_Code: 'GTI_NAIDUPETA', Location: STATIC_LOCATION_VALUE } : toLocation;
-    
-    const payload = {
-      requestDate: format(selectedDate, 'yyyy-MM-dd'),
-      transportType,
-      shipmentType,
-      containerSize,
-      weight: parseFloat(weight) || 0,
-      fromLocation: finalFrom,
-      toLocation: finalTo,
-      ...formData,
-      createdBy,
-    };
 
     try {
+      const fileFormData = new FormData();
+      fileFormData.append('file', selectedFile);
+      fileFormData.append('requestDate', format(selectedDate, 'yyyy-MM-dd'));
+      fileFormData.append('transportType', transportType);
+      fileFormData.append('shipmentType', shipmentType);
+      fileFormData.append('containerSize', containerSize);
+      fileFormData.append('fromLocation', finalFrom?.Location || 'N/A');
+      fileFormData.append('toLocation', finalTo?.Location || 'N/A');
+
+      const uploadResponse = await fetch('/api/req_transport/upload', {
+        method: 'POST',
+        body: fileFormData,
+      });
+
+      const uploadResult = await uploadResponse.json();
+      if (!uploadResponse.ok) {
+        throw new Error(uploadResult.error || 'File upload failed');
+      }
+      
+      const payload = {
+        requestDate: format(selectedDate, 'yyyy-MM-dd'),
+        transportType,
+        shipmentType,
+        containerSize,
+        weight: parseFloat(weight) || 0,
+        fromLocation: finalFrom,
+        toLocation: finalTo,
+        ...formData,
+        uploadedPdf: uploadResult.filePath,
+        createdBy,
+      };
+
       const response = await fetch('/api/req_transport/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       const result = await response.json();
-
       if (!response.ok) {
         throw new Error(result.error || `Error: ${response.statusText}`);
       }
@@ -154,8 +215,10 @@ export default function PremiumTransportFormFixed() {
         setIsSaved(false);
         handleReset();
       }, 3000);
+
     } catch (err) {
       setError(err.message);
+      setFileStatus('error');
     } finally {
       setIsSaving(false);
     }
@@ -163,7 +226,8 @@ export default function PremiumTransportFormFixed() {
 
   const allSelectionsComplete = !!selectedDate && !!transportType && !!shipmentType && !!containerSize && !!weight;
   const locationIsSelected = transportType === 'import' ? !!fromLocation : transportType === 'export' ? !!toLocation : false;
-  const allFieldsComplete = allSelectionsComplete && locationIsSelected;
+  const fileIsSelected = fileStatus === 'success';
+  const allFieldsComplete = allSelectionsComplete && locationIsSelected && fileIsSelected;
 
   return (
     <TooltipProvider>
@@ -182,19 +246,14 @@ export default function PremiumTransportFormFixed() {
                     <Label htmlFor="requestDate">Request Date</Label>
                     <div className="relative">
                       <Input
-                        id="requestDate"
-                        type="date"
+                        id="requestDate" type="date"
                         value={selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''}
                         onChange={(e) => {
                             const dateValue = e.target.value;
                             const date = dateValue ? new Date(dateValue + 'T00:00:00') : null;
                             setSelectedDate(date);
-                            setTransportType('');
-                            setShipmentType('');
-                            setContainerSize('');
-                            setWeight('');
-                            setFromLocation(null);
-                            setToLocation(null);
+                            setTransportType(''); setShipmentType(''); setContainerSize(''); setWeight('');
+                            setFromLocation(null); setToLocation(null);
                         }}
                         className="w-full pr-8"
                       />
@@ -220,13 +279,8 @@ export default function PremiumTransportFormFixed() {
                               {transportTypeOptions.map((type) => (
                                 <CommandItem key={type} value={type} onSelect={(currentValue) => {
                                   const newType = currentValue === transportType ? '' : currentValue;
-                                  setTransportType(newType);
-                                  setShipmentType('');
-                                  setContainerSize('');
-                                  setWeight('');
-                                  setFromLocation(null);
-                                  setToLocation(null);
-                                  setTransportOpen(false);
+                                  setTransportType(newType); setShipmentType(''); setContainerSize(''); setWeight('');
+                                  setFromLocation(null); setToLocation(null); setTransportOpen(false);
                                 }}>
                                   <Check className={cn("mr-2 h-4 w-4", transportType === type ? "opacity-100" : "opacity-0")} />
                                   {type}
@@ -257,9 +311,7 @@ export default function PremiumTransportFormFixed() {
                               {shipmentTypeOptions.map((type) => (
                                 <CommandItem key={type} value={type} onSelect={(currentValue) => {
                                   setShipmentType(currentValue === shipmentType ? '' : currentValue);
-                                  setContainerSize('');
-                                  setWeight('');
-                                  setShipmentOpen(false);
+                                  setContainerSize(''); setWeight(''); setShipmentOpen(false);
                                 }}>
                                   <Check className={cn("mr-2 h-4 w-4", shipmentType === type ? "opacity-100" : "opacity-0")} />
                                   {type}
@@ -305,136 +357,120 @@ export default function PremiumTransportFormFixed() {
 
                   <div className="space-y-2">
                     <Label htmlFor="weight">Weight (KG)</Label>
-                    <Input
-                      id="weight"
-                      type="number"
-                      value={weight}
-                      onChange={(e) => setWeight(e.target.value)}
-                      placeholder="e.g., 22000.50"
-                      disabled={!containerSize}
-                      autoComplete="off"
-                      step="0.01"
-                    />
+                    <Input id="weight" type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="e.g., 22000.50" disabled={!containerSize} autoComplete="off" step="0.01" />
                   </div>
-
                 </div>
               </div>
 
-              {containerSize && (
+              {allSelectionsComplete && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 border-b pb-2">Location Details</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                    <div className="space-y-2">
-                      <Label>From</Label>
-                      {transportType === 'import' ? (
-                        <Popover open={locationOpen} onOpenChange={setLocationOpen}>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" role="combobox" className="w-full justify-between">
-                              <span className="truncate">{fromLocation?.Location || "Select location..."}</span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <h3 className="text-lg font-semibold mb-4 border-b pb-2">Location & Document</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_2fr] gap-4 items-center">
+                        <div className="space-y-2 self-end">
+                          <Label>From</Label>
+                          {transportType === 'import' ? (
+                            <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" role="combobox" className="w-full justify-between">
+                                  <span className="truncate">{fromLocation?.Location || "Select location..."}</span>
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                <Command>
+                                  <CommandInput placeholder="Search location..." />
+                                  <CommandList>
+                                    <CommandEmpty>No location found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {locations.map((location) => (
+                                        <CommandItem key={location.Location_Code} value={location.Location} onSelect={() => { setFromLocation(location); setLocationOpen(false); }}>
+                                          <Check className={cn("mr-2 h-4 w-4", fromLocation?.Location_Code === location.Location_Code ? "opacity-100" : "opacity-0")} />
+                                          {location.Location}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          ) : ( <Input value={STATIC_LOCATION_VALUE} disabled className="bg-muted" /> )}
+                        </div>
+
+                        <div className="self-end pb-2"><ArrowRight className="w-5 h-5 text-muted-foreground" /></div>
+                        
+                        <div className="space-y-2 self-end">
+                            <Label>To</Label>
+                            {transportType === 'export' ? (
+                                <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" role="combobox" className="w-full justify-between">
+                                    <span className="truncate">{toLocation?.Location || "Select location..."}</span>
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                    <Command>
+                                    <CommandInput placeholder="Search location..." />
+                                    <CommandList>
+                                        <CommandEmpty>No location found.</CommandEmpty>
+                                        <CommandGroup>
+                                        {locations.map((location) => (
+                                            <CommandItem key={location.Location_Code} value={location.Location} onSelect={() => { setToLocation(location); setLocationOpen(false); }}>
+                                            <Check className={cn("mr-2 h-4 w-4", toLocation?.Location_Code === location.Location_Code ? "opacity-100" : "opacity-0")} />
+                                            {location.Location}
+                                            </CommandItem>
+                                        ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                                </Popover>
+                            ) : ( <Input value={STATIC_LOCATION_VALUE} disabled className="bg-muted" /> )}
+                        </div>
+
+                        <div className="space-y-2 self-end">
+                            <Label htmlFor="pdfUpload">Upload Document (PDF, Max 1.5MB)</Label>
+                            <Input id="pdfUpload" type="file" accept=".pdf" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                            <Button variant="outline" onClick={() => fileInputRef.current?.click()} className={cn("w-full justify-start text-left font-normal", fileStatus === 'error' && "border-destructive text-destructive animate-shake", fileStatus === 'success' && "border-green-500 text-green-600")}>
+                                {fileStatus === 'success' && <Check className="mr-2 h-4 w-4" />}
+                                {fileStatus === 'error' && <XCircle className="mr-2 h-4 w-4" />}
+                                {fileStatus === 'idle' && <FileUp className="mr-2 h-4 w-4" />}
+                                <span className="truncate">{selectedFile?.name || 'Click to upload PDF'}</span>
                             </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                            <Command>
-                              <CommandInput placeholder="Search location..." />
-                              <CommandList>
-                                <CommandEmpty>No location found.</CommandEmpty>
-                                <CommandGroup>
-                                  {locations.map((location) => (
-                                    <CommandItem key={location.Location_Code} value={location.Location} onSelect={() => { setFromLocation(location); setLocationOpen(false); }}>
-                                      <Check className={cn("mr-2 h-4 w-4", fromLocation?.Location_Code === location.Location_Code ? "opacity-100" : "opacity-0")} />
-                                      {location.Location}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      ) : (
-                        <Input value={STATIC_LOCATION_VALUE} disabled className="bg-muted" />
-                      )}
+                            {fileError && <p className="text-xs text-destructive mt-1">{fileError}</p>}
+                        </div>
                     </div>
-                    <div className="self-end pb-2"><ArrowRight className="w-5 h-5 text-muted-foreground" /></div>
-                    <div className="space-y-2">
-                      <Label>To</Label>
-                      {transportType === 'export' ? (
-                        <Popover open={locationOpen} onOpenChange={setLocationOpen}>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" role="combobox" className="w-full justify-between">
-                              <span className="truncate">{toLocation?.Location || "Select location..."}</span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                            <Command>
-                              <CommandInput placeholder="Search location..." />
-                              <CommandList>
-                                <CommandEmpty>No location found.</CommandEmpty>
-                                <CommandGroup>
-                                  {locations.map((location) => (
-                                    <CommandItem key={location.Location_Code} value={location.Location} onSelect={() => { setToLocation(location); setLocationOpen(false); }}>
-                                      <Check className={cn("mr-2 h-4 w-4", toLocation?.Location_Code === location.Location_Code ? "opacity-100" : "opacity-0")} />
-                                      {location.Location}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      ) : (
-                        <Input value={STATIC_LOCATION_VALUE} disabled className="bg-muted" />
-                      )}
-                    </div>
-                  </div>
                 </div>
               )}
 
               <div>
                 <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center">
                   <span>Transport Details</span>
-                  {!allSelectionsComplete && (
+                  {!allSelectionsComplete || !locationIsSelected && (
                     <Tooltip>
                       <TooltipTrigger asChild><Info className="h-4 w-4 ml-2 text-muted-foreground" /></TooltipTrigger>
                       <TooltipContent><p>Complete all request selections to enable.</p></TooltipContent>
                     </Tooltip>
                   )}
                 </h3>
-                <fieldset disabled={!allFieldsComplete} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 disabled:opacity-40 transition-opacity">
+                <fieldset disabled={!allSelectionsComplete || !locationIsSelected} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 disabled:opacity-40 transition-opacity">
                   {[
-                    { id: 'Commodity', label: 'Commodity', placeholder: 'e.g., Turbo charger and Engine components/No Commodity' },
-                    { id: 'HSN_Code', label: 'HSN Code', placeholder: 'e.g., 851712' },
-                    { id: 'Incoterms', label: 'Incoterms', placeholder: 'e.g., DAP' },
-                    { id: 'USD', label: 'USD', placeholder: 'e.g., In Indian Rupees' },
-                    { id: 'EURO', label: 'EURO', placeholder: 'e.g., In Indian Rupees' },
-                    { id: 'Transit_Days', label: 'Transit Days', placeholder: 'e.g., 42' },
-                    { id: 'Dest_Port', label: 'Destination Port', placeholder: 'e.g., Antwerp' },
-                    { id: 'Free_Days', label: 'Free Days', placeholder: 'e.g., 14' },
-                    { id: 'Pref_Vessel', label: 'Preferred Vessel', placeholder: 'e.g., Direct Vessel' },
-                    { id: 'Pref_Service', label: 'Preferred Service', placeholder: 'e.g., Truck' },
-                    { id: 'Pref_Liners', label: 'Preferred Liners', placeholder: 'e.g., All direct vessel liners preferable' },
-                    { id: 'Avg_Cont_Per_Mnth', label: 'Avg Containers/Month', placeholder: 'e.g., 10' }
+                    { id: 'Commodity', label: 'Commodity', placeholder: 'e.g., Turbo charger and Engine components' }, { id: 'HSN_Code', label: 'HSN Code', placeholder: 'e.g., 851712' },
+                    { id: 'Incoterms', label: 'Incoterms', placeholder: 'e.g., DAP' }, { id: 'USD', label: 'USD', placeholder: 'e.g., In Indian Rupees' },
+                    { id: 'EURO', label: 'EURO', placeholder: 'e.g., In Indian Rupees' }, { id: 'Transit_Days', label: 'Transit Days', placeholder: 'e.g., 42' },
+                    { id: 'Dest_Port', label: 'Destination Port', placeholder: 'e.g., Antwerp' }, { id: 'Free_Days', label: 'Free Days', placeholder: 'e.g., 14' },
+                    { id: 'Pref_Vessel', label: 'Preferred Vessel', placeholder: 'e.g., Direct Vessel' }, { id: 'Pref_Service', label: 'Preferred Service', placeholder: 'e.g., Truck' },
+                    { id: 'Pref_Liners', label: 'Preferred Liners', placeholder: 'e.g., All direct vessel liners' }, { id: 'Avg_Cont_Per_Mnth', label: 'Avg Containers/Month', placeholder: 'e.g., 10' }
                   ].map(input => (
                     <div className="space-y-2" key={input.id}>
                       <Label htmlFor={input.id}>{input.label}</Label>
                       <Input id={input.id} name={input.id} value={formData[input.id]} onChange={handleInputChange} placeholder={input.placeholder} autoComplete="off" />
                     </div>
                   ))}
-                  
                   <div className="space-y-2 sm:col-span-2 lg:col-span-3">
                     <Label htmlFor="Remarks">Remarks</Label>
-                    <Textarea
-                      id="Remarks"
-                      name="Remarks"
-                      value={formData.Remarks}
-                      onChange={handleInputChange}
-                      placeholder="Add any additional comments or instructions here..."
-                      rows={3}
-                      autoComplete="off"
-                    />
+                    <Textarea id="Remarks" name="Remarks" value={formData.Remarks} onChange={handleInputChange} placeholder="Add any additional comments or instructions here..." rows={3} autoComplete="off" />
                   </div>
-
                 </fieldset>
               </div>
             </div>
