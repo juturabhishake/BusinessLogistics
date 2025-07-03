@@ -28,7 +28,8 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: "Location code is required" });
     }
   try {
-    const result = await prisma.$queryRaw`EXEC [dbo].[GET_Locations_Type] ${RFQType}`;
+    // const result = await prisma.$queryRaw`EXEC [dbo].[GET_Locations_Type] ${RFQType}`;
+    const result = await prisma.$queryRaw`select * from get_req_locations(${RFQType});`;
 
     return res.status(200).json({ result });
   } catch (error) {

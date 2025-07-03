@@ -135,7 +135,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCL',sc: secureLocalStorage.getItem("sc") }),
+          body: JSON.stringify({ RFQType: 'import' }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -143,7 +143,6 @@ const QuotationTable = () => {
         console.error("Error fetching locations:", error);
       }
     };
-
     fetchLocations();
   }, []);
 

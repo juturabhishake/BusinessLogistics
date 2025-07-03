@@ -128,7 +128,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'LCLImport' }),
+          body: JSON.stringify({ RFQType: 'import' }),
         });
         const data = await response.json();
         setLocations(data.result);

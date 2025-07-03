@@ -100,7 +100,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCL',sc: secureLocalStorage.getItem("sc") }),
+          body: JSON.stringify({ RFQType: 'export' }),
         });
         const data = await response.json();
         setLocations(data.result);

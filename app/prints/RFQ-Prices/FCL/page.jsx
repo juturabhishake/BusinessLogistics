@@ -115,12 +115,12 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_vendors' , {
+        const response = await fetch('/api/get_locations' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCLImport',sc: secureLocalStorage.getItem("sc") }),
+          body: JSON.stringify({ RFQType: 'import' }),
         });
         const data = await response.json();
         setLocations(data.result);
