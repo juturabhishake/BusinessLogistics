@@ -95,7 +95,7 @@ const QuotationTable = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'export' }),
+          body: JSON.stringify({ RFQType: 'FCL', sc: secureLocalStorage.getItem("sc") || "Unknown Supplier" }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -378,12 +378,13 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
-      const response = await fetch('/api/GET_Supplier_LOC_details_new', {
+      const response = await fetch('/api/GET_Supplier_LOC_details', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Loc_Code: locCode, Transport_Type: "export", Shipment_Type: "FCL" }),
+        // body: JSON.stringify({ Loc_Code: locCode, Transport_Type: "export", Shipment_Type: "FCL" }),
+        body: JSON.stringify({ Loc_Code: locCode }),
       });
       const data = await response.json();
       if (data.result && data.result.length > 0) {
@@ -397,8 +398,8 @@ const QuotationTable = () => {
         setPref_Liners(data.result[0].Pref_Liners);
         setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
         setHSN_Code(data.result[0].HSN_Code);
-        setUSD(parseFloat(data.result[0].USD || 0));
-        setEUR(parseFloat(data.result[0].EURO || 0));
+        // setUSD(parseFloat(data.result[0].USD || 0));
+        // setEUR(parseFloat(data.result[0].EURO || 0));
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -422,6 +423,7 @@ const QuotationTable = () => {
       setHSN_Code("");
       setUSD(0);
       setEUR(0);
+      setRemarks("");
     }
   }, [selectedLocation]);
 
@@ -642,7 +644,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 11}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border"> {currency} / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -697,7 +699,7 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
                 <td colSpan="4" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
-              {locationName && (
+              {/* {locationName && (
                 <tr>
                 {currency === "USD" ? (
                   <>
@@ -712,7 +714,14 @@ const QuotationTable = () => {
                 )
               }
               </tr>
-              )}
+              )} */}
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">FX Rate</td>
+                <td className="py-1 px-3 border">USD</td>
+                <td className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td>
+                <td className="py-1 px-3 border">EURO</td>
+                <td className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
+              </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{transitDays}</td>

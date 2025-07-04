@@ -131,12 +131,12 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations' , {
+        const response = await fetch('/api/get_locations_venders' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'export' }),
+          body: JSON.stringify({ RFQType: 'FCL', sc: secureLocalStorage.getItem("sc") || "Unknown Supplier" }),
         });
         const data = await response.json();
         setLocations(data.result);
