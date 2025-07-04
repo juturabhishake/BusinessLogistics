@@ -90,7 +90,7 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_vendors' , {
+        const response = await fetch('/api/get_locations' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -421,8 +421,8 @@ const QuotationTable = () => {
       setPref_Liners("");
       setAvg_Cont_Per_Mnth("");
       setHSN_Code("");
-      setUSD(0);
-      setEUR(0);
+      // setUSD(0);
+      // setEUR(0);
       setRemarks("");
     }
   }, [selectedLocation]);
