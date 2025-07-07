@@ -76,6 +76,9 @@ const QuotationTable = () => {
   const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
+  const [uploadedPdfPath, setUploadedPdfPath] = useState('');
+  const [weight, setWeight] = useState("");
+  const [containerSize, setContainerSize] = useState("N/A");
 
   useEffect(() => {
     let flag = false
@@ -91,12 +94,12 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations' , {
+        const response = await fetch('/api/get_locations_Adhoc_Air' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCL',sc: secureLocalStorage.getItem("sc") }),
+          body: JSON.stringify({ Shipment_Type: 'Air',Transport_Type: 'export'   }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -114,8 +117,9 @@ const QuotationTable = () => {
         const response = await fetch('/api/get_currency');
         const data = await response.json();
         if (data.result && data.result.length > 0) {
-          setUSD(parseFloat(data.result[0].USD));
-          setEUR(parseFloat(data.result[0].EURO));
+          // setUSD(parseFloat(data.result[0].USD));
+          // setEUR(parseFloat(data.result[0].EURO));
+          console.log("OLD API USD and EURO values:", USD, EUR);
         }
       } catch (error) {
         console.error("Error fetching currency:", error);
@@ -341,7 +345,7 @@ const QuotationTable = () => {
   const calculateShipUSDTotal = (charges) => {
     return charges.reduce(
       (acc, charge) => {       
-        acc[20] += parseFloat(charge[20]*USD || 0);
+        acc[20] += parseFloat((charge[20]*(currency === "EURO" ? EUR : USD))*weight || 0);
         // acc[40] += parseFloat(charge[40]*USD || 0);
         return acc;
       },
@@ -349,22 +353,49 @@ const QuotationTable = () => {
     );
   };
 
-  const totalOrigin = calculateTotal(originCharges);
-  const totalSeaFreight = calculateTotal(seaFreightCharges);
-  const totalDestination = calculateUSDTotal(destinationCharges);
+  const totalOrigin = calculateUSDTotal(originCharges);
+  const totalSeaFreight = calculateShipUSDTotal(seaFreightCharges);
+  const totalDestination = calculateTotal(destinationCharges);
 
   const totalShipmentCost = {
     20: (totalOrigin[20] + totalSeaFreight[20] + totalDestination[20]).toFixed(2),
     // 40: (totalOrigin[40] + totalSeaFreight[40] + totalDestination[40]).toFixed(2),
   };
+  // const fetchSupplierDetails = async (locCode) => {
+  //   try {
+  //     const response = await fetch('/api/GET_Supplier_LOC_details', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ Loc_Code: locCode }),
+  //     });
+  //     const data = await response.json();
+  //     if (data.result && data.result.length > 0) {
+  //       setIncoterms(data.result[0].Incoterms);
+  //       setTransitDays(data.result[0].Transit_Days);
+  //       setCommodity(data.result[0].Commodity);
+  //       setDeliveryAddress(data.result[0].Delivery_Address);
+  //       setDest_Port(data.result[0].Dest_Port);
+  //       setCurrency(data.result[0].Currency);
+  //       setFree_Days(data.result[0].Free_Days);
+  //       setPref_Liners(data.result[0].Pref_Liners);
+  //       setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
+  //       setHSN_Code(data.result[0].HSN_Code);
+  //       console.log("Supplier details fetched successfully:", data.result[0]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching supplier details:", error);
+  //   }
+  // };
   const fetchSupplierDetails = async (locCode) => {
     try {
-      const response = await fetch('/api/GET_Supplier_LOC_details', {
+      const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Loc_Code: locCode }),
+        body: JSON.stringify({ Shipment_Type: 'Air',Transport_Type: 'export',Loc_Code: locCode }),
       });
       const data = await response.json();
       if (data.result && data.result.length > 0) {
@@ -378,6 +409,12 @@ const QuotationTable = () => {
         setPref_Liners(data.result[0].Pref_Liners);
         setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
         setHSN_Code(data.result[0].HSN_Code);
+        setRemarks(data.result[0].Remarks || "");
+        setUSD(parseFloat(data.result[0].USD));
+        setEUR(parseFloat(data.result[0].EURO));
+        setContainerSize(data.result[0].Container_Size || "N/A");
+        setUploadedPdfPath(data.result[0].UploadedPDF || "");
+        setWeight(parseFloat(data.result[0].Weight) || "");
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -386,6 +423,22 @@ const QuotationTable = () => {
   };
 
   useEffect(() => {
+    setIncoterms("");
+      setTransitDays("");
+      setCommodity("");
+      setDeliveryAddress("");
+      setDest_Port("");
+      setCurrency("");
+      setFree_Days("");
+      setPref_Liners("");
+      setAvg_Cont_Per_Mnth("");
+      setHSN_Code("");
+      setUSD(0);
+      setEUR(0);
+      setRemarks("");
+      setContainerSize('N/A');
+      setUploadedPdfPath('');
+      setWeight("");
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
       fetchQuotationData(selectedLocation);
@@ -468,13 +521,13 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Mode of Transport : Air</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">Air shipment</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">
@@ -497,7 +550,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">INR / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -543,7 +596,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 6}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">INR / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Per KG</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -587,7 +640,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 12}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">{currency} / Shipment</td>
+                    <td className="py-1 px-3 border">INR / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -650,7 +703,7 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs : </td>
-                <td colSpan="4" className="py-1 px-3 border text-left"></td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{weight}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Total Cost :</td>

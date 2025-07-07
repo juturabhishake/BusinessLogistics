@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     const { Month,Year } = req.body;
     console.log('Curr Month:', Month);  
     if (!Month) {
-        return res.status(400).json({ message: "Location code is required" });
+        return res.status(400).json({ message: "Location code is required" }); 
     }
   try {
     const result = await prisma.$queryRaw`EXEC [dbo].[Get_Currency_MonthYear] ${Month},${Year}`;

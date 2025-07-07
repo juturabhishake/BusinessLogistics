@@ -80,6 +80,7 @@ const QuotationTable = () => {
   const [fileStatus, setFileStatus] = useState({ status: 'idle', message: '' });
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [containerSize, setContainerSize] = useState("N/A");
 
   useEffect(() => {
     let flag = false
@@ -401,8 +402,9 @@ const QuotationTable = () => {
         setHSN_Code(data.result[0].HSN_Code);
         setRemarks(data.result[0].Remarks || "");
         setUSD(parseFloat(data.result[0].USD));
-          setEUR(parseFloat(data.result[0].EURO));
-          setUploadedPdfPath(data.result[0].UploadedPDF || "");
+        setEUR(parseFloat(data.result[0].EURO));
+        setUploadedPdfPath(data.result[0].UploadedPDF || "");
+        setContainerSize(data.result[0].Container_Size || "N/A");
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -411,6 +413,22 @@ const QuotationTable = () => {
   };
 
   useEffect(() => {
+    setIncoterms("");
+      setTransitDays("");
+      setCommodity("");
+      setDeliveryAddress("");
+      setDest_Port("");
+      setCurrency("");
+      setFree_Days("");
+      setPref_Liners("");
+      setAvg_Cont_Per_Mnth("");
+      setHSN_Code("");
+      setUSD(0);
+      setEUR(0);
+      setRemarks("");
+      setContainerSize("N/A");
+      setUploadedPdfPath('');
+      // setWeight("");
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
       fetchQuotationData(selectedLocation);
@@ -493,13 +511,13 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight Export ADOC FCL</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">Airshipment</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">
