@@ -95,12 +95,12 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations' , {
+        const response = await fetch('/api/get_locations_Adhoc_Air' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'export' }),
+          body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export'   }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -112,22 +112,22 @@ const QuotationTable = () => {
     fetchLocations();
   }, []);
 
-  useEffect(() => {
-    const fetchCurrency = async () => {
-      try {
-        const response = await fetch('/api/get_currency');
-        const data = await response.json();
-        if (data.result && data.result.length > 0) {
-          setUSD(parseFloat(data.result[0].USD));
-          setEUR(parseFloat(data.result[0].EURO));
-        }
-      } catch (error) {
-        console.error("Error fetching currency:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCurrency = async () => {
+  //     try {
+  //       const response = await fetch('/api/get_currency');
+  //       const data = await response.json();
+  //       if (data.result && data.result.length > 0) {
+  //         setUSD(parseFloat(data.result[0].USD));
+  //         setEUR(parseFloat(data.result[0].EURO));
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching currency:", error);
+  //     }
+  //   };
 
-    fetchCurrency();
-  }, []);
+  //   fetchCurrency();
+  // }, []);
 
   useEffect(() => {
     const currentDate = new Date();
@@ -183,8 +183,8 @@ const QuotationTable = () => {
         updatedDestinationCharges[5][20] = data.result[0].D_TDO || "";
         updatedDestinationCharges[6][20] = data.result[0].D_LOC || "";
 
-        setRemarks(data.result[0].remarks || "");
-        setUploadedPdfPath(data.result[0].UploadedPDF || "");
+        
+        
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
@@ -193,8 +193,8 @@ const QuotationTable = () => {
         setOriginCharges(originCharges.map((item) => ({ ...item, 20: "" })));
         setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, 20: "" })));
         setDestinationCharges(destinationCharges.map((item) => ({ ...item, 20: "" })));
-        setRemarks("");
-        setUploadedPdfPath("");
+        
+        s
       }
     } catch (error) {
       console.error("Error fetching quotation data:", error);
@@ -380,12 +380,12 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
-      const response = await fetch('/api/GET_Supplier_LOC_details', {
+      const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Loc_Code: locCode }),
+        body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode }),
       });
       const data = await response.json();
       if (data.result && data.result.length > 0) {
@@ -399,6 +399,10 @@ const QuotationTable = () => {
         setPref_Liners(data.result[0].Pref_Liners);
         setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
         setHSN_Code(data.result[0].HSN_Code);
+        setRemarks(data.result[0].Remarks || "");
+        setUSD(parseFloat(data.result[0].USD));
+          setEUR(parseFloat(data.result[0].EURO));
+          setUploadedPdfPath(data.result[0].UploadedPDF || "");
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -716,7 +720,7 @@ const QuotationTable = () => {
                         placeholder="..."                       
                         className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
                         value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
+                        
                       />
                 </td>
               </tr>

@@ -33,30 +33,30 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Pickup", 20: "", remarks: "Per Container" },
-    { description: "Custom Clearance", 20: "", remarks: "Per Container" },
-    { description: "Handling / DO/ ", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charge", 20: "", remarks: "Per BL" },
-    { description: "Documentation ", 20: "", remarks: "Per Container" },
+    { description: "Pickup", 20: "", remarks: "" },
+    { description: "Custom Clearance", 20: "", remarks: "" },
+    { description: "Handling / DO/ ", 20: "", remarks: "" },
+    { description: "Terminal Handling Charge", 20: "", remarks: "" },
+    { description: "Documentation ", 20: "", remarks: "" },
   ]);
   
   const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "AIR freight", 20: "", remarks: "Per Container" },
-    { description: "FSC (Fuel Surcharges)", 20: "", remarks: "Per BL" },
-    { description: "SSC (Security Sucharge)", 20: "", remarks: "Per Container" },
-    { description: "ISS Surcharge", 20: "", remarks: "Per Container" },
-    { description: "X-Ray", 20: "", remarks: "Per Container" },
-    { description: "AAI CHARGES", 20: "", remarks: "Per Container" },
+    { description: "AIR freight", 20: "", remarks: "" },
+    { description: "FSC (Fuel Surcharges)", 20: "", remarks: "" },
+    { description: "SSC (Security Sucharge)", 20: "", remarks: "" },
+    { description: "ISS Surcharge", 20: "", remarks: "" },
+    { description: "X-Ray", 20: "", remarks: "" },
+    { description: "AAI CHARGES", 20: "", remarks: "" },
   ]);
   
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Customs Clearence", 20: "", remarks: "Per Container" },
-    { description: "CC Fee", 20: "", remarks: "Per BL" },
-    { description: "D.O Charges", 20: "", remarks: "Per Container" },
-    { description: "LINER CHARGES", 20: "", remarks: "Per Container" },
-    { description: "Loading / Unloading", 20: "", remarks: "Per Container" },
-    { description: "Delivery", 20: "", remarks: "Per Container" },
-    // { description: "LOLO Charges", 20: "", remarks: "Per Container" },
+    { description: "Customs Clearence", 20: "", remarks: "" },
+    { description: "CC Fee", 20: "", remarks: "" },
+    { description: "D.O Charges", 20: "", remarks: "" },
+    { description: "LINER CHARGES", 20: "", remarks: "" },
+    { description: "Loading / Unloading", 20: "", remarks: "" },
+    { description: "Delivery", 20: "", remarks: "" },
+    // { description: "LOLO Charges", 20: "", remarks: "" },
   ]);
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
