@@ -21,6 +21,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { FaFilePdf, FaFilePdf as FaFilePdfIcon } from "react-icons/fa";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import "jspdf-autotable"; 
@@ -86,6 +87,14 @@ const QuotationTable = () => {
   const [totalB, setTotalB] = useState(["", "", "", "", "", ""]);
   const [totalC, setTotalC] = useState(["", "", "", "", "", ""]);
   const [total, setTotal] = useState(["", "", "", "", "", ""]);
+  const [uploadedPdfPath, setUploadedPdfPath] = useState('');
+  const [weight, setWeight] = useState("");
+  const [containerSize, setContainerSize] = useState("N/A");
+  const [remarks, setRemarks] = useState("");
+  const [Free_Days, setFree_Days] = useState(""); 
+  const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
+  const [HSN_Code, setHSN_Code] = useState(""); 
+  const [Pref_Liners, setPref_Liners] = useState(""); 
 
   const tableRef = useRef();
 
@@ -123,28 +132,24 @@ const QuotationTable = () => {
   }, []);
 
   useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const response = await fetch('/api/get_locations', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ RFQType: 'import' }),
-        });
-        const data = await response.json();
-        setLocations(data.result);
-        if (data.result.length > 0) {
-          setSelectedLocation(data.result[0].Location_Code);
-          setLocationName(data.result[0].Location_Name);
-        }
-      } catch (error) {
-        console.error("Error fetching locations:", error);
-      }
-    };
-
-    fetchLocations();
-  }, []);
+        const fetchLocations = async () => {
+          try {
+            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import'   }),
+            });
+            const data = await response.json();
+            setLocations(data.result);
+          } catch (error) {
+            console.error("Error fetching locations:", error);
+          }
+        };
+    
+        fetchLocations();
+      }, []);
   const fetchCurrency = async () => {
     try {
       const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
@@ -160,8 +165,9 @@ const QuotationTable = () => {
       });
       const data = await response.json();
       if (data.result && data.result.length > 0) {
-        setUSD(parseFloat(data.result[0].USD));
-        setEUR(parseFloat(data.result[0].EURO));
+        // setUSD(parseFloat(data.result[0].USD));
+        // setEUR(parseFloat(data.result[0].EURO));
+        console.log("Currency Data:", data.result[0]);
       } else {
         setUSD(0);
         setEUR(0);
@@ -193,27 +199,61 @@ const QuotationTable = () => {
   }, []);
 
   const fetchSupplierDetails = async (locCode) => {
-    try {
-      const response = await fetch('/api/GET_Supplier_LOC_details', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ Loc_Code: locCode }),
-      });
-      const data = await response.json();
-      if (data.result && data.result.length > 0) {
-        setIncoterms(data.result[0].Incoterms);
-        setTransitDays(data.result[0].Transit_Days);
-        setCommodity(data.result[0].Commodity);
-        setDeliveryAddress(data.result[0].Delivery_Address);
-        setDest_Port(data.result[0].Dest_Port);
-        setCurrency(data.result[0].Currency);
+      try {
+        const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import',Loc_Code: locCode }),
+        });
+        const data = await response.json();
+        if (data.result && data.result.length > 0) {
+          setIncoterms(data.result[0].Incoterms);
+          setTransitDays(data.result[0].Transit_Days);
+          setCommodity(data.result[0].Commodity);
+          setDeliveryAddress(data.result[0].Delivery_Address);
+          setDest_Port(data.result[0].Dest_Port);
+          setCurrency(data.result[0].Currency);
+          setFree_Days(data.result[0].Free_Days);
+          setPref_Liners(data.result[0].Pref_Liners);
+          setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
+          setHSN_Code(data.result[0].HSN_Code);
+          setRemarks(data.result[0].Remarks || "");
+          setUSD(parseFloat(data.result[0].USD));
+          setEUR(parseFloat(data.result[0].EURO));
+          setUploadedPdfPath(data.result[0].UploadedPDF || "");
+          setContainerSize(data.result[0].Container_Size || "N/A");
+          setWeight(parseFloat(data.result[0].Weight) || "");
+          console.log("Supplier details fetched successfully:", data.result[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching supplier details:", error);
       }
-    } catch (error) {
-      console.error("Error fetching supplier details:", error);
-    }
-  };
+    };
+  
+    useEffect(() => {
+      setIncoterms("");
+        setTransitDays("");
+        setCommodity("");
+        setDeliveryAddress("");
+        setDest_Port("");
+        setCurrency("");
+        setFree_Days("");
+        setPref_Liners("");
+        setAvg_Cont_Per_Mnth("");
+        setHSN_Code("");
+        setUSD(0);
+        setEUR(0);
+        setRemarks("");
+        setUploadedPdfPath('');
+        setContainerSize("N/A");
+        setWeight("");
+      if (selectedLocation) {
+        fetchSupplierDetails(selectedLocation);
+        fetchQuotationData(selectedLocation);
+      }
+    }, [selectedLocation]);
 
   const fetchQuotationData = async (locationCode, month, year, contFeet) => {
     try {
@@ -541,7 +581,7 @@ const QuotationTable = () => {
             { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
             { content: "Descriptions", rowSpan: 2, styles: { valign: "middle" }  },
             { content: "Currency in", rowSpan: 2, styles: { valign: "middle" }  },
-            { content: "Air Shipment", colSpan: 3, styles: { halign: "center" } },
+            { content: containerSize || "N/A", colSpan: 3, styles: { halign: "center" } },
             // { content: "40 ft", colSpan: 3, styles: { halign: "center" } },
             { content: "Remarks", rowSpan: 2, styles: { valign: "middle" }  },
         ],
@@ -632,13 +672,13 @@ const QuotationTable = () => {
     ]);
     tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } }, 
         { content: "USD", styles: { halign: "center" } }, 
-        { content: USD.toFixed(2), colSpan: 2, styles: { halign: "center" } }, 
+        { content: USD.toFixed(2), colSpan: 1, styles: { halign: "center" } }, 
         { content: "EURO", styles: { halign: "center" } }, 
-        { content: EUR.toFixed(2), colSpan: 3, styles: { halign: "center" } }]); 
+        { content: EUR.toFixed(2), colSpan: 1, styles: { halign: "center" } }]); 
     tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } }, 
-        { content: Dest_Port, colSpan: 2 }, 
+        { content: Dest_Port, colSpan: 1 }, 
         { content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, 
-        { content: transitDays, colSpan: 3 }]);
+        { content: transitDays, colSpan: 1 }]);
     tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 7 }]);
 
     doc.setFont("helvetica", "bold");
@@ -687,7 +727,7 @@ const QuotationTable = () => {
 
     doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
 
-    doc.save("quotation_print_ExportFCL.pdf");
+    doc.save("quotation_print_ADOC_ImportLCL.pdf");
   };
   
   return (
@@ -800,7 +840,7 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
-                <th colSpan="3" className="py-1 px-2 border border-[var(--bgBody)]">Air shipment</th>
+                <th colSpan="3" className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
                 {/* <th colSpan="3" className="py-1 px-2 border border-[var(--bgBody)]">40 ft</th> */}
                 <th colSpan="3" rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
@@ -952,16 +992,52 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
-                <td colSpan="8" className="py-1 px-3 border text-left">{transitDays}</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days :</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{transitDays}</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Free Days Requirement at Destination :</td>
+                <td colSpan="3" className="py-1 px-3 border text-left">{Free_Days}</td>
+              </tr>
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs : </td>
+                <td colSpan="8" className="py-1 px-3 border text-left">{weight}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
-                <td colSpan="8" className="py-1 px-3 border text-left">{Dest_Port}</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{Dest_Port}</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Preffered Liners</td>
+                <td colSpan="3" className="py-1 px-3 border text-left">{Pref_Liners}</td>
+              </tr>
+             
+              <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
+                <td colSpan="2" className="py-1 px-3 border text-left">{HSN_Code}</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="3" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>
+               <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+               <td colSpan="8" className="py-1 px-3 border text-left">
+                 {uploadedPdfPath ? 
+                 <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                       <FaFilePdfIcon />
+                       {uploadedPdfPath.split('/').pop()}
+                     </a>
+                 :<span>No PDF Uploaded</span>
+                 }
+               </td>
+             </tr>
+              <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
-                <td colSpan="8" className="py-1 px-3 border text-left"></td>
+                <td colSpan="8" className="py-1 px-3 border text-left">
+                    <input
+                        readOnly
+                        type="text"
+                        placeholder="..."                       
+                        className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                      />
+                </td>
               </tr>
             </tbody>
           </table>
