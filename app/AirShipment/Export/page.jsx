@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-import { FaFilePdf, FaFileExport } from "react-icons/fa";
+import { FaFilePdf, FaFileExport, FaFilePdf as FaFilePdfIcon } from "react-icons/fa";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -345,7 +345,7 @@ const QuotationTable = () => {
   const calculateShipUSDTotal = (charges) => {
     return charges.reduce(
       (acc, charge) => {       
-        acc[20] += parseFloat((charge[20]*(currency === "EURO" ? EUR : USD))*weight || 0);
+        acc[20] += parseFloat((charge[20])*weight || 0);
         // acc[40] += parseFloat(charge[40]*USD || 0);
         return acc;
       },
@@ -353,9 +353,9 @@ const QuotationTable = () => {
     );
   };
 
-  const totalOrigin = calculateUSDTotal(originCharges);
+  const totalOrigin = calculateTotal(originCharges);
   const totalSeaFreight = calculateShipUSDTotal(seaFreightCharges);
-  const totalDestination = calculateTotal(destinationCharges);
+  const totalDestination = calculateUSDTotal(destinationCharges);
 
   const totalShipmentCost = {
     20: (totalOrigin[20] + totalSeaFreight[20] + totalDestination[20]).toFixed(2),
@@ -550,7 +550,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 1}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">{currency} / Shipment</td>
+                    <td className="py-1 px-3 border">INR / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -596,7 +596,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 6}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">{currency} / Per KG</td>
+                    <td className="py-1 px-3 border">INR / Per KG</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -640,7 +640,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 12}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border">INR / Shipment</td>
+                    <td className="py-1 px-3 border">{currency} / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -723,7 +723,18 @@ const QuotationTable = () => {
                 <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Pref_Liners}</td>
               </tr>
-             
+             <tr>
+               <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+               <td colSpan="4" className="py-1 px-3 border text-left">
+                 {uploadedPdfPath ? 
+                 <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                       <FaFilePdfIcon />
+                       {uploadedPdfPath.split('/').pop()}
+                     </a>
+                 :<span>No PDF Uploaded</span>
+                 }
+               </td>
+             </tr>
               {/* <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>

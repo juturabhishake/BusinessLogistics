@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-import { FaFilePdf } from "react-icons/fa";
+import { FaFilePdf, FaFilePdf as FaFilePdfIcon } from "react-icons/fa";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,9 @@ const QuotationTable = () => {
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
   const [selectedDate, setSelectedDate] = useState(); 
+  const [uploadedPdfPath, setUploadedPdfPath] = useState('');
+  const [weight, setWeight] = useState("");
+  const [containerSize, setContainerSize] = useState("N/A");
 
   useEffect(() => {
     let flag = false
@@ -129,24 +132,24 @@ const QuotationTable = () => {
       fetchLatestMonthYear();
     }, []);
   useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const response = await fetch('/api/get_locations' , {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ RFQType: 'import' }),
-        });
-        const data = await response.json();
-        setLocations(data.result);
-      } catch (error) {
-        console.error("Error fetching locations:", error);
-      }
-    };
-
-    fetchLocations();
-  }, []);
+      const fetchLocations = async () => {
+        try {
+          const response = await fetch('/api/get_locations_Adhoc_Air' , {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
+          });
+          const data = await response.json();
+          setLocations(data.result);
+        } catch (error) {
+          console.error("Error fetching locations:", error);
+        }
+      };
+  
+      fetchLocations();
+    }, []);
 
   useEffect(() => {
     const fetchCurrency = async () => {
@@ -154,8 +157,9 @@ const QuotationTable = () => {
         const response = await fetch('/api/get_currency');
         const data = await response.json();
         if (data.result && data.result.length > 0) {
-          setUSD(parseFloat(data.result[0].USD));
-          setEUR(parseFloat(data.result[0].EURO));
+          // setUSD(parseFloat(data.result[0].USD));
+          // setEUR(parseFloat(data.result[0].EURO));
+          console.log("OLD API USD and EURO values:", USD, EUR);
         }
       } catch (error) {
         console.error("Error fetching currency:", error);
@@ -409,39 +413,61 @@ const QuotationTable = () => {
     40: (totalOrigin[40] + totalSeaFreight[40] + totalDestination[40]).toFixed(2),
   };
   const fetchSupplierDetails = async (locCode) => {
-    try {
-      const response = await fetch('/api/GET_Supplier_LOC_details', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ Loc_Code: locCode }),
-      });
-      const data = await response.json();
-      if (data.result && data.result.length > 0) {
-        setIncoterms(data.result[0].Incoterms);
-        setTransitDays(data.result[0].Transit_Days);
-        setCommodity(data.result[0].Commodity);
-        setDeliveryAddress(data.result[0].Delivery_Address);
-        setDest_Port(data.result[0].Dest_Port);
-        setCurrency(data.result[0].Currency);
-        setFree_Days(data.result[0].Free_Days);
-        setPref_Liners(data.result[0].Pref_Liners);
-        setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
-        setHSN_Code(data.result[0].HSN_Code);
-        console.log("Supplier details fetched successfully:", data.result[0]);
-      }
-    } catch (error) {
-      console.error("Error fetching supplier details:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedLocation) {
-      fetchSupplierDetails(selectedLocation);
-      fetchQuotationData(selectedLocation);
-    }
-  }, [selectedLocation]);
+        try {
+          const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode }),
+          });
+          const data = await response.json();
+          if (data.result && data.result.length > 0) {
+            setIncoterms(data.result[0].Incoterms);
+            setTransitDays(data.result[0].Transit_Days);
+            setCommodity(data.result[0].Commodity);
+            setDeliveryAddress(data.result[0].Delivery_Address);
+            setDest_Port(data.result[0].Dest_Port);
+            setCurrency(data.result[0].Currency);
+            setFree_Days(data.result[0].Free_Days);
+            setPref_Liners(data.result[0].Pref_Liners);
+            setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
+            setHSN_Code(data.result[0].HSN_Code);
+            setRemarks(data.result[0].Remarks || "");
+            setUSD(parseFloat(data.result[0].USD));
+            setEUR(parseFloat(data.result[0].EURO));
+            setUploadedPdfPath(data.result[0].UploadedPDF || "");
+            setContainerSize(data.result[0].Container_Size || "N/A");
+            setWeight(parseFloat(data.result[0].Weight) || "");
+            console.log("Supplier details fetched successfully:", data.result[0]);
+          }
+        } catch (error) {
+          console.error("Error fetching supplier details:", error);
+        }
+      };
+    
+      useEffect(() => {
+        setIncoterms("");
+          setTransitDays("");
+          setCommodity("");
+          setDeliveryAddress("");
+          setDest_Port("");
+          setCurrency("");
+          setFree_Days("");
+          setPref_Liners("");
+          setAvg_Cont_Per_Mnth("");
+          setHSN_Code("");
+          setUSD(0);
+          setEUR(0);
+          setRemarks("");
+          setUploadedPdfPath('');
+          setContainerSize("N/A");
+          setWeight("");
+        if (selectedLocation) {
+          fetchSupplierDetails(selectedLocation);
+          fetchQuotationData(selectedLocation);
+        }
+      }, [selectedLocation]);
   useEffect(() => {
     if (selectedLocation && selectedDate) {
       fetchSupplierDetails(selectedLocation);
@@ -473,7 +499,7 @@ const QuotationTable = () => {
         { content: "Remarks",  rowSpan: 2, styles: { valign: "middle" } },
       ],
       [
-        { content: "Air Shipment", colSpan: 2, styles: { halign: "center" } },
+        { content: containerSize || "N/A", colSpan: 2, styles: { halign: "center" } },
       ]
     ];
   
@@ -575,6 +601,7 @@ const QuotationTable = () => {
     tableBody.push([{ content: "Destination Port : ", colSpan: 2, styles: { fontStyle: "bold" } }, 
       { content: Dest_Port, colSpan: 8 }]);
     tableBody.push([{ content: "Required Transit Days : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 8 }]);
+    tableBody.push([{ content: "Weight of cargo : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: weight, colSpan: 8 }]);
     tableBody.push([{ content: "Free Days Requirement at Destination : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Free_Days, colSpan: 8 }]);
     tableBody.push([{ content: "Preffered Liners : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Pref_Liners, colSpan: 8 }]);
     tableBody.push([{ content: "HSN Code : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: HSN_Code, colSpan: 8 }]);
@@ -740,7 +767,7 @@ const QuotationTable = () => {
                 <th colSpan="2" rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Air Shipment</th>
+                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
                 {/* <th className="py-1 px-2 border border-[var(--bgBody)]">40 ft</th> */}
               </tr>
             </thead>
@@ -914,6 +941,10 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-left">{Free_Days}</td>
               </tr>
               <tr>
+                <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs : </td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{weight}</td>
+              </tr>
+              <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{Dest_Port}</td>
                 <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
@@ -927,9 +958,22 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>
+               <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+               <td colSpan="4" className="py-1 px-3 border text-left">
+                 {uploadedPdfPath ? 
+                 <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                       <FaFilePdfIcon />
+                       {uploadedPdfPath.split('/').pop()}
+                     </a>
+                 :<span>No PDF Uploaded</span>
+                 }
+               </td>
+             </tr>
+              <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">
                     <input
+                        readOnly
                         type="text"
                         placeholder="..."                       
                         className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"

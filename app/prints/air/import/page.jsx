@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-import { FaFilePdf } from "react-icons/fa";
+import { FaFilePdf, FaFilePdf as FaFilePdfIcon } from "react-icons/fa";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -81,6 +81,9 @@ const QuotationTable = () => {
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
   const [selectedDate, setSelectedDate] = useState(); 
+  const [uploadedPdfPath, setUploadedPdfPath] = useState('');
+  const [weight, setWeight] = useState("");
+  const [containerSize, setContainerSize] = useState("N/A");
 
   useEffect(() => {
     let flag = false
@@ -130,24 +133,24 @@ const QuotationTable = () => {
       fetchLatestMonthYear();
     }, []);
   useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const response = await fetch('/api/get_locations' , {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ RFQType: 'import' }),
-        });
-        const data = await response.json();
-        setLocations(data.result);
-      } catch (error) {
-        console.error("Error fetching locations:", error);
-      }
-    };
-
-    fetchLocations();
-  }, []);
+      const fetchLocations = async () => {
+        try {
+          const response = await fetch('/api/get_locations_Adhoc_Air' , {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ Shipment_Type: 'Air',Transport_Type: 'import'   }),
+          });
+          const data = await response.json();
+          setLocations(data.result);
+        } catch (error) {
+          console.error("Error fetching locations:", error);
+        }
+      };
+  
+      fetchLocations();
+    }, []);
 
   useEffect(() => {
     const fetchCurrency = async () => {
@@ -374,36 +377,36 @@ const QuotationTable = () => {
     return charges.reduce(
       (acc, charge) => {
         acc[20] += parseFloat(charge[20] || 0);
-        acc[40] += parseFloat(charge[40] || 0);
+        // acc[40] += parseFloat(charge[40] || 0);
         return acc;
       },
-      { 20: 0, 40: 0 }
+      { 20: 0 }
     );
   };
   const calculateUSDTotal = (charges) => {
     return charges.reduce(
       (acc, charge) => {       
         acc[20] += parseFloat(charge[20]*(currency === "EURO" ? EUR : USD) || 0);
-        acc[40] += parseFloat(charge[40]*(currency === "EURO" ? EUR : USD) || 0);
+        // acc[40] += parseFloat(charge[40]*(currency === "EURO" ? EUR : USD) || 0);
         return acc;
       },
-      { 20: 0, 40: 0 }
+      { 20: 0 }
     );
   };
 
   const calculateShipUSDTotal = (charges) => {
     return charges.reduce(
       (acc, charge) => {       
-        acc[20] += parseFloat(charge[20]*USD || 0);
-        acc[40] += parseFloat(charge[40]*USD || 0);
+        acc[20] += parseFloat((charge[20]*(currency === "EURO" ? EUR : USD))*weight || 0);
+        // acc[40] += parseFloat(charge[40]*USD || 0);
         return acc;
       },
-      { 20: 0, 40: 0 }
+      { 20: 0}
     );
   };
 
   const totalOrigin = calculateUSDTotal(originCharges);
-  const totalSeaFreight = calculateUSDTotal(seaFreightCharges);
+  const totalSeaFreight = calculateShipUSDTotal(seaFreightCharges);
   const totalDestination = calculateTotal(destinationCharges);
 
   const totalShipmentCost = {
@@ -412,12 +415,12 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
-      const response = await fetch('/api/GET_Supplier_LOC_details', {
+      const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Loc_Code: locCode }),
+        body: JSON.stringify({ Shipment_Type: 'Air',Transport_Type: 'import',Loc_Code: locCode }),
       });
       const data = await response.json();
       if (data.result && data.result.length > 0) {
@@ -431,6 +434,12 @@ const QuotationTable = () => {
         setPref_Liners(data.result[0].Pref_Liners);
         setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
         setHSN_Code(data.result[0].HSN_Code);
+        setRemarks(data.result[0].Remarks || "");
+        setUSD(parseFloat(data.result[0].USD));
+        setEUR(parseFloat(data.result[0].EURO));
+        setUploadedPdfPath(data.result[0].UploadedPDF || "");
+        setContainerSize(data.result[0].Container_Size || "N/A");
+        setWeight(parseFloat(data.result[0].Weight) || "");
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -439,6 +448,22 @@ const QuotationTable = () => {
   };
 
   useEffect(() => {
+    setIncoterms("");
+      setTransitDays("");
+      setCommodity("");
+      setDeliveryAddress("");
+      setDest_Port("");
+      setCurrency("");
+      setFree_Days("");
+      setPref_Liners("");
+      setAvg_Cont_Per_Mnth("");
+      setHSN_Code("");
+      setUSD(0);
+      setEUR(0);
+      setRemarks("");
+      setUploadedPdfPath('');
+      setContainerSize("N/A");
+      setWeight("");
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
       fetchQuotationData(selectedLocation);
@@ -475,7 +500,7 @@ const QuotationTable = () => {
         { content: "Remarks",  rowSpan: 2, styles: { valign: "middle" } },
       ],
       [
-        { content: "Air Shipment", colSpan: 2, styles: { halign: "center" } },
+        { content: containerSize || "N/A", colSpan: 2, styles: { halign: "center" } },
       ]
     ];
   
@@ -487,12 +512,12 @@ const QuotationTable = () => {
       ]);
     };
   
-    const addChargesToBody = (charges, currency) => {
+    const addChargesToBody = (charges, currency, chargeType) => {
       charges.forEach((charge, index) => {
         tableBody.push([
           index + 1,
           charge.description,
-          `${currency} / Shipment`,
+          `${currency} / ${chargeType === "Sea Freight Charges" ? "Per KG" : "Shipment"}`,
           { 
             content: (charge[20] === 0 || charge[20] === '0.00' || charge[20] === '0' || charge[20] === 0.00) ? "" : (charge[20] || ""), 
             colSpan: 2,
@@ -505,7 +530,7 @@ const QuotationTable = () => {
   
   
     addSectionHeader("A) ORIGIN CHARGES");
-    addChargesToBody(originCharges, currency);
+    addChargesToBody(originCharges, currency, "Origin Charges");
     tableBody.push([
       "",
       { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
@@ -518,7 +543,7 @@ const QuotationTable = () => {
     ]);
   
     addSectionHeader("B) SEA FREIGHT CHARGES");
-    addChargesToBody(seaFreightCharges, currency);
+    addChargesToBody(seaFreightCharges, currency, "Sea Freight Charges");
     tableBody.push([
       "",
       { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
@@ -531,7 +556,7 @@ const QuotationTable = () => {
     ]);
   
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, "INR");
+    addChargesToBody(destinationCharges, "INR", "Destination Charges");
     tableBody.push([
       "",
       { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
@@ -576,7 +601,7 @@ const QuotationTable = () => {
     tableBody.push([{ content: "Destination Port : ", colSpan: 2, styles: { fontStyle: "bold" } }, 
       { content: Dest_Port, colSpan: 8 }]);
     tableBody.push([{ content: "Required Transit Days : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: transitDays, colSpan: 8 }]);
-    tableBody.push([{ content: "Weight of cargo", colSpan: 2, styles: { fontStyle: "bold" } }, { content: "", colSpan: 8 }]);
+    tableBody.push([{ content: "Weight of cargo", colSpan: 2, styles: { fontStyle: "bold" } }, { content: weight, colSpan: 8 }]);
 
     tableBody.push([{ content: "Total Cost", colSpan: 2, styles: { fontStyle: "bold" } }, { content: totalShipmentCost[20], colSpan: 8 }]);
     tableBody.push([{ content: "Payment Terms", colSpan: 2, styles: { fontStyle: "bold" } }, { content: "Monthly Basis", colSpan: 8 }]);
@@ -747,7 +772,7 @@ const QuotationTable = () => {
                 <th colSpan="2" rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Air Shipment</th>
+                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
                 {/* <th className="py-1 px-2 border border-[var(--bgBody)]">40 ft</th> */}
               </tr>
             </thead>
@@ -926,7 +951,7 @@ const QuotationTable = () => {
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs : </td>
-                <td colSpan="4" className="py-1 px-3 border text-left"></td>
+                <td colSpan="4" className="py-1 px-3 border text-left">{weight}</td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Total Cost :</td>
@@ -946,7 +971,18 @@ const QuotationTable = () => {
                 <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Pref_Liners}</td>
               </tr>
-             
+             <tr>
+               <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+               <td colSpan="4" className="py-1 px-3 border text-left">
+                 {uploadedPdfPath ? 
+                 <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                       <FaFilePdfIcon />
+                       {uploadedPdfPath.split('/').pop()}
+                     </a>
+                 :<span>No PDF Uploaded</span>
+                 }
+               </td>
+             </tr>
               {/* <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
@@ -957,6 +993,7 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">
                     <input
+                        readOnly
                         type="text"
                         placeholder="..."                       
                         className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"

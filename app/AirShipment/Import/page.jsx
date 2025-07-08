@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { FiSave, FiCheck, FiLoader } from "react-icons/fi";
-import { FaFilePdf, FaFileExport } from "react-icons/fa";
+import { FaFilePdf, FaFileExport, FaFilePdf as FaFilePdfIcon } from "react-icons/fa";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -696,7 +696,18 @@ const QuotationTable = () => {
                 <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Pref_Liners}</td>
               </tr>
-             
+             <tr>
+              <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+              <td colSpan="4" className="py-1 px-3 border text-left">
+                {uploadedPdfPath ? 
+                <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                      <FaFilePdfIcon />
+                      {uploadedPdfPath.split('/').pop()}
+                    </a>
+                :<span>No PDF Uploaded</span>
+                }
+              </td>
+            </tr>
               {/* <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
