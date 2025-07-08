@@ -1013,7 +1013,7 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
                 <td colSpan="3" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
-              {/* <tr>
+              <tr>
                <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
                <td colSpan="8" className="py-1 px-3 border text-left">
                  {uploadedPdfPath ? 
@@ -1024,7 +1024,7 @@ const QuotationTable = () => {
                  :<span>No PDF Uploaded</span>
                  }
                </td>
-             </tr> */}
+             </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
                 <td colSpan="8" className="py-1 px-3 border text-left">
