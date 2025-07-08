@@ -664,7 +664,7 @@ const QuotationTable = () => {
         { content: Dest_Port, colSpan: 1 }, 
         { content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 1 }]);
-    tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: '', colSpan: 7 }]);
+    tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: remarks, colSpan: 7 }]);
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
