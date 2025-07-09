@@ -671,8 +671,8 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{transitDays}</td>
-                <td colSpan="1" className="py-1 px-3 border text-start">Free Days Requirement at Destination :</td>
-                <td colSpan="2" className="py-1 px-3 border text-left">{Free_Days}</td>
+                <td colSpan="1" className="py-1 px-3 border text-start"></td>
+                <td colSpan="2" className="py-1 px-3 border text-left"></td>
               </tr>
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs : </td>
@@ -686,16 +686,8 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-start">Payment Terms :</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">Monthly Basis</td>
               </tr>
-              <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Proposed Cost :</td>
-                <td colSpan="4" className="py-1 px-3 border text-left">{totalShipmentCost[20]}</td>
-              </tr>
-              <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
-                <td colSpan="1" className="py-1 px-3 border text-left">{Dest_Port}</td>
-                <td colSpan="1" className="py-1 px-3 border text-start">Preffered Liners</td>
-                <td colSpan="2" className="py-1 px-3 border text-left">{Pref_Liners}</td>
-              </tr>
+             
+           
              <tr>
               <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
               <td colSpan="4" className="py-1 px-3 border text-left">
@@ -717,13 +709,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Remarks</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">
-                    <input
-                        type="text"
-                        placeholder="..."                       
-                        className="w-full bg-transparent border-none focus:outline-none text-left hover:border-gray-400"
-                        value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
-                      />
+                   {remarks}
                 </td>
               </tr>
             </tbody>
