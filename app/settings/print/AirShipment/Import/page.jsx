@@ -41,31 +41,31 @@ const QuotationTable = () => {
   });
 
   const [originCharges, setOriginCharges] = useState([
-      { description: "Pickup", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "Custom Clearance", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "Handling / DO/ ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "Terminal Handling Charge", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-      { description: "Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+      { description: "Pickup", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "Custom Clearance", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "Handling / DO/ ", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "Terminal Handling Charge", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "Documentation", remarks: "", sc1: "", sc2: "", sc3: ""},
       // { description: "Halting", remarks: "If any", sc1: "", sc2: "", sc3: "" },
     ]);
   
     const [seaFreightCharges, setSeaFreightCharges] = useState([
-      { description: "AIR freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "FSC (Fuel Surcharges)", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-      { description: "SSC (Security Sucharge)", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "ISS Surcharge", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "X-Ray", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "AAI CHARGES", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "AIR freight", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "FSC (Fuel Surcharges)", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "SSC (Security Sucharge)", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "ISS Surcharge", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "X-Ray", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "AAI CHARGES", remarks: "", sc1: "", sc2: "", sc3: "" },
     ]);
   
     const [destinationCharges, setDestinationCharges] = useState([
-      { description: "Customs Clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "CC Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-      { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "LINER CHARGES", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      { description: "Delivery", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-      // { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+      { description: "Customs Clearence", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "CC Fee", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "D.O Charges", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "LINER CHARGES", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "Loading / Unloading", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
+      // { description: "LOLO Charges", remarks: "", sc1: "", sc2: "", sc3: "" },
     ]);
 
   const [suppliers, setSuppliers] = useState(["", "", "", "", "", ""]);
@@ -615,20 +615,20 @@ const QuotationTable = () => {
         });
     };
 
-    addSectionHeader("A) ORIGIN CHARGES");
+    addSectionHeader("A) EX Works CHARGES");
     addChargesToBody(originCharges, currency, "Origin Charges");
     tableBody.push([
         "",
-        { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        { content: "Total EX Works Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
         ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
 
-    addSectionHeader("B) SEA FREIGHT CHARGES");
+    addSectionHeader("B) AIR FREIGHT CHARGES");
     addChargesToBody(seaFreightCharges, currency, "Sea Freight Charges");
     tableBody.push([
         "",
-        { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        { content: "Total Air Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
         ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" , fontStyle: "bold"} })),
         "",
     ]);
@@ -644,7 +644,7 @@ const QuotationTable = () => {
 
     tableBody.push([
         "",
-        { content: "TOTAL SHIPMENT COST (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        { content: "TOTAL COST (A + B + C)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
         ...total.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
@@ -670,9 +670,9 @@ const QuotationTable = () => {
         { content: USD.toFixed(2),  styles: { halign: "center" } }, 
         { content: "EURO", styles: { halign: "center" } }, 
         { content: EUR.toFixed(2),  styles: { halign: "center" } }]); 
-    tableBody.push([{ content: "Weight of cargo : ", colSpan: 3, styles: { fontStyle: "bold" } }, { content: weight, colSpan: 7 }]);
-    tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } }, 
-        { content: Dest_Port, colSpan: 2 }, 
+   
+    tableBody.push([{ content: "Weight of cargo :", colSpan: 3, styles: { fontStyle: "bold" } }, 
+        { content: weight, colSpan: 2 }, 
         { content: "Required Transit Days", colSpan: 1, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 1 }]);
     // tableBody.push([
@@ -684,11 +684,11 @@ const QuotationTable = () => {
     //     { content: total[1], styles: { halign: "center" } },
     //     { content: total[2], styles: { halign: "center" } },
     //     { content: "", styles: { halign: "center" } }]);
-    // tableBody.push([{ content: "Payment Terms", colSpan: 3, styles: { fontStyle: "bold" } },
-    //     { content: "Basis", styles: { halign: "center" } },
-    //     { content: "Monthly Basis", styles: { halign: "center" } },
-    //     { content: "Basis", styles: { halign: "center" } },
-    //     { content: "", styles: { halign: "center" } }]);
+    tableBody.push([{ content: "Payment Terms", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: "Monthly Basis", styles: { halign: "center" } },
+        { content: "Monthly Basis", styles: { halign: "center" } },
+        { content: "Monthly Basis", styles: { halign: "center" } },
+        { content: "", styles: { halign: "center" } }]);
     // tableBody.push([{ content: "Proposed Cost", colSpan: 3, styles: { fontStyle: "bold" } },
     //     { content: total[0], styles: { halign: "center" } },
     //     { content: total[1], styles: { halign: "center" } },
@@ -701,12 +701,12 @@ const QuotationTable = () => {
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
     doc.setFontSize(8);
-    doc.text(`Air Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    // doc.text(`Air Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} ADOC LCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Quote for ${loc} to GTI Air shipment`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
     doc.setFontSize(8);
     
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
@@ -716,7 +716,7 @@ const QuotationTable = () => {
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
-    const startY = 24;
+    const startY = 22;
       
     doc.autoTable({
         head: tableHeaders,
@@ -853,7 +853,7 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
             <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">MODE OF TRANSPORT : AIR</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="3" className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
                 {/* <th colSpan="3" className="py-1 px-2 border border-[var(--bgBody)]">40 ft</th> */}
@@ -875,7 +875,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="8" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Origin Charges
+                  {sections.origin ? "▼" : "▶"} EX Works Charges
                 </td>
               </tr>
               {sections.origin &&
@@ -895,7 +895,7 @@ const QuotationTable = () => {
                 ))}
               {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total EX Works Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td className="py-1 px-3 border">{totalA[0] || ""}</td>
                   <td className="py-1 px-3 border">{totalA[1] || ""}</td>
@@ -912,7 +912,7 @@ const QuotationTable = () => {
               >
                 <td>B.</td>
                 <td colSpan="8" className="py-2 px-3 text-start flex items-center">
-                  {sections.seaFreight ? "▼" : "▶"} Sea Freight Charges
+                  {sections.seaFreight ? "▼" : "▶"} Air Freight Charges
                 </td>
               </tr>
               {sections.seaFreight &&
@@ -932,7 +932,7 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Air Freight Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td className="py-1 px-3 border">{totalB[0] || ""}</td>
                   <td className="py-1 px-3 border">{totalB[1] || ""}</td>
@@ -981,7 +981,7 @@ const QuotationTable = () => {
                 </tr>
               )}
               <tr className="border">
-                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Total Shipment Cost in INR (A + B + C)</td>
+                <td colSpan="2" className="font-bold py-1 px-3 border text-start">Total Cost in INR (A + B + C)</td>
                 <td className="py-1 px-3 border"></td>
                 <td className="py-1 px-3 border">{total[0] || ""}</td>
                 <td className="py-1 px-3 border">{total[1] || ""}</td>
@@ -1014,10 +1014,7 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-start">Required Transit Days</td>
                 <td colSpan="8" className="py-1 px-3 border text-left">{transitDays}</td>
               </tr>
-              <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
-                <td colSpan="8" className="py-1 px-3 border text-left">{Dest_Port}</td>
-              </tr>
+             
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo :</td>
                 <td colSpan="8" className="py-1 px-3 border text-left">{weight}</td>
@@ -1033,19 +1030,12 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">Payment Terms : </td>
                 <td className="py-1 px-3 border text-left"></td>
-                <td colSpan="1" className="py-1 px-3 border text-center">Basis</td>
                 <td colSpan="1" className="py-1 px-3 border text-center">Monthly Basis</td>
-                <td colSpan="1" className="py-1 px-3 border text-center">Basis</td>
+                <td colSpan="1" className="py-1 px-3 border text-center">Monthly Basis</td>
+                <td colSpan="1" className="py-1 px-3 border text-center">Monthly Basis</td>
                 <td colSpan="3" className="py-1 px-3 border text-left"></td>
               </tr>
-              <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Proposed Cost : </td>
-                <td className="py-1 px-3 border text-left"></td>
-                <td colSpan="1" className="py-1 px-3 border text-center">{total[0]}</td>
-                <td colSpan="1" className="py-1 px-3 border text-center">{total[1]}</td>
-                <td colSpan="1" className="py-1 px-3 border text-center">{total[2]}</td>
-                <td colSpan="3" className="py-1 px-3 border text-center"></td>
-              </tr>
+             
               <tr>
                  <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
                  <td colSpan="8" className="py-1 px-3 border text-left">

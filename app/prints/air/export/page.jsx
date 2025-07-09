@@ -529,7 +529,7 @@ const QuotationTable = () => {
     };
   
   
-    addSectionHeader("A) EX Works Charges");
+    addSectionHeader("A) Origin Charges");
     addChargesToBody(originCharges, "INR", "Origin Charges");
     tableBody.push([
       "",
@@ -546,7 +546,7 @@ const QuotationTable = () => {
     addChargesToBody(seaFreightCharges, "INR", "Sea Freight Charges");
     tableBody.push([
       "",
-      { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+      { content: "Total Air Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
       { 
         content: [0, "0.00", "0", 0.0].includes(totalSeaFreight[20]) ? "" : (totalSeaFreight[20] ?? 0).toFixed(2), 
         colSpan: 2,
@@ -781,7 +781,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Ex Works Charges
+                  {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
             
@@ -865,7 +865,7 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Air Freight Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td colSpan="2" className="py-1 px-3 border">{totalSeaFreight[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>

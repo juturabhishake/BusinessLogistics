@@ -537,7 +537,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} EX Works Charges
+                  {sections.origin ? "▼" : "▶"} Origin Charges
                 </td>
               </tr>
             
@@ -620,7 +620,7 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Air Freight Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td colSpan="2" className="py-1 px-3 border">{totalSeaFreight[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>

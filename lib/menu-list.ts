@@ -68,8 +68,8 @@ export function getMenuList(pathname: string): Group[] {
             submenus: [
               { href: "/export/FCL", label: "FCL" },
               { href: "/export/LCL", label: "LCL" },
-              { href: "/export/ADOC_FCL", label: "ADOC FCL" },
-              { href: "/export/ADOC_LCL", label: "ADOC LCL" },
+              { href: "/export/ADOC_FCL", label: "Adhoc FCL" },
+              { href: "/export/ADOC_LCL", label: "Adhoc LCL" },
             ],
           },
           {
@@ -79,8 +79,8 @@ export function getMenuList(pathname: string): Group[] {
             submenus: [
               { href: "/RFQ-Prices/FCL", label: "FCL" },
               { href: "/RFQ-Prices/LCL", label: "LCL" },
-              { href: "/RFQ-Prices/ADOC_FCL", label: "ADOC FCL" },
-              { href: "/RFQ-Prices/ADOC_LCL", label: "ADOC LCL" },
+              { href: "/RFQ-Prices/ADOC_FCL", label: "Adhoc FCL" },
+              { href: "/RFQ-Prices/ADOC_LCL", label: "Adhoc LCL" },
             ],
           },
           {
@@ -125,8 +125,8 @@ export function getMenuList(pathname: string): Group[] {
               submenus: [
                 { href: "/settings/print/Export/FCL", label: "FCL" },
                 { href: "/settings/print/Export/LCL", label: "LCL" },
-                { href: "/settings/print/Export/ADOC_LCL", label: "ADOC LCL" },
-                { href: "/settings/print/Export/ADOC_FCL", label: "ADOC FCL" }
+                { href: "/settings/print/Export/ADOC_LCL", label: "Adhoc LCL" },
+                { href: "/settings/print/Export/ADOC_FCL", label: "Adhoc FCL" }
               ]
             },
             {
@@ -136,8 +136,8 @@ export function getMenuList(pathname: string): Group[] {
               submenus: [
                 { href: "/settings/print/Import/FCL", label: "FCL" },
                 { href: "/settings/print/Import/LCL", label: "LCL" },
-                { href: "/settings/print/Import/ADOC_LCL", label: "ADOC LCL" },
-                { href: "/settings/print/Import/ADOC_FCL", label: "ADOC FCL" }
+                { href: "/settings/print/Import/ADOC_LCL", label: "Adhoc LCL" },
+                { href: "/settings/print/Import/ADOC_FCL", label: "Adhoc FCL" }
               ]
             },
             {
