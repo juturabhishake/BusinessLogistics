@@ -609,7 +609,7 @@ const QuotationTable = () => {
                 index + 1,
                 charge.description,
                 `${currency} / Shipment`,
-                ...[charge.sc1, charge.sc2, charge.sc3, charge.sc4, charge.sc5, charge.sc6].map(val => 
+                ...[charge.sc1, charge.sc2, charge.sc3].map(val => 
                     ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" } })
                 ),
                 charge.remarks,

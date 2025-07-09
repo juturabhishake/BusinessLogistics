@@ -575,7 +575,7 @@ const QuotationTable = () => {
             { content: "Currency in", rowSpan: 2, styles: { valign: "middle" }  },
             { content: containerSize || "N/A", colSpan: 3, styles: { halign: "center" } },
             // { content: "40 ft", colSpan: 3, styles: { halign: "center" } },
-            { content: "Remarks", rowSpan: 2, styles: { valign: "middle" }  },
+            // { content: "Remarks", rowSpan: 2, styles: { valign: "middle" }  },
         ],
         // [suppliers[0], suppliers[1], suppliers[2], suppliers[3], suppliers[4], suppliers[5]],
         [
@@ -650,7 +650,7 @@ const QuotationTable = () => {
     ]);
 
     tableBody.push([
-      { content: "INCO Term : ", colSpan: 3, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 2 },
+      { content: "INCO Term : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: incoterms, colSpan: 2 },
       { content: "Location : ", colSpan: 1, styles: { fontStyle: "bold" } }, { content: locationName, colSpan: 1 }
     ]);
     
@@ -662,16 +662,16 @@ const QuotationTable = () => {
     const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
 
     tableBody.push([
-        { content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: "Delivery Address", colSpan: 2, styles: { fontStyle: "bold" } },
         { content: cleanedDeliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap", fontSize: 7 } }
     ]);
-    tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } }, 
+    tableBody.push([{ content: "FX Rate", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: "USD", styles: { halign: "center" } }, 
         { content: USD.toFixed(2),  styles: { halign: "center" } }, 
         { content: "EURO", styles: { halign: "center" } }, 
         { content: EUR.toFixed(2),  styles: { halign: "center" } }]); 
   
-    tableBody.push([{ content: "Weight of cargo :", colSpan: 3, styles: { fontStyle: "bold" } }, 
+    tableBody.push([{ content: "Weight of cargo :", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: weight, colSpan: 2 }, 
         { content: "Required Transit Days", colSpan: 1, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 1 }]);
@@ -694,7 +694,7 @@ const QuotationTable = () => {
     //     { content: total[1], styles: { halign: "center" } },
     //     { content: total[2], styles: { halign: "center" } },
     //     { content: "", styles: { halign: "center" } }]);
-    tableBody.push([{ content: "Remarks", colSpan: 3, styles: { fontStyle: "bold" } }, { content: remarks, colSpan: 7 }]);
+    tableBody.push([{ content: "Remarks", colSpan: 2, styles: { fontStyle: "bold" } }, { content: remarks, colSpan: 7 }]);
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
@@ -726,15 +726,15 @@ const QuotationTable = () => {
         headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.15,lineColor: [0, 0, 0] }, 
         columnStyles: {
             0: { cellWidth: 10 },
-            1: { cellWidth: 60 },
-            2: { cellWidth: 25 },
-            3: { cellWidth: 35 },
-            4: { cellWidth: 35 },
-            5: { cellWidth: 35 },
+            1: { cellWidth: 100 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 48 },
+            4: { cellWidth: 48 },
+            5: { cellWidth: 48 },
             // 6: { cellWidth: 27 },
             // 7: { cellWidth: 27 },
             // 8: { cellWidth: 27 },
-            9: { cellWidth: 30 },
+            // 9: { cellWidth: 30 },
         },
         margin: { left: 5, right: 5 },
         theme: "grid",
