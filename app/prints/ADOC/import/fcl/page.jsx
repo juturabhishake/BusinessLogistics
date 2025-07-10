@@ -65,6 +65,9 @@ const QuotationTable = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
   const [locationName, setLocationName] = useState("");
+  const [containerSizeOpen, setContainerSizeOpen] = useState(false);
+  const [selectedContainerSize, setSelectedContainerSize] = useState("");
+  const [containerSizes, setContainerSizes] = useState([]);
   const [USD, setUSD] = useState(0.00);
   const [EUR, setEUR] = useState(0.00);
   const [incoterms, setIncoterms] = useState("");
@@ -132,25 +135,55 @@ const QuotationTable = () => {
       fetchLatestMonthYear();
     }, []);
   useEffect(() => {
-      const fetchLocations = async () => {
-        try {
-          const response = await fetch('/api/get_locations_Adhoc_Air' , {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
-          });
-          const data = await response.json();
-          setLocations(data.result);
-        } catch (error) {
-          console.error("Error fetching locations:", error);
+        const fetchLocations = async () => {
+          try {
+            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
+            });
+            const data = await response.json();
+            setLocations(data.result);
+          } catch (error) {
+            console.error("Error fetching locations:", error);
+          }
+        };
+        fetchLocations();
+      }, []);
+      useEffect(() => {
+        if (selectedLocation) {
+          fetchSupplierDetails(selectedLocation);
+          // setSelectedContainerSize("");
+          // fetchContainerSizes();
         }
+        if (selectedLocation && selectedContainerSize) {
+          fetchQuotationData(selectedLocation, selectedContainerSize);
+        }
+      }, [selectedLocation, selectedContainerSize]);
+      useEffect(() => {
+        if (selectedLocation) {
+          // fetchQuotationData(selectedLocation, selectedContainerSize);
+          setSelectedContainerSize("");
+          setContainerSizes([]);
+          fetchContainerSizes();
+        }
+      }, [selectedLocation]);
+      const fetchContainerSizes = async () => {
+          try {
+              const response = await fetch('/api/ADOC/get_containers', {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A" }),
+              });
+              const data = await response.json();
+              console.log("Container Sizes Data:", data);
+              setContainerSizes(data.result || []);
+          } catch (error) {
+              console.error("Error fetching container sizes:", error);
+          }
       };
-  
-      fetchLocations();
-    }, []);
-
   useEffect(() => {
     const fetchCurrency = async () => {
       try {
@@ -202,6 +235,7 @@ const QuotationTable = () => {
           sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
           quote_month: selectedMonth,
           quote_year: selectedYear,
+          container_size: selectedContainerSize
         }),
       });
       const data = await response.json(); 
@@ -414,14 +448,16 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
         try {
-          const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+          const response = await fetch('/api/ADOC/ADOCFCL_Terms', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode }),
+            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize }),
           });
           const data = await response.json();
+          console.log("Request body:", { Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize });
+          console.log("Supplier Details Data:", data);
           if (data.result && data.result.length > 0) {
             setIncoterms(data.result[0].Incoterms);
             setTransitDays(data.result[0].Transit_Days);
@@ -438,7 +474,6 @@ const QuotationTable = () => {
             setEUR(parseFloat(data.result[0].EURO));
             setUploadedPdfPath(data.result[0].UploadedPDF || "");
             setContainerSize(data.result[0].Container_Size || "N/A");
-            setWeight(parseFloat(data.result[0].Weight) || "");
             console.log("Supplier details fetched successfully:", data.result[0]);
           }
         } catch (error) {
@@ -460,14 +495,14 @@ const QuotationTable = () => {
           setUSD(0);
           setEUR(0);
           setRemarks("");
-          setUploadedPdfPath('');
           setContainerSize("N/A");
-          setWeight("");
+          setUploadedPdfPath('');
+          // setWeight("");
         if (selectedLocation) {
           fetchSupplierDetails(selectedLocation);
           fetchQuotationData(selectedLocation);
         }
-      }, [selectedLocation]);
+      }, [selectedLocation, selectedContainerSize]);
   useEffect(() => {
     if (selectedLocation && selectedDate) {
       fetchSupplierDetails(selectedLocation);
@@ -499,7 +534,7 @@ const QuotationTable = () => {
         { content: "Remarks",  rowSpan: 2, styles: { valign: "middle" } },
       ],
       [
-        { content: containerSize || "N/A", colSpan: 2, styles: { halign: "center" } },
+        { content: selectedContainerSize || "N/A", colSpan: 2, styles: { halign: "center" } },
       ]
     ];
   
@@ -614,7 +649,7 @@ const QuotationTable = () => {
     doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
-    doc.text(`Adhoc Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Adhoc Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
     doc.text(`Quote for GTI to ${loc} FCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
@@ -697,9 +732,10 @@ const QuotationTable = () => {
                   />
                 </LocalizationProvider>
               </div>
-              <div className="flex flex-row lg:flex-row items-center justify-start lg:justify-end gap-4">
-              <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
-                <Popover open={open} onOpenChange={setOpen}>
+              <div className="flex flex-col lg:flex-row items-start justify-start lg:justify-end gap-4">
+              <div className="flex flex-col items-start justify-between lg:flex-row justify-end">
+                <div className="flex flex-col lg:flex-row gap-2">
+                  <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
                       {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."}
@@ -736,6 +772,34 @@ const QuotationTable = () => {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                <Popover open={containerSizeOpen} onOpenChange={setContainerSizeOpen}>
+                  <PopoverTrigger asChild>
+                    <Button disabled={!selectedLocation} role="combobox" aria-expanded={containerSizeOpen} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "120px", fontSize:"12px" }}>
+                      {selectedContainerSize || "Select Size..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search size..." className="h-9" />
+                      <CommandList><CommandEmpty>No size found.</CommandEmpty>
+                        <CommandGroup>
+                          {containerSizes.map((size, index) => (
+                            <CommandItem key={index} value={size.Container_Size}
+                              onSelect={(currentValue) => {
+                                setSelectedContainerSize(currentValue === selectedContainerSize ? "" : currentValue);
+                                setContainerSizeOpen(false);
+                              }}>
+                              {size.Container_Size}
+                              <Check className={cn("ml-auto h-4 w-4", selectedContainerSize === size.Container_Size ? "opacity-100" : "opacity-0")}/>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                </div>
               </div>
               <div>
                 {/* <button
@@ -748,7 +812,7 @@ const QuotationTable = () => {
                   {saveState === "saving" && <FiLoader size={16} className="animate-spin" />}
                   {saveState === "saved" && <FiCheck size={16} />}
                 </button> */}
-                <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-red-500 text-white rounded">
+                <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-red-500 text-white rounded mt-1">
                   <FaFilePdf className="" />
                 </Button>
               </div>
@@ -767,7 +831,7 @@ const QuotationTable = () => {
                 <th colSpan="2" rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
+                <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">{selectedContainerSize || "N/A"}</th>
                 {/* <th className="py-1 px-2 border border-[var(--bgBody)]">40 ft</th> */}
               </tr>
             </thead>

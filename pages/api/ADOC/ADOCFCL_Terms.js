@@ -1,3 +1,4 @@
+///api/ADOC/ADOCFCL_Terms
 import { PrismaClient } from "@prisma/client";
 import Cors from 'cors';
 
@@ -23,16 +24,16 @@ export default async function handler(req, res) {
     await runMiddleware(req, res, cors);
 
     if (req.method === "POST") {
-        const { Loc_Code,sc,containerSize  } = req.body;
-        if (!Loc_Code || !sc || !containerSize) {
+        const {Shipment_Type,Transport_Type, Loc_Code, Container_Size } = req.body;
+        console.log('Terms Request body:', req.body);
+        if (!Loc_Code || !Shipment_Type || !Transport_Type || !Container_Size) {
             return res.status(400).json({ message: "Location code and Container Size is required" });
         }
         try {
-            const result = await prisma.$queryRaw`EXEC [dbo].[get_ADOC_Export_FCL_QUOTE] ${Loc_Code},${sc},${containerSize}`;
-            console.log('FCL Data:', result);    
+            const result = await prisma.$queryRaw`EXEC [dbo].[Get_Terms_AdhocFCL_AIR] ${Shipment_Type},${Transport_Type},${Loc_Code}, ${Container_Size}`;
             return res.status(200).json({ result });
         } catch (error) {
-            console.error('Error fetching get_ADOC_Export_FCL_QUOTE:', error);
+            console.error('Error fetching GET_Supplier_LOC_details:', error);
             return res.status(500).json({ message: 'Internal Server Error' });
         } finally {
             await prisma.$disconnect();

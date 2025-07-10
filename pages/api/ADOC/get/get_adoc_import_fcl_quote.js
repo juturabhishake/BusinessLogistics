@@ -23,12 +23,12 @@ export default async function handler(req, res) {
     await runMiddleware(req, res, cors);
 
     if (req.method === "POST") {
-        const { Loc_Code ,sc} = req.body;
-        if (!Loc_Code) {
+        const { Loc_Code ,sc, containerSize} = req.body;
+        if (!Loc_Code || !sc || !containerSize) {
             return res.status(400).json({ message: "Location code is required" });
         }
         try {
-            const result = await prisma.$queryRaw`EXEC [dbo].[get_ADOC_Import_FCL_QUOTE] ${Loc_Code},${sc}`;
+            const result = await prisma.$queryRaw`EXEC [dbo].[get_ADOC_Import_FCL_QUOTE] ${Loc_Code},${sc},${containerSize}`;
             return res.status(200).json({ result });
         } catch (error) {
             console.error('Error fetching get_ADOC_Import_FCL_QUOTE:', error);

@@ -34,34 +34,37 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Container" },
-    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Container" },
-    { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
-    { description: "Halting", 20: "", remarks: "If any" },
+    { description: "Customs Clearance & Documentation", value: "", remarks: "Per Container" },
+    { description: "Local Transportation From GTI-Chennai", value: "", remarks: "Per Container" },
+    { description: "Terminal Handling Charges - Origin", value: "", remarks: "Per Container" },
+    { description: "Bill of Lading Charges", value: "", remarks: "Per BL" },
+    { description: "Loading/Unloading / SSR", value: "", remarks: "Per Container" },
+    { description: "Halting", value: "", remarks: "If any" },
   ]);
   
   const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "Sea Freight", 20: "", remarks: "Per Container" },
-    { description: "ENS", 20: "", remarks: "Per BL" },
-    { description: "ISPS", 20: "", remarks: "Per Container" },
-    { description: "IT Transmission", 20: "", remarks: "Per Container" },
+    { description: "Sea Freight", value: "", remarks: "Per Container" },
+    { description: "ENS", value: "", remarks: "Per BL" },
+    { description: "ISPS", value: "", remarks: "Per Container" },
+    { description: "IT Transmission", value: "", remarks: "Per Container" },
   ]);
   
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Destination Terminal Handling Charges", 20: "", remarks: "Per Container" },
-    { description: "BL Fee", 20: "", remarks: "Per BL" },
-    { description: "Delivery by Barge/Road", 20: "", remarks: "Per Container" },
-    { description: "Delivery Order Fees", 20: "", remarks: "Per Container" },
-    { description: "Handling Charges", 20: "", remarks: "Per Container" },
-    { description: "T1 Doc", 20: "", remarks: "Per Container" },
-    { description: "LOLO Charges", 20: "", remarks: "Per Container" },
+    { description: "Destination Terminal Handling Charges", value: "", remarks: "Per Container" },
+    { description: "BL Fee", value: "", remarks: "Per BL" },
+    { description: "Delivery by Barge/Road", value: "", remarks: "Per Container" },
+    { description: "Delivery Order Fees", value: "", remarks: "Per Container" },
+    { description: "Handling Charges", value: "", remarks: "Per Container" },
+    { description: "T1 Doc", value: "", remarks: "Per Container" },
+    { description: "LOLO Charges", value: "", remarks: "Per Container" },
   ]);
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
   const [locationName, setLocationName] = useState("");
+  const [containerSizeOpen, setContainerSizeOpen] = useState(false);
+  const [selectedContainerSize, setSelectedContainerSize] = useState("");
+  const [containerSizes, setContainerSizes] = useState([]);
   const [USD, setUSD] = useState(0.00);
   const [EUR, setEUR] = useState(0.00);
   const [incoterms, setIncoterms] = useState("");
@@ -109,9 +112,40 @@ const QuotationTable = () => {
         console.error("Error fetching locations:", error);
       }
     };
-
     fetchLocations();
   }, []);
+  useEffect(() => {
+    if (selectedLocation) {
+      fetchSupplierDetails(selectedLocation);
+      // setSelectedContainerSize("");
+      // fetchContainerSizes();
+    }
+    if (selectedLocation && selectedContainerSize) {
+      fetchQuotationData(selectedLocation, selectedContainerSize);
+    }
+  }, [selectedLocation, selectedContainerSize]);
+  useEffect(() => {
+    if (selectedLocation) {
+      // fetchQuotationData(selectedLocation, selectedContainerSize);
+      setSelectedContainerSize("");
+      setContainerSizes([]);
+      fetchContainerSizes();
+    }
+  }, [selectedLocation]);
+  const fetchContainerSizes = async () => {
+      try {
+          const response = await fetch('/api/ADOC/get_containers', {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "export", locCode: selectedLocation || "N/A" }),
+          });
+          const data = await response.json();
+          console.log("Container Sizes Data:", data);
+          setContainerSizes(data.result || []);
+      } catch (error) {
+          console.error("Error fetching container sizes:", error);
+      }
+  };
 
   // useEffect(() => {
   //   const fetchCurrency = async () => {
@@ -145,18 +179,23 @@ const QuotationTable = () => {
     console.log(formattedDate, currentDate);
     setCurrentDateInfo(formattedDate);
   }, []);
-  const fetchQuotationData = async (locationCode) => {
+  const fetchQuotationData = async (locationCode, containerSize) => {
+    // resetCharges();
+    if (!locationCode || !containerSize) return;
+
     try {
       const response = await fetch("/api/ADOC/get/get_adoc_export_fcl_quote", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ Loc_Code: locationCode, sc: secureLocalStorage.getItem("sc") || "Unknown Supplier", }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+            Loc_Code: locationCode, 
+            sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
+            containerSize: selectedContainerSize || "N/A" 
+        }),
       });
 
       const data = await response.json();    
-      console.log("Quotation ADOC Data:", data);
+      console.log("Quotation Data:", data);
       if (data.result && data.result.length > 0) {
         const updatedOriginCharges = [...originCharges];
         const updatedSeaFreightCharges = [...seaFreightCharges];
@@ -184,8 +223,7 @@ const QuotationTable = () => {
         updatedDestinationCharges[5][20] = data.result[0].D_TDO || "";
         updatedDestinationCharges[6][20] = data.result[0].D_LOC || "";
 
-        
-        
+        setRemarks(data.result[0].remarks || "");
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
@@ -194,8 +232,6 @@ const QuotationTable = () => {
         setOriginCharges(originCharges.map((item) => ({ ...item, 20: "" })));
         setSeaFreightCharges(seaFreightCharges.map((item) => ({ ...item, 20: "" })));
         setDestinationCharges(destinationCharges.map((item) => ({ ...item, 20: "" })));
-        
-        s
       }
     } catch (error) {
       console.error("Error fetching quotation data:", error);
@@ -236,6 +272,7 @@ const QuotationTable = () => {
     const quoteData = {
       supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
+      containerSize: selectedContainerSize || "N/A",
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
       originData: filterCharges(originCharges),
@@ -381,14 +418,16 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
-      const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+      const response = await fetch('/api/ADOC/ADOCFCL_Terms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode }),
+        body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode, Container_Size: selectedContainerSize }),
       });
       const data = await response.json();
+      console.log("Request body:", { Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode, Container_Size: selectedContainerSize });
+      console.log("Supplier Details Data:", data);
       if (data.result && data.result.length > 0) {
         setIncoterms(data.result[0].Incoterms);
         setTransitDays(data.result[0].Transit_Days);
@@ -433,7 +472,7 @@ const QuotationTable = () => {
       fetchSupplierDetails(selectedLocation);
       fetchQuotationData(selectedLocation);
     }
-  }, [selectedLocation]);
+  }, [selectedLocation, selectedContainerSize]);
 
   const downloadPDF = () => {
     window.location.href = "/prints/ADOC/export/fcl";
@@ -449,9 +488,10 @@ const QuotationTable = () => {
               <p className="text-xs text-gray-100">"RFQ Export rates for {currentDateInfo}"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
-            <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4">
-              <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
-                <Popover open={open} onOpenChange={setOpen}>
+            <div className="flex flex-col items-start justify-start lg:flex-row justify-end gap-2">
+              <div className="flex flex-row items-start justify-between lg:flex-row justify-end">
+                <div className="flex flex-col lg:flex-row gap-2">
+                  <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
                       {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."}
@@ -488,8 +528,36 @@ const QuotationTable = () => {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                <Popover open={containerSizeOpen} onOpenChange={setContainerSizeOpen}>
+                  <PopoverTrigger asChild>
+                    <Button disabled={!selectedLocation} role="combobox" aria-expanded={containerSizeOpen} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "120px", fontSize:"12px" }}>
+                      {selectedContainerSize || "Select Size..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search size..." className="h-9" />
+                      <CommandList><CommandEmpty>No size found.</CommandEmpty>
+                        <CommandGroup>
+                          {containerSizes.map((size, index) => (
+                            <CommandItem key={index} value={size.Container_Size}
+                              onSelect={(currentValue) => {
+                                setSelectedContainerSize(currentValue === selectedContainerSize ? "" : currentValue);
+                                setContainerSizeOpen(false);
+                              }}>
+                              {size.Container_Size}
+                              <Check className={cn("ml-auto h-4 w-4", selectedContainerSize === size.Container_Size ? "opacity-100" : "opacity-0")}/>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-1">
                 <button
                   onClick={handleSave}
                   className="mt-0 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded"
@@ -517,7 +585,7 @@ const QuotationTable = () => {
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)] text-orange-500">{containerSize || "N/A"}</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)] text-orange-500">{selectedContainerSize || "N/A"}</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">

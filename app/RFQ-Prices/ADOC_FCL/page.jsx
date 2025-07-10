@@ -61,6 +61,9 @@ const QuotationTable = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
   const [locationName, setLocationName] = useState("");
+  const [containerSizeOpen, setContainerSizeOpen] = useState(false);
+  const [selectedContainerSize, setSelectedContainerSize] = useState("");
+  const [containerSizes, setContainerSizes] = useState([]);
   const [USD, setUSD] = useState(0.00);
   const [EUR, setEUR] = useState(0.00);
   const [incoterms, setIncoterms] = useState("");
@@ -90,26 +93,66 @@ const QuotationTable = () => {
     }
   }, []);
   useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const response = await fetch('/api/get_locations_Adhoc_Air' , {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
-        });
-        const data = await response.json();
-        console.log("Locations Data:", data);
-        setLocations(data.result);
-      } catch (error) {
-        console.error("Error fetching locations:", error);
+      const fetchLocations = async () => {
+        try {
+          const response = await fetch('/api/get_locations_Adhoc_Air' , {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
+          });
+          const data = await response.json();
+          setLocations(data.result);
+        } catch (error) {
+          console.error("Error fetching locations:", error);
+        }
+      };
+      fetchLocations();
+    }, []);
+  // useEffect(() => {
+  //     if (selectedLocation) {
+  //       fetchSupplierDetails(selectedLocation);
+  //     }
+  //     if (selectedLocation && selectedContainerSize) {
+  //       fetchQuotationData(selectedLocation, selectedContainerSize);
+  //     }
+  //   }, [selectedLocation, selectedContainerSize]);
+    useEffect(() => {
+      if (selectedLocation) {
+        fetchSupplierDetails(selectedLocation);
+        // setSelectedContainerSize("");
+        // setSelectedContainerSize("");
+        // setContainerSizes([]);
+        // fetchContainerSizes();
       }
+      if (selectedLocation && selectedContainerSize) {
+        fetchQuotationData(selectedLocation);
+      }
+    }, [selectedLocation, selectedContainerSize]);
+    useEffect(() => {
+      if (selectedLocation) {
+        // fetchQuotationData(selectedLocation, selectedContainerSize);
+        setSelectedContainerSize("");
+        setContainerSizes([]);
+        fetchContainerSizes();
+      }
+    }, [selectedLocation]);
+    const fetchContainerSizes = async () => {
+        try {
+            const response = await fetch('/api/ADOC/get_containers', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A" }),
+            });
+            const data = await response.json();
+            console.log("request body for container sizes:", { shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A" });
+            console.log("Container Sizes Data:", data);
+            setContainerSizes(data.result || []);
+        } catch (error) {
+            console.error("Error fetching container sizes:", error);
+        }
     };
-
-    fetchLocations();
-  }, []);
-
   useEffect(() => {
     const fetchCurrency = async () => {
       try {
@@ -150,11 +193,14 @@ const QuotationTable = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Loc_Code: locationCode, sc: secureLocalStorage.getItem("sc") || "Unknown Supplier", }),
+        body: JSON.stringify({ 
+          Loc_Code: locationCode, 
+          sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
+          containerSize: selectedContainerSize || "N/A"}),
       });
-
+      console.log("Request body for quotation data:", { Loc_Code: locationCode, sc: secureLocalStorage.getItem("sc") || "Unknown Supplier", containerSize: containerSize });
       const data = await response.json();    
-
+      console.log("Quotation Data:", data);
       if (data.result && data.result.length > 0) {
         const updatedOriginCharges = [...originCharges];
         const updatedSeaFreightCharges = [...seaFreightCharges];
@@ -218,6 +264,7 @@ const QuotationTable = () => {
     const quoteData = {
       supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
+      containerSize: selectedContainerSize || "N/A",
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
       originData: filterCharges(originCharges),
@@ -361,12 +408,12 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
     try {
-      const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+      const response = await fetch('/api/ADOC/ADOCFCL_Terms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode }),
+        body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize }),
       });
       const data = await response.json();
       if (data.result && data.result.length > 0) {
@@ -413,7 +460,7 @@ const QuotationTable = () => {
       fetchSupplierDetails(selectedLocation);
       fetchQuotationData(selectedLocation);
     }
-  }, [selectedLocation]);
+  }, [selectedLocation, selectedContainerSize]);
 
   const downloadPDF = () => {
     window.location.href = "/prints/ADOC/import/fcl";
@@ -429,9 +476,10 @@ const QuotationTable = () => {
               <p className="text-xs text-gray-100">"RFQ Import rates for {currentDateInfo}"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
-            <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4">
-              <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
-                <Popover open={open} onOpenChange={setOpen}>
+            <div className="flex flex-col items-start justify-start lg:flex-row justify-end gap-2">
+              <div className="flex flex-row items-start justify-between lg:flex-row justify-end">
+                <div className="flex flex-col lg:flex-row gap-2">
+                  <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
                       {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."}
@@ -468,8 +516,36 @@ const QuotationTable = () => {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                <Popover open={containerSizeOpen} onOpenChange={setContainerSizeOpen}>
+                  <PopoverTrigger asChild>
+                    <Button disabled={!selectedLocation} role="combobox" aria-expanded={containerSizeOpen} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "120px", fontSize:"12px" }}>
+                      {selectedContainerSize || "Select Size..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search size..." className="h-9" />
+                      <CommandList><CommandEmpty>No size found.</CommandEmpty>
+                        <CommandGroup>
+                          {containerSizes.map((size, index) => (
+                            <CommandItem key={index} value={size.Container_Size}
+                              onSelect={(currentValue) => {
+                                setSelectedContainerSize(currentValue === selectedContainerSize ? "" : currentValue);
+                                setContainerSizeOpen(false);
+                              }}>
+                              {size.Container_Size}
+                              <Check className={cn("ml-auto h-4 w-4", selectedContainerSize === size.Container_Size ? "opacity-100" : "opacity-0")}/>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-1">
                 <button
                   onClick={handleSave}
                   className="mt-0 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded"
@@ -497,7 +573,7 @@ const QuotationTable = () => {
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
-                <th className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
+                <th className="py-1 px-2 border border-[var(--bgBody)]">{selectedContainerSize || "N/A"}</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--bgBody3)]">

@@ -23,16 +23,16 @@ export default async function handler(req, res) {
     await runMiddleware(req, res, cors);
 
     if (req.method === "POST") {
-        const { Loc_Code,sc,containerSize  } = req.body;
-        if (!Loc_Code || !sc || !containerSize) {
-            return res.status(400).json({ message: "Location code and Container Size is required" });
+        const { shipType, transport_type, locCode } = req.body;
+        if (!shipType || !transport_type || !locCode) {
+            return res.status(400).json({ message: "Ship Type, Location Code and Transport type are required fields." });
         }
         try {
-            const result = await prisma.$queryRaw`EXEC [dbo].[get_ADOC_Export_FCL_QUOTE] ${Loc_Code},${sc},${containerSize}`;
-            console.log('FCL Data:', result);    
+            const result = await prisma.$queryRaw`EXEC [dbo].[get_container_sizes] ${shipType},${transport_type}, ${locCode}`;
+            console.log('container Data:', result);    
             return res.status(200).json({ result });
         } catch (error) {
-            console.error('Error fetching get_ADOC_Export_FCL_QUOTE:', error);
+            console.error('Error fetching get_container_sizes :', error);
             return res.status(500).json({ message: 'Internal Server Error' });
         } finally {
             await prisma.$disconnect();

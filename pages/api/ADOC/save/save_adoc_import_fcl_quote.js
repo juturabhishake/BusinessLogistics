@@ -28,6 +28,7 @@ export default async function handler(req, res) {
   const {
     supplierCode,
     locationCode,
+    containerSize,
     quoteMonth,
     quoteYear,
     originData,
@@ -44,6 +45,7 @@ export default async function handler(req, res) {
   if (
     !supplierCode ||
     !locationCode ||
+    !containerSize ||
     !quoteMonth ||
     !quoteYear ||
     !originData ||
@@ -62,6 +64,7 @@ export default async function handler(req, res) {
   const quoteData = {
     Supplier_Code: supplierCode,
     Location_Code: locationCode || "",
+    Container_Size: containerSize,
     Quote_Month: quoteMonth,
     Quote_Year: quoteYear,
     O_CCD: parseDecimal(originData[0]?.[20]),
