@@ -7,6 +7,7 @@ import { useStore } from "@/hooks/use-store";
 import { cn } from "@/lib/utils";
 // import { PanelsTopLeft } from "lucide-react";
 import Link from "next/link";
+import secureLocalStorage from "react-secure-storage";
 
 export function Sidebar() {
   const sidebar = useStore(useSidebar, (x) => x);
@@ -36,7 +37,7 @@ export function Sidebar() {
           variant="link"
           asChild
         >
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href={secureLocalStorage.getItem("sc") === "admin" ? "/settings/dashboarda" : "/dashboard"} className="flex items-center gap-2">
             {/* <PanelsTopLeft className="w-6 h-6 mr-1" /> */}
             {!getOpenState() && <b><h1 className="font-bold text-lg font-serif">GTI</h1></b> }
             <h1
