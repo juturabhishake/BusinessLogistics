@@ -602,7 +602,7 @@ const QuotationTable = () => {
             { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
             { content: "Descriptions", rowSpan: 2, styles: { valign: "middle" }  },
             { content: "Currency in", rowSpan: 2, styles: { valign: "middle" }  },
-            { content: containerSize || "N/A", colSpan: 3, styles: { halign: "center" } },
+            { content: selectedContainerSize || "N/A", colSpan: 3, styles: { halign: "center" } },
             // { content: "40 ft", colSpan: 3, styles: { halign: "center" } },
             { content: "Remarks", rowSpan: 2, styles: { valign: "middle" }  },
         ],
@@ -890,7 +890,7 @@ const QuotationTable = () => {
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
-                <th colSpan="3" className="py-1 px-2 border border-[var(--bgBody)]">{containerSize || "N/A"}</th>
+                <th colSpan="3" className="py-1 px-2 border border-[var(--bgBody)]">{selectedContainerSize || "N/A"}</th>
                 {/* <th colSpan="3" className="py-1 px-2 border border-[var(--bgBody)]">40 ft</th> */}
                 <th colSpan="3" rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
