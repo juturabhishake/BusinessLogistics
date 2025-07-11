@@ -72,6 +72,9 @@ const QuotationTable = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
   const [locationName, setLocationName] = useState("");
+  const [containerSizeOpen, setContainerSizeOpen] = useState(false);
+  const [selectedContainerSize, setSelectedContainerSize] = useState("");
+  const [containerSizes, setContainerSizes] = useState([]);
   const [USD, setUSD] = useState(0.00);
   const [EUR, setEUR] = useState(0.00);
   const [incoterms, setIncoterms] = useState("");
@@ -131,24 +134,50 @@ const QuotationTable = () => {
   }, []);
 
   useEffect(() => {
-      const fetchLocations = async () => {
-        try {
-          const response = await fetch('/api/get_locations_Adhoc_Air' , {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
-          });
-          const data = await response.json();
-          setLocations(data.result);
-        } catch (error) {
-          console.error("Error fetching locations:", error);
-        }
-      };
-  
-      fetchLocations();
-    }, []);
+          const fetchLocations = async () => {
+            try {
+              const response = await fetch('/api/get_locations_Adhoc_Air' , {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
+              });
+              const data = await response.json();
+              setLocations(data.result);
+            } catch (error) {
+              console.error("Error fetching locations:", error);
+            }
+          };
+          fetchLocations();
+        }, []);
+        useEffect(() => {
+          if (selectedLocation && selectedContainerSize) {
+            fetchSupplierDetails(selectedLocation);
+            const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
+            const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
+            fetchQuotationData(selectedLocation, month, year, selectedContainerSize);
+          }
+        }, [selectedLocation, selectedContainerSize, selectedDate]);
+        useEffect(() => {
+          if (selectedLocation) {
+            fetchContainerSizes();
+          }
+        }, [selectedLocation]);
+        const fetchContainerSizes = async () => {
+            try {
+                const response = await fetch('/api/ADOC/get_containers', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A" }),
+                });
+                const data = await response.json();
+                console.log("Container Sizes Data:", data);
+                setContainerSizes(data.result || []);
+            } catch (error) {
+                console.error("Error fetching container sizes:", error);
+            }
+        };
   const fetchCurrency = async () => {
     try {
       const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
@@ -198,61 +227,62 @@ const QuotationTable = () => {
   }, []);
 
   const fetchSupplierDetails = async (locCode) => {
-    try {
-      const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode }),
-      });
-      const data = await response.json();
-      if (data.result && data.result.length > 0) {
-        setIncoterms(data.result[0].Incoterms);
-        setTransitDays(data.result[0].Transit_Days);
-        setCommodity(data.result[0].Commodity);
-        setDeliveryAddress(data.result[0].Delivery_Address);
-        setDest_Port(data.result[0].Dest_Port);
-        setCurrency(data.result[0].Currency);
-        setFree_Days(data.result[0].Free_Days);
-        setPref_Liners(data.result[0].Pref_Liners);
-        setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
-        setHSN_Code(data.result[0].HSN_Code);
-        setRemarks(data.result[0].Remarks || "");
-        setUSD(parseFloat(data.result[0].USD));
-        setEUR(parseFloat(data.result[0].EURO));
-        setUploadedPdfPath(data.result[0].UploadedPDF || "");
-        setContainerSize(data.result[0].Container_Size || "N/A");
-        setWeight(parseFloat(data.result[0].Weight) || "");
-        console.log("Supplier details fetched successfully:", data.result[0]);
-      }
-    } catch (error) {
-      console.error("Error fetching supplier details:", error);
-    }
-  };
-
-  useEffect(() => {
-    setIncoterms("");
-      setTransitDays("");
-      setCommodity("");
-      setDeliveryAddress("");
-      setDest_Port("");
-      setCurrency("");
-      setFree_Days("");
-      setPref_Liners("");
-      setAvg_Cont_Per_Mnth("");
-      setHSN_Code("");
-      setUSD(0);
-      setEUR(0);
-      setRemarks("");
-      setUploadedPdfPath('');
-      setContainerSize("N/A");
-      setWeight("");
-    if (selectedLocation) {
-      fetchSupplierDetails(selectedLocation);
-      fetchQuotationData(selectedLocation);
-    }
-  }, [selectedLocation]);
+          try {
+            const response = await fetch('/api/ADOC/ADOCFCL_Terms', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize }),
+            });
+            const data = await response.json();
+            console.log("Request body:", { Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize });
+            console.log("Supplier Details Data:", data);
+            if (data.result && data.result.length > 0) {
+              setIncoterms(data.result[0].Incoterms);
+              setTransitDays(data.result[0].Transit_Days);
+              setCommodity(data.result[0].Commodity);
+              setDeliveryAddress(data.result[0].Delivery_Address);
+              setDest_Port(data.result[0].Dest_Port);
+              setCurrency(data.result[0].Currency);
+              setFree_Days(data.result[0].Free_Days);
+              setPref_Liners(data.result[0].Pref_Liners);
+              setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
+              setHSN_Code(data.result[0].HSN_Code);
+              setRemarks(data.result[0].Remarks || "");
+              setUSD(parseFloat(data.result[0].USD));
+              setEUR(parseFloat(data.result[0].EURO));
+              setUploadedPdfPath(data.result[0].UploadedPDF || "");
+              setContainerSize(data.result[0].Container_Size || "N/A");
+              console.log("Supplier details fetched successfully:", data.result[0]);
+            }
+          } catch (error) {
+            console.error("Error fetching supplier details:", error);
+          }
+        };
+      
+        useEffect(() => {
+          setIncoterms("");
+            setTransitDays("");
+            setCommodity("");
+            setDeliveryAddress("");
+            setDest_Port("");
+            setCurrency("");
+            setFree_Days("");
+            setPref_Liners("");
+            setAvg_Cont_Per_Mnth("");
+            setHSN_Code("");
+            setUSD(0);
+            setEUR(0);
+            setRemarks("");
+            setContainerSize("N/A");
+            setUploadedPdfPath('');
+            // setWeight("");
+          if (selectedLocation) {
+            fetchSupplierDetails(selectedLocation);
+            fetchQuotationData(selectedLocation);
+          }
+        }, [selectedLocation, selectedContainerSize]);
 
   const fetchQuotationData = async (locationCode, month, year, contFeet) => {
     try {
@@ -267,12 +297,19 @@ const QuotationTable = () => {
           sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
           username: secureLocalStorage.getItem("un") || "Unknown",
           loc_code: locationCode,
-          cont_ft: contFeet,
+          container_size: selectedContainerSize || "N/A",
         }),
       });
 
       const data = await response.json();
-
+      console.log("request body:", {
+        quote_month: month,
+        quote_year: year,
+        sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
+        username: secureLocalStorage.getItem("un") || "Unknown",
+        loc_code: locationCode,
+        container_size: selectedContainerSize || "N/A",
+      });
       // console.log("Fetched Data : ", data);
       if (data.length <= 0) {
         setOriginCharges(originCharges.map(item => ({ ...item, sc1: "", sc2: "", sc3: ""})));
@@ -290,7 +327,7 @@ const QuotationTable = () => {
         const updatedSeaFreightCharges = [...seaFreightCharges];
         const updatedDestinationCharges = [...destinationCharges];
 
-        if (contFeet === 20) {
+        // if (contFeet === 20) {
           setSuppliers([
             data.find(item => item.Attribute === "Vendor_Name").Supplier_1,
             data.find(item => item.Attribute === "Vendor_Name").Supplier_2,
@@ -379,7 +416,7 @@ const QuotationTable = () => {
             data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || ""
           ])
 
-        } 
+        // } 
         // else if (contFeet === 40) {
         //   setSuppliers((prev) => [
         //     prev[0],
@@ -516,13 +553,13 @@ const QuotationTable = () => {
       const year = selectedDate ? selectedDate.year() : new Date().getFullYear();
       console.log("selected Location : ", selectedLocation);
       const fetchData = async () => {
-        await fetchQuotationData(selectedLocation, month, year, 20);
+        await fetchQuotationData(selectedLocation, month, year, selectedContainerSize);
         // await fetchQuotationData(selectedLocation, month, year, 40);
       };
   
       fetchData();
     }
-  }, [selectedLocation, selectedDate]);
+  }, [selectedLocation, selectedDate, selectedContainerSize]);
 
   const toggleSection = (section) => {
     setSections((prev) => ({
@@ -732,12 +769,13 @@ const QuotationTable = () => {
               <p className="text-xs text-gray-100">Quote for GTI to {locationName || "{select location}"} shipment</p>
             </div>
             <div className="flex flex-col lg:flex-row justify-end items-start lg:items-center lg:space-y-0 sm:space-x-2 space-y-2">
-            <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
-              <Button onClick={downloadPDF} variant="outline" className="bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)]">
+            <div className="flex flex-col items-start justify-start lg:flex-row justify-end gap-4">
+              <Button onClick={downloadPDF} variant="outline" className="bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] mt-1">
                 <FileText className="mr-0" />
               </Button>
               <div className="flex flex-row items-center justify-between lg:flex-row justify-end">
-                <Popover open={open} onOpenChange={setOpen}>
+                <div className="flex flex-row items-center justify-between gap-2">
+                  <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
                       {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."}
@@ -781,6 +819,34 @@ const QuotationTable = () => {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                <Popover open={containerSizeOpen} onOpenChange={setContainerSizeOpen}>
+                  <PopoverTrigger asChild>
+                    <Button disabled={!selectedLocation} role="combobox" aria-expanded={containerSizeOpen} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "120px", fontSize:"12px" }}>
+                      {selectedContainerSize || "Select Size..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search size..." className="h-9" />
+                      <CommandList><CommandEmpty>No size found.</CommandEmpty>
+                        <CommandGroup>
+                          {containerSizes.map((size, index) => (
+                            <CommandItem key={index} value={size.Container_Size}
+                              onSelect={(currentValue) => {
+                                setSelectedContainerSize(currentValue === selectedContainerSize ? "" : currentValue);
+                                setContainerSizeOpen(false);
+                              }}>
+                              {size.Container_Size}
+                              <Check className={cn("ml-auto h-4 w-4", selectedContainerSize === size.Container_Size ? "opacity-100" : "opacity-0")}/>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                </div>
               </div>
             </div>
             <div>

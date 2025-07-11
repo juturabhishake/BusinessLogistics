@@ -28,16 +28,23 @@ export default async function handler(req, res) {
   }
 
  
-    const { quote_month, quote_year, sc, username, loc_code } = req.body;
+    const { quote_month, quote_year, sc, username, loc_code, container_size } = req.body;
 
-    if (!quote_month || !quote_year || !sc) {
+    console.log('quote_month:', quote_month);
+    console.log('quote_year:', quote_year);
+    console.log('sc:', sc);
+    console.log('username:', username);
+    console.log('loc_code:', loc_code);
+    console.log('container_size:', container_size);
+
+    if (!quote_month || !quote_year || !sc || !username || !loc_code || !container_size) {
       return res.status(400).json({ message: 'Missing required fields' });
     }     
     if (req.method === "POST") {
     
       try {
         console.log('Dashboard Data:', quote_month); 
-          const result = await prisma.$queryRaw`exec [dbo].[GET_ADOCImportFCL_Print] ${quote_month}, ${quote_year}, ${sc}, ${username}, ${loc_code}`;
+          const result = await prisma.$queryRaw`exec [dbo].[GET_ADOCImportFCL_Print] ${quote_month}, ${quote_year}, ${sc}, ${username}, ${loc_code}, ${container_size}`;
            console.log('Dashboard Data:', result);        
           return res.status(200).json(result);
       } catch (error) {
