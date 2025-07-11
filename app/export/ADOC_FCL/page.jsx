@@ -560,6 +560,7 @@ const QuotationTable = () => {
               <div className="flex gap-2 pt-1">
                 <button
                   onClick={handleSave}
+                  disabled={!selectedLocation || !selectedContainerSize}
                   className="mt-0 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded"
                   style={{ minWidth: "80px" }}
                 >
