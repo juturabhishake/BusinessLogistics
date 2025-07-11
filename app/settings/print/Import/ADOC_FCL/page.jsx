@@ -161,6 +161,8 @@ const QuotationTable = () => {
         }, [selectedLocation, selectedContainerSize, selectedDate]);
         useEffect(() => {
           if (selectedLocation) {
+            setSelectedContainerSize("");
+            setContainerSizes([]);
             fetchContainerSizes();
           }
         }, [selectedLocation]);
