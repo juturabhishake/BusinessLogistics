@@ -80,6 +80,8 @@ const QuotationTable = () => {
   const [Pref_Liners, setPref_Liners] = useState(""); 
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [containerSize, setContainerSize] = useState("");
+    const [quoteDate, setquoteDate] = useState("");
+    const [quoteTime, setquoteTime] = useState("");
   
   useEffect(() => {
     let flag = false
@@ -265,6 +267,7 @@ const QuotationTable = () => {
       supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
       containerSize: selectedContainerSize || "N/A",
+      Quote_Date: quoteDate,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
       originData: filterCharges(originCharges),
@@ -432,6 +435,8 @@ const QuotationTable = () => {
         setEUR(parseFloat(data.result[0].EURO));
         setContainerSize(data.result[0].Container_Size || "");
         setUploadedPdfPath(data.result[0].UploadedPDF || "");
+        setquoteDate(data.result[0].Request_Date);
+        setquoteTime("11:00 AM");
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -453,6 +458,8 @@ const QuotationTable = () => {
     setUSD(0);
     setEUR(0);
     setRemarks("");
+     setquoteDate("");
+      setquoteTime("");
     setUploadedPdfPath('');
     setContainerSize("N/A");
       // setWeight("");
@@ -568,7 +575,13 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - Adhoc FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]  ">Sea Freight Import - Adhoc FCL {" "} <span className="text-red-500">
+    ( {quoteDate
+                      ? new Date(quoteDate).toLocaleDateString(
+                          "en-GB"
+                        )
+                      : ""} {quoteTime})
+  </span></th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -758,7 +771,7 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Shipment Details</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">
                   {uploadedPdfPath ? 
                   <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">

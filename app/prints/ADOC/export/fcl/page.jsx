@@ -137,12 +137,14 @@ const QuotationTable = () => {
   useEffect(() => {
       const fetchLocations = async () => {
         try {
-          const response = await fetch('/api/get_locations_Adhoc_Air' , {
+           const selectedMonth = dayjs(selectedDate).month() + 1;
+           const selectedYear = dayjs(selectedDate).year();
+          const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export'   }),
+            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export' ,Month_No:selectedMonth ,Year_No: selectedYear  }),
           });
           const data = await response.json();
           setLocations(data.result);
@@ -151,7 +153,7 @@ const QuotationTable = () => {
         }
       };
       fetchLocations();
-    }, []);
+    }, [selectedDate]);
     useEffect(() => {
       if (selectedLocation) {
         fetchSupplierDetails(selectedLocation);
@@ -514,7 +516,7 @@ const QuotationTable = () => {
   const downloadPDF = () => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   
-    const now = moment().add(20, 'days');
+    const now = moment().add(0, 'days');
     const formattedDate = now.format("DD-MM-YYYY");
     const startDate = selectedDate.clone().startOf("month").format("DD");
     const endDate = selectedDate.clone().endOf("month").format("DD");
@@ -642,7 +644,7 @@ const QuotationTable = () => {
     doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
-    doc.text(`Adhoc Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Adhoc Export rates`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
     doc.text(`Quote for GTI to ${loc} FCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);

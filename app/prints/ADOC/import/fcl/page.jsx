@@ -137,12 +137,14 @@ const QuotationTable = () => {
   useEffect(() => {
         const fetchLocations = async () => {
           try {
-            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+             const selectedMonth = dayjs(selectedDate).month() + 1;
+          const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import' ,Month_No:selectedMonth ,Year_No: selectedYear }),
             });
             const data = await response.json();
             setLocations(data.result);
@@ -151,7 +153,7 @@ const QuotationTable = () => {
           }
         };
         fetchLocations();
-      }, []);
+      }, [selectedDate]);
       useEffect(() => {
         if (selectedLocation) {
           fetchSupplierDetails(selectedLocation);
@@ -519,7 +521,7 @@ const QuotationTable = () => {
   const downloadPDF = () => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   
-    const now = moment().add(20, 'days');
+    const now = moment().add(0, 'days');
     const formattedDate = now.format("DD-MM-YYYY");
     const startDate = selectedDate.clone().startOf("month").format("DD");
     const endDate = selectedDate.clone().endOf("month").format("DD");
