@@ -28,8 +28,10 @@ export default async function handler(req, res) {
   const {
     supplierCode,
     locationCode,
+    quote_Date,
     quoteMonth,
     quoteYear,
+    cbm,
     originData,
     seaFreightData,
     destinationData,
@@ -62,8 +64,10 @@ export default async function handler(req, res) {
   const quoteData = {
     Supplier_Code: supplierCode,
     Location_Code: locationCode || "",
+    Quote_Date: quote_Date,
     Quote_Month: quoteMonth,
     Quote_Year: quoteYear,
+    CBM: cbm,
     O_CCD: parseDecimal(originData[0]?.[20]),
     O_LTG: parseDecimal(originData[1]?.[20]),
     O_THC: parseDecimal(originData[2]?.[20]),
