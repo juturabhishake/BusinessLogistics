@@ -453,8 +453,9 @@ export default function PremiumTransportFormFixed() {
                     </Tooltip>
                   )}
                 </h3>
-                <fieldset disabled={!allSelectionsComplete || !locationIsSelected} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 disabled:opacity-40 transition-opacity">
-                  {[
+                <fieldset disabled={!allSelectionsComplete || !locationIsSelected} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 disabled:opacity-40 transition-opacity">                 
+                  {
+                  [
                     { id: 'Commodity', label: 'Commodity', placeholder: 'e.g., Turbo charger and Engine components' }, { id: 'HSN_Code', label: 'HSN Code', placeholder: 'e.g., 851712' },
                     { id: 'Incoterms', label: 'Incoterms', placeholder: 'e.g., DAP' }, { id: 'USD', label: 'USD', placeholder: 'e.g., In Indian Rupees' },
                     { id: 'EURO', label: 'EURO', placeholder: 'e.g., In Indian Rupees' }, { id: 'Transit_Days', label: 'Transit Days', placeholder: 'e.g., 42' },
@@ -481,7 +482,7 @@ export default function PremiumTransportFormFixed() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="w-full sm:w-auto">
-                  <Button onClick={handleSave} disabled={!allFieldsComplete || isSaving || isSaved} className="w-full">
+                  <Button onClick={handleSave} disabled={!allFieldsComplete || isSaving || isSaved  || !formData.USD?.trim() || !formData.EURO?.trim() || !formData.Incoterms?.trim()} className="w-full">
                     {isSaving ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>)
                       : isSaved ? (<><Check className="mr-2 h-4 w-4" /> Saved Successfully</>)
                         : ('Create Request')}

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { FaSearch, FaEdit, FaTrash } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash,FaEye } from "react-icons/fa";
 import secureLocalStorage from "react-secure-storage";
 
 const TransportRequestsTable = () => {
@@ -242,10 +242,10 @@ const TransportRequestsTable = () => {
                     paginatedData.map((item) => (
                       <tr key={item.ID} className="border hover:bg-muted">
                         <td className="px-4 py-2 border">
-                          <button onClick={() => handleEdit(item)} className="mr-2 text-blue-500"><FaEdit /></button>
-                          <button onClick={() => handleDelete(item.ID)} className="px-2 text-red-500">
+                          <button onClick={() => handleEdit(item)} className="mr-2 text-blue-500"><FaEye /></button>
+                          {/* <button onClick={() => handleDelete(item.ID)} className="px-2 text-red-500">
                             {deleteState[item.ID] === 'deleting' ? '...' : <FaTrash />}
-                          </button>
+                          </button> */}
                         </td>
                         {Object.values(columnKeyMap).map((key) => (
                           <td key={key} className="px-4 py-2 border">
@@ -351,7 +351,7 @@ const TransportRequestsTable = () => {
             </div>
             <div className="flex justify-end p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg border-t mt-auto">
               <button onClick={() => setIsModalOpen(false)} className="mr-2 px-4 py-2 bg-gray-500 text-white rounded">Cancel</button>
-              <button
+              {/* <button
                 onClick={handleSave}
                 className={`px-4 py-2 rounded flex items-center justify-center min-w-[80px]
                 ${saveState === "success" ? "bg-green-500 text-white" : 
@@ -360,7 +360,7 @@ const TransportRequestsTable = () => {
                 {saveState === "saving" ? <div className="animate-spin w-5 h-5 border-4 border-white border-t-transparent rounded-full"></div>
                   : saveState === "success" ? "✔ Saved"
                   : saveState === "error" ? "❌ Error" : "Save"}
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

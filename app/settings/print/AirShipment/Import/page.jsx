@@ -686,8 +686,8 @@ const QuotationTable = () => {
     //     { content: "", styles: { halign: "center" } }]);
     tableBody.push([{ content: "Payment Terms", colSpan: 2, styles: { fontStyle: "bold" } },
         { content: "Monthly Basis", styles: { halign: "center" } },
-        { content: "Monthly Basis", styles: { halign: "center" } },
-        { content: "Monthly Basis", styles: { halign: "center" } },
+        { content: "", styles: { halign: "center" } },
+        { content: "", styles: { halign: "center" } },
         { content: "", styles: { halign: "center" } }]);
     // tableBody.push([{ content: "Proposed Cost", colSpan: 3, styles: { fontStyle: "bold" } },
     //     { content: total[0], styles: { halign: "center" } },
