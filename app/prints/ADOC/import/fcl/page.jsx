@@ -474,6 +474,7 @@ const QuotationTable = () => {
             setRemarks(data.result[0].Remarks || "");
             setUSD(parseFloat(data.result[0].USD));
             setEUR(parseFloat(data.result[0].EURO));
+            setWeight(parseFloat(data.result[0].Weight) || "");
             setUploadedPdfPath(data.result[0].UploadedPDF || "");
             setContainerSize(data.result[0].Container_Size || "N/A");
             console.log("Supplier details fetched successfully:", data.result[0]);
@@ -499,7 +500,7 @@ const QuotationTable = () => {
           setRemarks("");
           setContainerSize("N/A");
           setUploadedPdfPath('');
-          // setWeight("");
+          setWeight("");
         if (selectedLocation) {
           fetchSupplierDetails(selectedLocation);
           fetchQuotationData(selectedLocation);
@@ -651,7 +652,7 @@ const QuotationTable = () => {
     doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
-    doc.text(`Adhoc Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Adhoc Import rates`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
     doc.text(`Quote for GTI to ${loc} FCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);

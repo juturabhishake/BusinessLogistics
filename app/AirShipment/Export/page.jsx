@@ -79,6 +79,9 @@ const QuotationTable = () => {
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [weight, setWeight] = useState("");
   const [containerSize, setContainerSize] = useState("N/A");
+      const [quoteDate, setquoteDate] = useState("");
+      const [quoteTime, setquoteTime] = useState("");
+      const [cmmQ, setcmmQ] = useState("");
 
   useEffect(() => {
     let flag = false
@@ -220,6 +223,8 @@ const QuotationTable = () => {
     const quoteData = {
       supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
+       quote_Date: quoteDate,
+      cbm:cmmQ,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
       originData: filterCharges(originCharges),
@@ -416,6 +421,9 @@ const QuotationTable = () => {
         setUploadedPdfPath(data.result[0].UploadedPDF || "");
         setWeight(parseFloat(data.result[0].Weight) || "");
         console.log("Supplier details fetched successfully:", data.result[0]);
+        setquoteDate(data.result[0].Request_Date);
+          setquoteTime("11:00 AM");
+          setcmmQ(data.result[0].Container_Size);
       }
     } catch (error) {
       console.error("Error fetching supplier details:", error);
@@ -439,6 +447,9 @@ const QuotationTable = () => {
       setContainerSize('N/A');
       setUploadedPdfPath('');
       setWeight("");
+       setcmmQ("");       
+        setquoteDate("");
+        setquoteTime("");
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
       fetchQuotationData(selectedLocation);
@@ -456,7 +467,7 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
-              <p className="text-xs text-gray-100">"Air shipment export rates for {currentDateInfo}"</p>
+              <p className="text-xs text-gray-100">Air shipment export</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4">
@@ -521,7 +532,13 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Mode of Transport : Air</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Mode of Transport : Air {" "} <span className="text-red-500">
+    ( {quoteDate
+                      ? new Date(quoteDate).toLocaleDateString(
+                          "en-GB"
+                        )
+                      : ""} {quoteTime})
+  </span></th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>

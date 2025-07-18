@@ -76,6 +76,9 @@ const QuotationTable = () => {
   const [Pref_Liners, setPref_Liners] = useState(""); 
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [containerSize, setContainerSize] = useState("");
+    const [quoteDate, setquoteDate] = useState("");
+    const [quoteTime, setquoteTime] = useState("");
+    const [cmmQ, setcmmQ] = useState("");
 
   useEffect(() => {
     let flag = false
@@ -161,11 +164,11 @@ const QuotationTable = () => {
         
         // const fcl20 = data.result.find((item) => item.Cont_Feet === 20) || {};
 
-        updatedOriginCharges[0][20] = data.result[0].O_CCD || "";
-        updatedOriginCharges[1][20] = data.result[0].O_LTG || "";
-        updatedOriginCharges[2][20] = data.result[0].O_THC || "";
-        updatedOriginCharges[3][20] = data.result[0].O_BLC || "";
-        updatedOriginCharges[4][20] = data.result[0].O_LUS || "";
+        updatedOriginCharges[0][20] = data.result[0].D_CCD || "";
+        updatedOriginCharges[1][20] = data.result[0].D_LTS || "";
+        updatedOriginCharges[2][20] = data.result[0].D_THC || "";
+        updatedOriginCharges[3][20] = data.result[0].D_BLC || "";
+        updatedOriginCharges[4][20] = data.result[0].D_LUS || "";
         // updatedOriginCharges[5][20] = data.result[0].O_Halt || "";
 
         updatedSeaFreightCharges[0][20] = data.result[0].S_SeaFre || "";
@@ -173,12 +176,12 @@ const QuotationTable = () => {
         updatedSeaFreightCharges[2][20] = data.result[0].S_SSC || "";
         // updatedSeaFreightCharges[3][20] = data.result[0].S_ITT || "";
 
-        updatedDestinationCharges[0][20] = data.result[0].D_CC || "";
-        updatedDestinationCharges[1][20] = data.result[0].D_CCF || "";
-        updatedDestinationCharges[2][20] = data.result[0].D_DOC || "";
-        updatedDestinationCharges[3][20] = data.result[0].D_CFS || "";
-        updatedDestinationCharges[4][20] = data.result[0].D_LU || "";
-        updatedDestinationCharges[5][20] = data.result[0].D_Del || "";
+        updatedDestinationCharges[0][20] = data.result[0].O_CC || "";
+        updatedDestinationCharges[1][20] = data.result[0].O_CCF || "";
+        updatedDestinationCharges[2][20] = data.result[0].O_DOC || "";
+        updatedDestinationCharges[3][20] = data.result[0].O_CFS || "";
+        updatedDestinationCharges[4][20] = data.result[0].O_LU || "";
+        updatedDestinationCharges[5][20] = data.result[0].O_Del || "";
         // updatedDestinationCharges[6][20] = data.result[0].D_LOC || "";
 
         setRemarks(data.result[0].remarks || "");
@@ -217,6 +220,8 @@ const QuotationTable = () => {
     const quoteData = {
       supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
+      quote_Date: quoteDate,
+      cbm:cmmQ,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
       originData: filterCharges(originCharges),
@@ -384,6 +389,9 @@ const QuotationTable = () => {
           setEUR(parseFloat(data.result[0].EURO));
           setContainerSize(data.result[0].Container_Size || "");
           setUploadedPdfPath(data.result[0].UploadedPDF || "");
+          setquoteDate(data.result[0].Request_Date);
+          setquoteTime("11:00 AM");
+          setcmmQ(data.result[0].Container_Size);
           console.log("Supplier details fetched successfully:", data.result[0]);
         }
       } catch (error) {
@@ -406,6 +414,9 @@ const QuotationTable = () => {
       setEUR(0);
       setRemarks("");
       setUploadedPdfPath('');
+       setcmmQ("");       
+        setquoteDate("");
+        setquoteTime("");
       setContainerSize("N/A");
         // setWeight("");
       if (selectedLocation) {
@@ -490,7 +501,13 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - Adhoc LCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - Adhoc LCL{" "} <span className="text-red-500">
+    ( {quoteDate
+                      ? new Date(quoteDate).toLocaleDateString(
+                          "en-GB"
+                        )
+                      : ""} {quoteTime})
+  </span></th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>

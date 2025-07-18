@@ -485,7 +485,7 @@ const QuotationTable = () => {
   const downloadPDF = () => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   
-    const now = moment().add(20, 'days');
+    const now = moment().add(0, 'days');
     const formattedDate = now.format("DD-MM-YYYY");
     const startDate = selectedDate.clone().startOf("month").format("DD");
     const endDate = selectedDate.clone().endOf("month").format("DD");
@@ -580,14 +580,14 @@ const QuotationTable = () => {
     tableBody.push([{ content: "Location", colSpan: 2, styles: { fontStyle: "bold" } }, { content: locationName, colSpan: 8 }]);
   
     const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
-    const maxDeliveryAddressLength = 50;
+    const maxDeliveryAddressLength = 300;
     const trimmedAddress = cleanedDeliveryAddress.length > maxDeliveryAddressLength
       ? cleanedDeliveryAddress.slice(0, maxDeliveryAddressLength) + '...'
       : cleanedDeliveryAddress;
   
     tableBody.push([
       { content: "Delivery Address", colSpan: 2, styles: { fontStyle: "bold" } },
-      { content: trimmedAddress, colSpan: 8, styles: { fontSize: 7 } }
+      { content: cleanedDeliveryAddress, colSpan: 8, styles: { fontSize: 7 } }
     ]);
   
     tableBody.push([
@@ -617,7 +617,7 @@ const QuotationTable = () => {
     doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
-    doc.text(`Air Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Air Import rates`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
     doc.text(`Quote for  ${loc} to GTI Air shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
@@ -671,7 +671,7 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
-              <p className="text-xs text-gray-100">"Air Import rates for { dayjs(selectedDate).format("MMMM YYYY")}"</p>
+              <p className="text-xs text-gray-100">Air Import rates</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4 sm:gap-0 lg:gap-4 mt-4 lg:mt-0">
@@ -764,7 +764,7 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Air Freight RFQ - FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Air Freight Import </th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Quote for {locationName || "{select location}"} to GTI  Air shipment</th>
                 <th colSpan="2" rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
