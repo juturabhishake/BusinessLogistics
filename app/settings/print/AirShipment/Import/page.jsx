@@ -96,7 +96,7 @@ const QuotationTable = () => {
   const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
-
+  const [actual_Location, setActual_Location] = useState("");  
   const tableRef = useRef();
 
   useEffect(() => {
@@ -226,6 +226,7 @@ const QuotationTable = () => {
                     setUploadedPdfPath(data.result[0].UploadedPDF || "");
                     setContainerSize(data.result[0].Container_Size || "N/A");
                     setWeight(parseFloat(data.result[0].Weight) || "");
+                       setActual_Location(data.result[0].Actual_Location || "");
                     console.log("Supplier details fetched successfully:", data.result[0]);
                   }
                 } catch (error) {
@@ -250,6 +251,7 @@ const QuotationTable = () => {
                   setUploadedPdfPath('');
                   setContainerSize("N/A");
                   setWeight("");
+                   setActual_Location("");
                 if (selectedLocation) {
                   fetchSupplierDetails(selectedLocation);
                   fetchQuotationData(selectedLocation);
@@ -703,7 +705,7 @@ const QuotationTable = () => {
     doc.setFontSize(8);
     // doc.text(`Air Import rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for ${loc} to GTI Air shipment`, 5, 14, { align: "left" });
+    doc.text(`Quote for ${actual_Location} to GTI Air shipment`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });

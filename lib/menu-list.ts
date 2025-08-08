@@ -164,7 +164,8 @@ export function getMenuList(pathname: string): Group[] {
               icon: LocateFixedIcon,
               submenus: [
                 { href: "/settings/location_settings", label: "Location Master" },
-                { href: "/settings/location_details", label: "Location Details" }
+                { href: "/settings/location_details", label: "Location Details" },
+                 { href: "/settings/adhoc_locations", label: "Adhoc Locations" }
               ]
             },
             {

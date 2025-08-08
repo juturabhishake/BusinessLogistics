@@ -97,7 +97,7 @@ const QuotationTable = () => {
   const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
-
+  const [actual_Location, setActual_Location] = useState("");  
   const tableRef = useRef();
 
   useEffect(() => {
@@ -256,6 +256,7 @@ const QuotationTable = () => {
               setEUR(parseFloat(data.result[0].EURO));
               setUploadedPdfPath(data.result[0].UploadedPDF || "");
               setContainerSize(data.result[0].Container_Size || "N/A");
+              setActual_Location(data.result[0].Actual_Location || "");
               console.log("Supplier details fetched successfully:", data.result[0]);
             }
           } catch (error) {
@@ -279,6 +280,7 @@ const QuotationTable = () => {
             setRemarks("");
             setContainerSize("N/A");
             setUploadedPdfPath('');
+            setActual_Location("");
             // setWeight("");
           if (selectedLocation) {
             fetchSupplierDetails(selectedLocation);
@@ -711,7 +713,7 @@ const QuotationTable = () => {
     doc.setFontSize(8);
     doc.text(`ADOC Import FCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} ADOC FCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Quote for GTI to ${actual_Location} ADOC FCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
@@ -1063,7 +1065,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="2" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Container / CBM :</td>
                 <td colSpan="3" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>

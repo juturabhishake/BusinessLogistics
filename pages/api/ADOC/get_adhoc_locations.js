@@ -24,11 +24,11 @@ export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
 
   try {
-    const result = await prisma.$queryRaw`SELECT [Location_Code],[Location] FROM Adhoc_Request.[dbo].[Adhoc_Locations] Where Status=1`;
-
+    const result = await prisma.$queryRaw`select * from get_adhoc_location()`;
+    console.log('Location data:', result);
     return res.status(200).json({ result });
   } catch (error) {
-    console.error('Error fetching currency:', error);
+    console.error('Error fetching location data:', error);
     return res.status(500).json({ message: 'Internal Server Error' });
   } finally {
     await prisma.$disconnect();
