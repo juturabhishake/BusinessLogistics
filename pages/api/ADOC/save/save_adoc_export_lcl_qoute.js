@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     totalSeaFreight,
     totalDestination,
     createdBy,
-    remarks,
+    remarks,Request_Id,
   } = req.body;
 
   if (
@@ -89,6 +89,7 @@ export default async function handler(req, res) {
     Created_Date: new Date(),
     Created_By: createdBy || "Unknown",
     remarks: remarks || "",
+     Request_Id: Request_Id,
   };
 
   try {

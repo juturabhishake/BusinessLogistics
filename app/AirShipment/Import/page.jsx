@@ -79,9 +79,10 @@ const QuotationTable = () => {
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [weight, setWeight] = useState("");
   const [containerSize, setContainerSize] = useState("N/A");
-    const [quoteDate, setquoteDate] = useState("");
-        const [quoteTime, setquoteTime] = useState("");
-        const [cmmQ, setcmmQ] = useState("");
+  const [quoteDate, setquoteDate] = useState("");
+  const [quoteTime, setquoteTime] = useState("");
+  const [cmmQ, setcmmQ] = useState("");
+  const [Request_Id, setRequest_Id] = useState(0); 
   
 
   useEffect(() => {
@@ -237,6 +238,7 @@ const QuotationTable = () => {
       totalDestination: totalDestination,
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
+       Request_Id:Request_Id,
     };
     console.log("Quote Data:", quoteData);
     try {
@@ -397,6 +399,7 @@ const QuotationTable = () => {
           setquoteDate(data.result[0].Request_Date);
           setquoteTime("11:00 AM");
           setcmmQ(data.result[0].Container_Size);
+          setRequest_Id(data.result[0].Request_Id);
           console.log("Supplier details fetched successfully:", data.result[0]);
         }
       } catch (error) {
@@ -423,6 +426,7 @@ const QuotationTable = () => {
         setWeight("");
         setcmmQ("");       
         setquoteDate("");
+        setRequest_Id(0);
         setquoteTime("");
       if (selectedLocation) {
         fetchSupplierDetails(selectedLocation);

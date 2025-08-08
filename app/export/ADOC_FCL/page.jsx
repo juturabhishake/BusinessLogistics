@@ -86,7 +86,7 @@ const QuotationTable = () => {
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [containerSize, setContainerSize] = useState("N/A");
-
+    const [Request_Id, setRequest_Id] = useState(0); 
   useEffect(() => {
     let flag = false
     const check_sc = secureLocalStorage.getItem("sc");
@@ -290,6 +290,7 @@ const QuotationTable = () => {
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
       uploaded_pdf_path: pdfPath || "",
+      Request_Id:Request_Id,
     };
     console.log("Quote Data:", quoteData);
     try {
@@ -451,6 +452,7 @@ const QuotationTable = () => {
         setEUR(parseFloat(data.result[0].EURO));
         setUploadedPdfPath(data.result[0].UploadedPDF || "");
         setContainerSize(data.result[0].Container_Size || "N/A");
+        setRequest_Id(data.result[0].Request_Id);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -476,6 +478,7 @@ const QuotationTable = () => {
       setRemarks("");
       setContainerSize("N/A");
       setUploadedPdfPath('');
+      setRequest_Id(0);
       // setWeight("");
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);

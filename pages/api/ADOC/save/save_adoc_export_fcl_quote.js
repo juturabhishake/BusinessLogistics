@@ -50,6 +50,7 @@ export default async function handler(req, res) {
     createdBy,
     remarks,
     uploaded_pdf_path,
+    Request_Id,
   } = req.body;
 
   if (
@@ -103,6 +104,7 @@ export default async function handler(req, res) {
     Created_By: createdBy || "Unknown",
     remarks: remarks || "",
     uploaded_pdf_path: uploaded_pdf_path || "",
+    Request_Id: Request_Id,
   };
   console.log("Payload:", quoteData);
   try {

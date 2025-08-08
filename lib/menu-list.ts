@@ -155,7 +155,8 @@ export function getMenuList(pathname: string): Group[] {
               icon: FilePlus, 
               submenus: [
                 { href: "/settings/req_transport", label: "Create" },
-                { href: "/settings/req_transport/view", label: "View/Edit" }
+                { href: "/settings/req_transport/view", label: "View" },
+                { href: "/settings/req_transport/status", label: "Status" }
               ]
             },
             {
