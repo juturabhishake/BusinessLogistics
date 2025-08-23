@@ -41,12 +41,12 @@ const QuotationTable = () => {
   });
 
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Local Transportation From GTI-Chennai", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Terminal Handling Charges - Origin", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Bill of Lading Charges", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
-    { description: "Halting", remarks: "If any", sc1: "", sc2: "", sc3: "" },
+    { description: "Customs clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "CC Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "LINER CHARGES", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+    { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
   ]);
 
   const [seaFreightCharges, setSeaFreightCharges] = useState([
@@ -57,11 +57,11 @@ const QuotationTable = () => {
   ]);
 
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Destination Terminal Handling Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "BL Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "Delivery by Barge/Road", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Delivery Order Fees", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Handling Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Pickup & Clerance Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Custom Clearance", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "Handling / DO/ ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Terminal Handling Charge ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Documentation ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "T1 Doc", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
   ]);
@@ -136,12 +136,14 @@ const QuotationTable = () => {
   useEffect(() => {
           const fetchLocations = async () => {
             try {
-              const response = await fetch('/api/get_locations_Adhoc_Air' , {
+                const selectedMonth = dayjs(selectedDate).month() + 1;
+                const selectedYear = dayjs(selectedDate).year();
+              const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
+                body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import' ,Month_No:selectedMonth ,Year_No: selectedYear  }),
               });
               const data = await response.json();
               setLocations(data.result);
@@ -168,10 +170,12 @@ const QuotationTable = () => {
         }, [selectedLocation]);
         const fetchContainerSizes = async () => {
             try {
-                const response = await fetch('/api/ADOC/get_containers', {
+               const selectedMonth = dayjs(selectedDate).month() + 1;
+              const selectedYear = dayjs(selectedDate).year();
+                const response = await fetch('/api/ADOC/get_containers_admin', {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A" }),
+                    body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A",MonthNo:selectedMonth ,YearNo: selectedYear }),
                 });
                 const data = await response.json();
                 console.log("Container Sizes Data:", data);
@@ -230,12 +234,14 @@ const QuotationTable = () => {
 
   const fetchSupplierDetails = async (locCode) => {
           try {
-            const response = await fetch('/api/ADOC/ADOCFCL_Terms', {
+              const selectedMonth = dayjs(selectedDate).month() + 1;
+              const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize ,MonthNo: selectedMonth,YearNo: selectedYear }),
             });
             const data = await response.json();
             console.log("Request body:", { Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize });
@@ -648,11 +654,11 @@ const QuotationTable = () => {
         });
     };
 
-    addSectionHeader("A) ORIGIN CHARGES");
-    addChargesToBody(originCharges, "INR");
+    addSectionHeader("A) EX Works Charges");
+    addChargesToBody(destinationCharges, currency);
     tableBody.push([
         "",
-        { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        { content: "Total EX Works Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
         ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
@@ -667,7 +673,8 @@ const QuotationTable = () => {
     ]);
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, currency);
+    addChargesToBody(originCharges, "INR");
+    
     tableBody.push([
         "",
         { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
@@ -710,13 +717,13 @@ const QuotationTable = () => {
     doc.setFontSize(10);
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
-    doc.setFontSize(8);
-    doc.text(`ADOC Import FCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    // doc.setFontSize(8);
+    // doc.text(`ADOC Import FCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${actual_Location} ADOC FCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Sea Import for ${actual_Location}  to GTI ${containerSize} shipment`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
     doc.setFontSize(8);
     
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
@@ -726,7 +733,7 @@ const QuotationTable = () => {
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
-    const startY = 24;
+    const startY = 22;
       
     doc.autoTable({
         head: tableHeaders,

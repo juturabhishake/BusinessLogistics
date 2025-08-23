@@ -134,12 +134,14 @@ const QuotationTable = () => {
   useEffect(() => {
         const fetchLocations = async () => {
           try {
-            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+             const selectedMonth = dayjs(selectedDate).month() + 1;
+             const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'export'   }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'export'   ,Month_No:selectedMonth ,Year_No: selectedYear  }),
             });
             const data = await response.json();
             setLocations(data.result);
@@ -200,12 +202,14 @@ const QuotationTable = () => {
 
   const fetchSupplierDetails = async (locCode) => {
           try {
-            const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+            const selectedMonth = dayjs(selectedDate).month() + 1;
+             const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'export',Loc_Code: locCode }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'export',Loc_Code: locCode,Container_Size: 'LCL' ,MonthNo: selectedMonth,YearNo: selectedYear }),
             });
             const data = await response.json();
             if (data.result && data.result.length > 0) {
@@ -687,13 +691,12 @@ const QuotationTable = () => {
     doc.setFontSize(10);
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
-    doc.setFontSize(8);
-    doc.text(`ADOC Export LCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${actual_Location} ADOC LCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Sea Export for GTI to ${actual_Location} LCL shipment`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
     doc.setFontSize(8);
     
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
@@ -703,7 +706,7 @@ const QuotationTable = () => {
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
-    const startY = 24;
+    const startY = 22;
       
     doc.autoTable({
         head: tableHeaders,

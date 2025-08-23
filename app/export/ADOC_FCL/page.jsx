@@ -149,22 +149,7 @@ const QuotationTable = () => {
       }
   };
 
-  // useEffect(() => {
-  //   const fetchCurrency = async () => {
-  //     try {
-  //       const response = await fetch('/api/get_currency');
-  //       const data = await response.json();
-  //       if (data.result && data.result.length > 0) {
-  //         setUSD(parseFloat(data.result[0].USD));
-  //         setEUR(parseFloat(data.result[0].EURO));
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching currency:", error);
-  //     }
-  //   };
 
-  //   fetchCurrency();
-  // }, []);
 
   useEffect(() => {
     const currentDate = new Date();

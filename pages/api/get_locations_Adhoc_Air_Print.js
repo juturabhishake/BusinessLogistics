@@ -24,10 +24,12 @@ export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
   if (req.method === "POST") {
     const { Shipment_Type,Transport_Type,Month_No,Year_No } = req.body;
+       console.log("Shipment_Type,Transport_Type,Month_No,Year_No", Shipment_Type,Transport_Type,Month_No,Year_No);
     if (!Shipment_Type) {
         return res.status(400).json({ message: "Location code is required" });
     }
   try {
+ 
     const result = await prisma.$queryRaw`EXEC [dbo].[GET_Locations_Adhoc_AIR_Print] ${Shipment_Type},${Transport_Type},${Month_No},${Year_No}`;
     // const result = await prisma.$queryRaw`select * from get_req_locations(${RFQType});`;
 

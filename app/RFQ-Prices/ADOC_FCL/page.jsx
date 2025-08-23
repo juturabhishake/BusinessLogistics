@@ -33,12 +33,12 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Container" },
-    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Container" },
-    { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
-    { description: "Halting", 20: "", remarks: "If any" },
+   { description: "Customs clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "CC Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "LINER CHARGES", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+    { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
   ]);
   
   const [seaFreightCharges, setSeaFreightCharges] = useState([
@@ -49,13 +49,13 @@ const QuotationTable = () => {
   ]);
   
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Destination Terminal Handling Charges", 20: "", remarks: "Per Container" },
-    { description: "BL Fee", 20: "", remarks: "Per BL" },
-    { description: "Delivery by Barge/Road", 20: "", remarks: "Per Container" },
-    { description: "Delivery Order Fees", 20: "", remarks: "Per Container" },
-    { description: "Handling Charges", 20: "", remarks: "Per Container" },
-    { description: "T1 Doc", 20: "", remarks: "Per Container" },
-    { description: "LOLO Charges", 20: "", remarks: "Per Container" },
+    { description: "Pickup & Clerance Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Custom Clearance", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "Handling / DO/ ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Terminal Handling Charge ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Documentation ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "T1 Doc", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
   ]);
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -601,7 +601,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.destination ? "▼" : "▶"} Destination Charges
+                  {sections.destination ? "▼" : "▶"} EX Works Charges
                 </td>
               </tr>
               {sections.destination &&
@@ -633,7 +633,7 @@ const QuotationTable = () => {
                 ))}
               {sections.destination && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total EX Works Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td colSpan="2" className="py-1 px-3 border">{totalDestination[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
@@ -689,7 +689,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Origin Charges
+                  {sections.origin ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
             
@@ -728,7 +728,7 @@ const QuotationTable = () => {
               })}
               {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td colSpan="2" className="py-1 px-3 border">{totalOrigin[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
