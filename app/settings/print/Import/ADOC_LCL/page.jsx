@@ -673,7 +673,7 @@ const QuotationTable = () => {
     const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
 
     tableBody.push([
-        { content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: "Pickup Address", colSpan: 3, styles: { fontStyle: "bold" } },
         { content: cleanedDeliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap", fontSize: 7 } }
     ]);
     tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } }, 
@@ -691,13 +691,11 @@ const QuotationTable = () => {
     doc.setFontSize(10);
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
-    doc.setFontSize(8);
-    doc.text(`ADOC Import LCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${actual_Location} ADOC LCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Quote for ${actual_Location} to GTI Sea shipment ${containerSize}`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
     doc.setFontSize(8);
     
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
@@ -707,7 +705,7 @@ const QuotationTable = () => {
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
-    const startY = 24;
+    const startY = 22;
       
     doc.autoTable({
         head: tableHeaders,
@@ -751,7 +749,7 @@ const QuotationTable = () => {
                   }`
                 }
                 </p>
-              <p className="text-xs text-gray-100">Quote for GTI to {locationName || "{select location}"} shipment</p>
+              <p className="text-xs text-gray-100">Quote for {locationName || "{select location}"} to GTI Sea shipment</p>
             </div>
             <div className="flex flex-col lg:flex-row justify-end items-start lg:items-center lg:space-y-0 sm:space-x-2 space-y-2">
             <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
@@ -987,7 +985,7 @@ const QuotationTable = () => {
                 <td colSpan="8" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Delivery Address</td>             
+                <td colSpan="2" className="py-1 px-3 border text-start">Pickup Address</td>             
                 <td colSpan="8" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>

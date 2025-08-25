@@ -518,7 +518,7 @@ const QuotationTable = () => {
                       : ""} {quoteTime})
   </span></th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
-                <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
+                <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for  {locationName || "{select location}"} to GTI shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
@@ -680,7 +680,7 @@ const QuotationTable = () => {
                 <td colSpan="4" className="py-1 px-3 border text-left">{locationName}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
+                <td colSpan="2" className="py-1 px-3 border  text-start">Pickup Location</td>             
                 <td colSpan="4" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>

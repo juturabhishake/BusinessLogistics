@@ -693,7 +693,7 @@ const QuotationTable = () => {
 
 
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Sea Export for GTI to ${actual_Location} LCL shipment`, 5, 14, { align: "left" });
+    doc.text(`Quote for GTI to ${actual_Location} Sea shipment ${containerSize}`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });

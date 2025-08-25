@@ -174,10 +174,12 @@ const QuotationTable = () => {
       }, [selectedLocation]);
       const fetchContainerSizes = async () => {
           try {
-              const response = await fetch('/api/ADOC/get_containers', {
+              const selectedMonth = dayjs(selectedDate).month() + 1;
+               const selectedYear = dayjs(selectedDate).year();
+               const response = await fetch('/api/ADOC/get_containers_admin', {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A" }),
+                  body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A" ,MonthNo:selectedMonth ,YearNo: selectedYear }),
               });
               const data = await response.json();
               console.log("Container Sizes Data:", data);

@@ -613,7 +613,7 @@ const QuotationTable = () => {
     doc.setFontSize(8);
     // doc.text(`ADOC Export FCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${actual_Location} Export FCL shipment`, 5, 14, { align: "left" });
+    doc.text(`Sea Export for GTI to ${actual_Location} ${containerSize} shipment`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });

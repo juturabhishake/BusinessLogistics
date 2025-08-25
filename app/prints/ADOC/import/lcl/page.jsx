@@ -133,12 +133,14 @@ const QuotationTable = () => {
   useEffect(() => {
         const fetchLocations = async () => {
           try {
-            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+           const selectedMonth = dayjs(selectedDate).month() + 1;
+           const selectedYear = dayjs(selectedDate).year();
+           const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import'   }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import'   ,Month_No:selectedMonth ,Year_No: selectedYear  }),
             });
             const data = await response.json();
             setLocations(data.result);
@@ -413,12 +415,14 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
           try {
-            const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+            const selectedMonth = dayjs(selectedDate).month() + 1;
+            const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import',Loc_Code: locCode }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import',Loc_Code: locCode , Container_Size: 'LCL' ,MonthNo: selectedMonth,YearNo: selectedYear }),
             });
             const data = await response.json();
             if (data.result && data.result.length > 0) {

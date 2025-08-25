@@ -135,12 +135,14 @@ const QuotationTable = () => {
   useEffect(() => {
         const fetchLocations = async () => {
           try {
-            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+            const selectedMonth = dayjs(selectedDate).month() + 1;
+            const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ Shipment_Type: 'AIR',Transport_Type: 'import'   }),
+              body: JSON.stringify({ Shipment_Type: 'AIR',Transport_Type: 'import'  ,Month_No:selectedMonth ,Year_No: selectedYear  }),
             });
             const data = await response.json();
             setLocations(data.result);
@@ -201,12 +203,14 @@ const QuotationTable = () => {
 
   const fetchSupplierDetails = async (locCode) => {
                 try {
-                  const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+                  const selectedMonth = dayjs(selectedDate).month() + 1;
+                   const selectedYear = dayjs(selectedDate).year();
+                  const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ Shipment_Type: 'AIR',Transport_Type: 'import',Loc_Code: locCode }),
+                    body: JSON.stringify({ Shipment_Type: 'AIR',Transport_Type: 'import',Loc_Code: locCode , Container_Size: 'Air' ,MonthNo: selectedMonth,YearNo: selectedYear }),
                   });
                   const data = await response.json();
                   if (data.result && data.result.length > 0) {
@@ -664,7 +668,7 @@ const QuotationTable = () => {
     const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
 
     tableBody.push([
-        { content: "Delivery Address", colSpan: 2, styles: { fontStyle: "bold" } },
+        { content: "Pickup Address", colSpan: 2, styles: { fontStyle: "bold" } },
         { content: cleanedDeliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap", fontSize: 7 } }
     ]);
     tableBody.push([{ content: "FX Rate", colSpan: 2, styles: { fontStyle: "bold" } }, 
@@ -1002,7 +1006,7 @@ const QuotationTable = () => {
                 <td colSpan="8" className="py-1 px-3 border text-left">{locationName}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Delivery Address</td>             
+                <td colSpan="2" className="py-1 px-3 border text-start">Pickup Address</td>             
                 <td colSpan="8" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>
