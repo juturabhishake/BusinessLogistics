@@ -33,11 +33,11 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Container" },
-    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Container" },
+    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Shipment" },
+    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Shipment" },
+    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Shipment" },
     { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
+    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Shipment" },
     // { description: "Halting", 20: "", remarks: "If any" },
     { description: "CFS Charges", 20: "", remarks: "At Actual" },
   ]);

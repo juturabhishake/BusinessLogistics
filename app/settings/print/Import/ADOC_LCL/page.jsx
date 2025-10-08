@@ -41,16 +41,16 @@ const QuotationTable = () => {
   });
 
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Local Transportation From GTI-Chennai", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Terminal Handling Charges - Origin", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Customs Clearance & Documentation", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "Local Transportation From GTI-Chennai", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "Terminal Handling Charges - Origin", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
     { description: "Bill of Lading Charges", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+    { description: "Loading/Unloading / SSR", remarks: "Per CBM", sc1: "", sc2: "", sc3: ""},
     // { description: "CFS Charges (At Actual)", remarks: "At Actual", sc1: "", sc2: "", sc3: "" },
   ]);
 
   const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "Sea Freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Sea Freight", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
     { description: "FSC (Fuel Surcharge)", remarks: "", sc1: "", sc2: "", sc3: "" },
     { description: "SSC (Security Surcharge))", 20: "", remarks: "" },
     // { description: "ISPS", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
@@ -58,12 +58,12 @@ const QuotationTable = () => {
   ]);
 
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Custom Clearance", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Custom Clearance", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
     { description: "CC Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "CFS Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Deliver", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "D.O Charges", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "CFS Charges", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "Loading/Unloading", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "Deliver", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
     // { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
   ]);
 

@@ -634,7 +634,7 @@ const QuotationTable = () => {
     addChargesToBody(seaFreightCharges, "INR", "Sea Freight Charges");
     tableBody.push([
         "",
-        { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        { content: "Total Air Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
         ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" , fontStyle: "bold"} })),
         "",
     ]);
@@ -677,7 +677,7 @@ const QuotationTable = () => {
         { content: "EURO", styles: { halign: "center" } }, 
         { content: EUR.toFixed(2),  styles: { halign: "center" } }]); 
   
-    tableBody.push([{ content: "Weight of cargo :", colSpan: 2, styles: { fontStyle: "bold" } }, 
+    tableBody.push([{ content: "Weight of cargo in kgs :", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: weight, colSpan: 2 }, 
         { content: "Required Transit Days", colSpan: 1, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 1 }]);
@@ -938,7 +938,7 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Air Freight Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td className="py-1 px-3 border">{totalB[0] || ""}</td>
                   <td className="py-1 px-3 border">{totalB[1] || ""}</td>
@@ -1022,7 +1022,7 @@ const QuotationTable = () => {
               </tr>
              
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo :</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs :</td>
                 <td colSpan="8" className="py-1 px-3 border text-left">{weight}</td>
               </tr>
               <tr>

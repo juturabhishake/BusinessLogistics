@@ -62,7 +62,7 @@ const QuotationTable = () => {
       { description: "Customs Clearence", remarks: "", sc1: "", sc2: "", sc3: "" },
       { description: "CC Fee", remarks: "", sc1: "", sc2: "", sc3: "" },
       { description: "D.O Charges", remarks: "", sc1: "", sc2: "", sc3: "" },
-      { description: "LINER CHARGES", remarks: "", sc1: "", sc2: "", sc3: "" },
+      { description: "LINER CHARGES (At Actual)", remarks: "", sc1: "", sc2: "", sc3: "" },
       { description: "Loading / Unloading", remarks: "", sc1: "", sc2: "", sc3: "" },
       { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
       // { description: "LOLO Charges", remarks: "", sc1: "", sc2: "", sc3: "" },
@@ -677,7 +677,7 @@ const QuotationTable = () => {
         { content: "EURO", styles: { halign: "center" } }, 
         { content: EUR.toFixed(2),  styles: { halign: "center" } }]); 
    
-    tableBody.push([{ content: "Weight of cargo :", colSpan: 2, styles: { fontStyle: "bold" } }, 
+    tableBody.push([{ content: "Weight of cargo in kgs :", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: weight, colSpan: 2 }, 
         { content: "Required Transit Days", colSpan: 1, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 1 }]);

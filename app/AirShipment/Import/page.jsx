@@ -53,7 +53,7 @@ const QuotationTable = () => {
     { description: "Customs Clearence", 20: "", remarks: "" },
     { description: "CC Fee", 20: "", remarks: "" },
     { description: "D.O Charges", 20: "", remarks: "" },
-    { description: "LINER CHARGES", 20: "", remarks: "" },
+    { description: "LINER CHARGES (At Actual)", 20: "", remarks: "" },
     { description: "Loading / Unloading", 20: "", remarks: "" },
     { description: "Delivery", 20: "", remarks: "" },
     // { description: "LOLO Charges", 20: "", remarks: "" },
@@ -630,8 +630,11 @@ const QuotationTable = () => {
                   {sections.destination ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
-              {sections.destination &&
-                destinationCharges.map((item, index) => (
+             {sections.destination &&
+              destinationCharges.map((item, index) => {
+                const isCFS = item.description === "LINER CHARGES (At Actual)";
+
+                return (
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 12}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
@@ -643,20 +646,15 @@ const QuotationTable = () => {
                         className="w-full bg-transparent border-none focus:outline-none text-right"
                         value={item[20]}
                         onChange={(e) => handleDestinationChange(index, 20, e.target.value)}
+                        readOnly={isCFS}
                       />
                     </td>
                     <td colSpan="2" className="py-1 px-3 border">
-                    {item.remarks}
-                      {/* <input
-                        type="text"
-                        readOnly
-                        className="w-full bg-transparent border-none focus:outline-none text-center"
-                        value={item.remarks}
-                        onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
-                      /> */}
+                      {item.remarks}
                     </td>
                   </tr>
-                ))}
+                );
+              })}
               {sections.destination && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>

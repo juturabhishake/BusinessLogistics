@@ -48,11 +48,11 @@ const QuotationTable = () => {
   ]);
   
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Custom Clearance", 20: "", remarks: "Per Container" },
-    { description: "CC Fee", 20: "", remarks: "Per Container" },
-    { description: "D.O Charges per BL", 20: "", remarks: "Per Container" },
+    { description: "Custom Clearance", 20: "", remarks: "Per Shipment" },
+    { description: "CC Fee", 20: "", remarks: "Per Shipment" },
+    { description: "D.O Charges per BL", 20: "", remarks: "Per Shipment" },
     { description: "CFS Charges", 20: "", remarks: "Per BL" },
-    { description: "Loading/Unloading", 20: "", remarks: "Per Container" },
+    { description: "Loading/Unloading", 20: "", remarks: "Per Shipment" },
     { description: "Delivery", 20: "", remarks: "If any" },
     // { description: "CFS Charges", 20: "", remarks: "At Actual" },
   ]);
