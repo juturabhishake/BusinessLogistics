@@ -79,13 +79,13 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_venders' , {
+        const response = await fetch('/api/get_locations_vendors', {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'LCL', sc: secureLocalStorage.getItem("sc") || "Unknown Supplier" }),
-        });
+          body: JSON.stringify({ RFQType: 'LCL',sc: secureLocalStorage.getItem("sc") }),
+        } );
         const data = await response.json();
         setLocations(data.result);
       } catch (error) {
@@ -527,7 +527,7 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[240px] text-orange-500 ">Sea Freight Export LCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[240px] text-orange-500 ">Sea Freight RFQ - LCL</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] w-[130px]">Forwarders</th>
                 <th colSpan="6" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{Select Location}"} LCL shipment</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>

@@ -90,12 +90,12 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations' , {
+        const response = await fetch('/api/get_locations_vendors' , {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'FCL', sc: secureLocalStorage.getItem("sc") || "Unknown Supplier" }),
+          body: JSON.stringify({ RFQType: 'FCL',sc: secureLocalStorage.getItem("sc") }),
         });
         const data = await response.json();
         setLocations(data.result);
@@ -113,7 +113,6 @@ const QuotationTable = () => {
         const response = await fetch('/api/get_currency');
         const data = await response.json();
         if (data.result && data.result.length > 0) {
-          console.log('old Currency:', data.result);
           setUSD(parseFloat(data.result[0].USD));
           setEUR(parseFloat(data.result[0].EURO));
         }
@@ -383,7 +382,6 @@ const QuotationTable = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        // body: JSON.stringify({ Loc_Code: locCode, Transport_Type: "export", Shipment_Type: "FCL" }),
         body: JSON.stringify({ Loc_Code: locCode }),
       });
       const data = await response.json();
@@ -398,8 +396,6 @@ const QuotationTable = () => {
         setPref_Liners(data.result[0].Pref_Liners);
         setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
         setHSN_Code(data.result[0].HSN_Code);
-        // setUSD(parseFloat(data.result[0].USD || 0));
-        // setEUR(parseFloat(data.result[0].EURO || 0));
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -411,19 +407,6 @@ const QuotationTable = () => {
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
       fetchQuotationData(selectedLocation);
-      setIncoterms("");
-      setTransitDays("");
-      setCommodity("");
-      setDeliveryAddress("");
-      setDest_Port("");
-      setCurrency("");
-      setFree_Days("");
-      setPref_Liners("");
-      setAvg_Cont_Per_Mnth("");
-      setHSN_Code("");
-      // setUSD(0);
-      // setEUR(0);
-      setRemarks("");
     }
   }, [selectedLocation]);
 
@@ -503,7 +486,7 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight Export FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - FCL</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -590,7 +573,7 @@ const QuotationTable = () => {
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 7}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
-                    <td className="py-1 px-3 border"> USD / Shipment</td>
+                    <td className="py-1 px-3 border">USD / Shipment</td>
                     <td className="py-1 px-3 border">
                       <input
                         type="number"
@@ -699,22 +682,6 @@ const QuotationTable = () => {
                 <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
                 <td colSpan="4" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
-              {/* {locationName && (
-                <tr>
-                {currency === "USD" ? (
-                  <>
-                  <td colSpan="2" className="py-1 px-3 border text-start">FX Rate</td>
-                  <td colSpan="1" className="py-1 px-3 border">USD</td>
-                  <td colSpan="3" className="py-1 px-3 border font-bold text-red-500 text-left">{USD}</td></>
-                ) : (
-                  <>
-                  <td colSpan="2" className="py-1 px-3 border text-start">FX Rate</td>
-                  <td colSpan="1" className="py-1 px-3 border">EURO</td>
-                  <td colSpan="3" className="py-1 px-3 border font-bold text-red-500 text-left">{EUR}</td></>
-                )
-              }
-              </tr>
-              )} */}
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">FX Rate</td>
                 <td className="py-1 px-3 border">USD</td>
