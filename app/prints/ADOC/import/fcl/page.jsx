@@ -40,7 +40,7 @@ const QuotationTable = () => {
  { description: "Customs clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "CC Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "LINER CHARGES", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "LINER CHARGES (At Actuals)", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
     { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
     { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
     ]);

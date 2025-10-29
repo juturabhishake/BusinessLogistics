@@ -44,7 +44,7 @@ const QuotationTable = () => {
     { description: "Customs clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "CC Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "LINER CHARGES", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "LINER CHARGES (At Actuals)", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
     { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
     { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
   ]);
@@ -659,7 +659,7 @@ const QuotationTable = () => {
     tableBody.push([
         "",
         { content: "Total EX Works Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
+        ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
 
@@ -678,7 +678,7 @@ const QuotationTable = () => {
     tableBody.push([
         "",
         { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
+        ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
 
@@ -707,7 +707,7 @@ const QuotationTable = () => {
         { content: USD.toFixed(2), colSpan: 1, styles: { halign: "center" } }, 
         { content: "EURO", styles: { halign: "center" } }, 
         { content: EUR.toFixed(2), colSpan: 1, styles: { halign: "center" } }]); 
-    tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } }, 
+    tableBody.push([{ content: "Origin Port", colSpan: 3, styles: { fontStyle: "bold" } }, 
         { content: Dest_Port, colSpan: 1 }, 
         { content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 1 }]);
@@ -1063,7 +1063,7 @@ const QuotationTable = () => {
                 <td colSpan="8" className="py-1 px-3 border text-left">{weight}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Origin Port</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Dest_Port}</td>
                 <td colSpan="2" className="py-1 px-3 border text-start">Preffered Liners</td>
                 <td colSpan="3" className="py-1 px-3 border text-left">{Pref_Liners}</td>
