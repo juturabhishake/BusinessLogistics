@@ -41,12 +41,12 @@ const QuotationTable = () => {
   });
 
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Local Transportation From GTI-Chennai", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Terminal Handling Charges - Origin", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Bill of Lading Charges", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
-    { description: "Halting", remarks: "If any", sc1: "", sc2: "", sc3: "" },
+    { description: "Customs clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "CC Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "LINER CHARGES (At Actuals)", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+    { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
   ]);
 
   const [seaFreightCharges, setSeaFreightCharges] = useState([
@@ -57,11 +57,11 @@ const QuotationTable = () => {
   ]);
 
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Destination Terminal Handling Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "BL Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "Delivery by Barge/Road", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Delivery Order Fees", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Handling Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Pickup & Clerance Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Custom Clearance", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "Handling / DO/ ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Terminal Handling Charge ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Documentation ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "T1 Doc", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
   ]);
@@ -97,7 +97,7 @@ const QuotationTable = () => {
   const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
-
+  const [actual_Location, setActual_Location] = useState("");  
   const tableRef = useRef();
 
   useEffect(() => {
@@ -136,12 +136,14 @@ const QuotationTable = () => {
   useEffect(() => {
           const fetchLocations = async () => {
             try {
-              const response = await fetch('/api/get_locations_Adhoc_Air' , {
+                const selectedMonth = dayjs(selectedDate).month() + 1;
+                const selectedYear = dayjs(selectedDate).year();
+              const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import'   }),
+                body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import' ,Month_No:selectedMonth ,Year_No: selectedYear  }),
               });
               const data = await response.json();
               setLocations(data.result);
@@ -168,10 +170,12 @@ const QuotationTable = () => {
         }, [selectedLocation]);
         const fetchContainerSizes = async () => {
             try {
-                const response = await fetch('/api/ADOC/get_containers', {
+               const selectedMonth = dayjs(selectedDate).month() + 1;
+              const selectedYear = dayjs(selectedDate).year();
+                const response = await fetch('/api/ADOC/get_containers_admin', {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A" }),
+                    body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "import", locCode: selectedLocation || "N/A",MonthNo:selectedMonth ,YearNo: selectedYear }),
                 });
                 const data = await response.json();
                 console.log("Container Sizes Data:", data);
@@ -230,12 +234,14 @@ const QuotationTable = () => {
 
   const fetchSupplierDetails = async (locCode) => {
           try {
-            const response = await fetch('/api/ADOC/ADOCFCL_Terms', {
+              const selectedMonth = dayjs(selectedDate).month() + 1;
+              const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize ,MonthNo: selectedMonth,YearNo: selectedYear }),
             });
             const data = await response.json();
             console.log("Request body:", { Shipment_Type: 'ADOCFCL',Transport_Type: 'import',Loc_Code: locCode, Container_Size: selectedContainerSize });
@@ -256,6 +262,7 @@ const QuotationTable = () => {
               setEUR(parseFloat(data.result[0].EURO));
               setUploadedPdfPath(data.result[0].UploadedPDF || "");
               setContainerSize(data.result[0].Container_Size || "N/A");
+              setActual_Location(data.result[0].Actual_Location || "");
               console.log("Supplier details fetched successfully:", data.result[0]);
             }
           } catch (error) {
@@ -279,6 +286,7 @@ const QuotationTable = () => {
             setRemarks("");
             setContainerSize("N/A");
             setUploadedPdfPath('');
+            setActual_Location("");
             // setWeight("");
           if (selectedLocation) {
             fetchSupplierDetails(selectedLocation);
@@ -646,12 +654,12 @@ const QuotationTable = () => {
         });
     };
 
-    addSectionHeader("A) ORIGIN CHARGES");
-    addChargesToBody(originCharges, "INR");
+    addSectionHeader("A) EX Works Charges");
+    addChargesToBody(destinationCharges, currency);
     tableBody.push([
         "",
-        { content: "Total Origin Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
+        { content: "Total EX Works Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
 
@@ -665,11 +673,12 @@ const QuotationTable = () => {
     ]);
 
     addSectionHeader("C) DESTINATION CHARGES");
-    addChargesToBody(destinationCharges, currency);
+    addChargesToBody(originCharges, "INR");
+    
     tableBody.push([
         "",
         { content: "Total Destination Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
-        ...totalC.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
+        ...totalA.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center", fontStyle: "bold" } })),
         "",
     ]);
 
@@ -690,7 +699,7 @@ const QuotationTable = () => {
     const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
 
     tableBody.push([
-        { content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: "Pickup Address", colSpan: 3, styles: { fontStyle: "bold" } },
         { content: cleanedDeliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap", fontSize: 7 } }
     ]);
     tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } }, 
@@ -698,7 +707,7 @@ const QuotationTable = () => {
         { content: USD.toFixed(2), colSpan: 1, styles: { halign: "center" } }, 
         { content: "EURO", styles: { halign: "center" } }, 
         { content: EUR.toFixed(2), colSpan: 1, styles: { halign: "center" } }]); 
-    tableBody.push([{ content: "Destination Port", colSpan: 3, styles: { fontStyle: "bold" } }, 
+    tableBody.push([{ content: "Origin Port", colSpan: 3, styles: { fontStyle: "bold" } }, 
         { content: Dest_Port, colSpan: 1 }, 
         { content: "Required Transit Days", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 1 }]);
@@ -708,13 +717,13 @@ const QuotationTable = () => {
     doc.setFontSize(10);
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
-    doc.setFontSize(8);
-    doc.text(`ADOC Import FCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    // doc.setFontSize(8);
+    // doc.text(`ADOC Import FCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} ADOC FCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Sea Import for ${actual_Location}  to GTI ${containerSize} shipment`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
     doc.setFontSize(8);
     
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
@@ -724,7 +733,7 @@ const QuotationTable = () => {
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
-    const startY = 24;
+    const startY = 22;
       
     doc.autoTable({
         head: tableHeaders,
@@ -1033,7 +1042,7 @@ const QuotationTable = () => {
                 <td colSpan="8" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Delivery Address</td>             
+                <td colSpan="2" className="py-1 px-3 border text-start">Pickup Address</td>             
                 <td colSpan="8" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>
@@ -1054,7 +1063,7 @@ const QuotationTable = () => {
                 <td colSpan="8" className="py-1 px-3 border text-left">{weight}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Destination Port</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Origin Port</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Dest_Port}</td>
                 <td colSpan="2" className="py-1 px-3 border text-start">Preffered Liners</td>
                 <td colSpan="3" className="py-1 px-3 border text-left">{Pref_Liners}</td>
@@ -1063,7 +1072,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="2" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Container / CBM :</td>
                 <td colSpan="3" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>

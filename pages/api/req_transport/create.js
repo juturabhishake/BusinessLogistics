@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     createdBy,
   } = req.body;
 
-  if (!requestDate || !transportType || !shipmentType || !containerSize || !weight) {
+  if (!requestDate || !transportType || !shipmentType || !containerSize || !weight || !USD || !EURO) {
     return res.status(400).json({ error: "Missing required selection fields" });
   }
   

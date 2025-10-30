@@ -52,11 +52,11 @@ const QuotationTable = () => {
     ]);
     
     const [destinationCharges, setDestinationCharges] = useState([
-      { description: "Custom Clearance", 20: "", remarks: "Per Container" },
-      { description: "CC Fee", 20: "", remarks: "Per Container" },
-      { description: "D.O Charges per BL", 20: "", remarks: "Per Container" },
+      { description: "Custom Clearance", 20: "", remarks: "Per Shipment" },
+      { description: "CC Fee", 20: "", remarks: "Per Shipment" },
+      { description: "D.O Charges per BL", 20: "", remarks: "Per Shipment" },
       { description: "CFS Charges", 20: "", remarks: "Per BL" },
-      { description: "Loading/Unloading", 20: "", remarks: "Per Container" },
+      { description: "Loading/Unloading", 20: "", remarks: "Per Shipment" },
       { description: "Delivery", 20: "", remarks: "If any" },
       // { description: "CFS Charges", 20: "", remarks: "At Actual" },
     ]);
@@ -133,12 +133,14 @@ const QuotationTable = () => {
   useEffect(() => {
         const fetchLocations = async () => {
           try {
-            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+           const selectedMonth = dayjs(selectedDate).month() + 1;
+           const selectedYear = dayjs(selectedDate).year();
+           const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import'   }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import'   ,Month_No:selectedMonth ,Year_No: selectedYear  }),
             });
             const data = await response.json();
             setLocations(data.result);
@@ -214,11 +216,11 @@ const QuotationTable = () => {
         // const fcl20 = data.find((item) => item.Cont_Feet === 20) || {};
         // const fcl40 = data.find((item) => item.Cont_Feet === 40) || {};
 
-        updatedOriginCharges[0][20] = data[0].O_CCD || "";
-        updatedOriginCharges[1][20] = data[0].O_LTG || "";
-        updatedOriginCharges[2][20] = data[0].O_THC || "";
-        updatedOriginCharges[3][20] = data[0].O_BLC || "";
-        updatedOriginCharges[4][20] = data[0].O_LUS || "";
+        updatedOriginCharges[0][20] = data[0].D_CCD || "";
+        updatedOriginCharges[1][20] = data[0].D_LTS || "";
+        updatedOriginCharges[2][20] = data[0].D_THC || "";
+        updatedOriginCharges[3][20] = data[0].D_BLC || "";
+        updatedOriginCharges[4][20] = data[0].D_LUS || "";
         // updatedOriginCharges[5][20] = data[0].O_Halt || "";
 
         updatedSeaFreightCharges[0][20] = data[0].S_SeaFre || "";
@@ -226,12 +228,12 @@ const QuotationTable = () => {
         updatedSeaFreightCharges[2][20] = data[0].S_SSC || "";
         // updatedSeaFreightCharges[3][20] = data[0].S_ITT || "";
 
-        updatedDestinationCharges[0][20] = data[0].D_CC || "";
-        updatedDestinationCharges[1][20] = data[0].D_CCF || "";
-        updatedDestinationCharges[2][20] = data[0].D_DOC || "";
-        updatedDestinationCharges[3][20] = data[0].D_CFS || "";
-        updatedDestinationCharges[4][20] = data[0].D_LU || "";
-        updatedDestinationCharges[5][20] = data[0].D_Del || "";
+        updatedDestinationCharges[0][20] = data[0].O_CC || "";
+        updatedDestinationCharges[1][20] = data[0].O_CCF || "";
+        updatedDestinationCharges[2][20] = data[0].O_DOC || "";
+        updatedDestinationCharges[3][20] = data[0].O_CFS || "";
+        updatedDestinationCharges[4][20] = data[0].O_LU || "";
+        updatedDestinationCharges[5][20] = data[0].O_Del || "";
         // updatedDestinationCharges[6][20] = data[0].D_LOC || "";
 
         setRemarks(data[0].remarks || "");
@@ -413,12 +415,14 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
           try {
-            const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+            const selectedMonth = dayjs(selectedDate).month() + 1;
+            const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import',Loc_Code: locCode }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import',Loc_Code: locCode , Container_Size: 'LCL' ,MonthNo: selectedMonth,YearNo: selectedYear }),
             });
             const data = await response.json();
             if (data.result && data.result.length > 0) {
@@ -483,7 +487,7 @@ const QuotationTable = () => {
   const downloadPDF = () => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   
-    const now = moment().add(20, 'days');
+    const now = moment().add(0, 'days');
     const formattedDate = now.format("DD-MM-YYYY");
     const startDate = selectedDate.clone().startOf("month").format("DD");
     const endDate = selectedDate.clone().endOf("month").format("DD");
@@ -602,7 +606,7 @@ const QuotationTable = () => {
     tableBody.push([{ content: "Free Days Requirement at Destination : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Free_Days, colSpan: 8 }]);
     tableBody.push([{ content: "Preffered Liners : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Pref_Liners, colSpan: 8 }]);
     tableBody.push([{ content: "HSN Code : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: HSN_Code, colSpan: 8 }]);
-    tableBody.push([{ content: "Avg. Containers per month : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Avg_Cont_Per_Mnth, colSpan: 8 }]);
+    tableBody.push([{ content: "Required CBM : ", colSpan: 2, styles: { fontStyle: "bold" } }, { content: Avg_Cont_Per_Mnth, colSpan: 8 }]);
   
     tableBody.push([{ content: "Remarks", colSpan: 2, styles: { fontStyle: "bold" } }, { content: remarks, colSpan: 8 }]);
       
@@ -611,7 +615,7 @@ const QuotationTable = () => {
     doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
-    doc.text(`Adhoc Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Adhoc Import rates`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
     doc.text(`Quote for GTI to ${loc} LCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
@@ -951,7 +955,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Required CBM :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>

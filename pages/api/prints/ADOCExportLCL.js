@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     
       try {
         console.log('Dashboard Data:', quote_month); 
+         console.log('loc_code Data:', loc_code); 
           const result = await prisma.$queryRaw`exec [dbo].[GET_ADOCExportLCL_Print] ${quote_month}, ${quote_year}, ${sc}, ${username}, ${loc_code}`;
            console.log('Dashboard Data:', result);        
           return res.status(200).json(result);

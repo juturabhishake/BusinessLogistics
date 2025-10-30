@@ -41,16 +41,16 @@ const QuotationTable = () => {
   });
 
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Local Transportation From GTI-Chennai", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Terminal Handling Charges - Origin", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Customs Clearance & Documentation", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "Local Transportation From GTI-Chennai", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "Terminal Handling Charges - Origin", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
     { description: "Bill of Lading Charges", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+    { description: "Loading/Unloading / SSR", remarks: "Per CBM", sc1: "", sc2: "", sc3: ""},
     // { description: "CFS Charges (At Actual)", remarks: "At Actual", sc1: "", sc2: "", sc3: "" },
   ]);
 
   const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "Sea Freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Sea Freight", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
     { description: "FSC (Fuel Surcharge)", remarks: "", sc1: "", sc2: "", sc3: "" },
     { description: "SSC (Security Surcharge))", 20: "", remarks: "" },
     // { description: "ISPS", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
@@ -58,12 +58,12 @@ const QuotationTable = () => {
   ]);
 
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Custom Clearance", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Custom Clearance", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
     { description: "CC Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "CFS Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Deliver", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "D.O Charges", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "CFS Charges", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "Loading/Unloading", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
+    { description: "Deliver", remarks: "Per CBM", sc1: "", sc2: "", sc3: "" },
     // { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
   ]);
 
@@ -95,7 +95,7 @@ const QuotationTable = () => {
   const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
-
+  const [actual_Location, setActual_Location] = useState("");  
   const tableRef = useRef();
 
   useEffect(() => {
@@ -134,12 +134,14 @@ const QuotationTable = () => {
   useEffect(() => {
         const fetchLocations = async () => {
           try {
-            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+             const selectedMonth = dayjs(selectedDate).month() + 1;
+             const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import'   }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import'  ,Month_No:selectedMonth ,Year_No: selectedYear  }),
             });
             const data = await response.json();
             setLocations(data.result);
@@ -200,12 +202,14 @@ const QuotationTable = () => {
 
   const fetchSupplierDetails = async (locCode) => {
       try {
-        const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+        const selectedMonth = dayjs(selectedDate).month() + 1;
+          const selectedYear = dayjs(selectedDate).year();
+         const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import',Loc_Code: locCode }),
+          body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'import',Loc_Code: locCode ,Container_Size: 'LCL' ,MonthNo: selectedMonth,YearNo: selectedYear }),
         });
         const data = await response.json();
         if (data.result && data.result.length > 0) {
@@ -225,6 +229,7 @@ const QuotationTable = () => {
           setUploadedPdfPath(data.result[0].UploadedPDF || "");
           setContainerSize(data.result[0].Container_Size || "N/A");
           setWeight(parseFloat(data.result[0].Weight) || "");
+          setActual_Location(data.result[0].Actual_Location || "");
           console.log("Supplier details fetched successfully:", data.result[0]);
         }
       } catch (error) {
@@ -248,6 +253,7 @@ const QuotationTable = () => {
         setRemarks("");
         setUploadedPdfPath('');
         setContainerSize("N/A");
+        setActual_Location("");
         setWeight("");
       if (selectedLocation) {
         fetchSupplierDetails(selectedLocation);
@@ -300,11 +306,11 @@ const QuotationTable = () => {
             "",
             "",
           ]);
-          updatedOriginCharges[0].sc1 = data.find(item => item.Attribute === "O_CCD").Supplier_1 || "";
-          updatedOriginCharges[1].sc1 = data.find(item => item.Attribute === "O_LTG").Supplier_1 || "";
-          updatedOriginCharges[2].sc1 = data.find(item => item.Attribute === "O_THC").Supplier_1 || "";
-          updatedOriginCharges[3].sc1 = data.find(item => item.Attribute === "O_BLC").Supplier_1 || "";
-          updatedOriginCharges[4].sc1 = data.find(item => item.Attribute === "O_LUS").Supplier_1 || "";
+          updatedOriginCharges[0].sc1 = data.find(item => item.Attribute === "D_CCD").Supplier_1 || "";
+          updatedOriginCharges[1].sc1 = data.find(item => item.Attribute === "D_LTS").Supplier_1 || "";
+          updatedOriginCharges[2].sc1 = data.find(item => item.Attribute === "D_THC").Supplier_1 || "";
+          updatedOriginCharges[3].sc1 = data.find(item => item.Attribute === "D_BLC").Supplier_1 || "";
+          updatedOriginCharges[4].sc1 = data.find(item => item.Attribute === "D_LUS").Supplier_1 || "";
           // updatedOriginCharges[5].sc1 = data.find(item => item.Attribute === "O_Halt").Supplier_1 || "";
 
           updatedSeaFreightCharges[0].sc1 = data.find(item => item.Attribute === "S_SeaFre").Supplier_1 || "";
@@ -312,19 +318,19 @@ const QuotationTable = () => {
           updatedSeaFreightCharges[2].sc1 = data.find(item => item.Attribute === "S_SSC").Supplier_1 || "";
           // updatedSeaFreightCharges[3].sc1 = data.find(item => item.Attribute === "S_ITT").Supplier_1 || "";
 
-          updatedDestinationCharges[0].sc1 = data.find(item => item.Attribute === "D_CC").Supplier_1 || "";
-          updatedDestinationCharges[1].sc1 = data.find(item => item.Attribute === "D_CCF").Supplier_1 || "";
-          updatedDestinationCharges[2].sc1 = data.find(item => item.Attribute === "D_DOC").Supplier_1 || "";
-          updatedDestinationCharges[3].sc1 = data.find(item => item.Attribute === "D_CFS").Supplier_1 || "";
-          updatedDestinationCharges[4].sc1 = data.find(item => item.Attribute === "D_LU").Supplier_1 || "";
-          updatedDestinationCharges[5].sc1 = data.find(item => item.Attribute === "D_Del").Supplier_1 || "";
+          updatedDestinationCharges[0].sc1 = data.find(item => item.Attribute === "O_CC").Supplier_1 || "";
+          updatedDestinationCharges[1].sc1 = data.find(item => item.Attribute === "O_CCF").Supplier_1 || "";
+          updatedDestinationCharges[2].sc1 = data.find(item => item.Attribute === "O_DOC").Supplier_1 || "";
+          updatedDestinationCharges[3].sc1 = data.find(item => item.Attribute === "O_CFS").Supplier_1 || "";
+          updatedDestinationCharges[4].sc1 = data.find(item => item.Attribute === "O_LU").Supplier_1 || "";
+          updatedDestinationCharges[5].sc1 = data.find(item => item.Attribute === "O_Del").Supplier_1 || "";
           // updatedDestinationCharges[6].sc1 = data.find(item => item.Attribute === "D_LOC").Supplier_1 || "";
 
-          updatedOriginCharges[0].sc2 = data.find(item => item.Attribute === "O_CCD").Supplier_2 || "";
-          updatedOriginCharges[1].sc2 = data.find(item => item.Attribute === "O_LTG").Supplier_2 || "";
-          updatedOriginCharges[2].sc2 = data.find(item => item.Attribute === "O_THC").Supplier_2 || "";
-          updatedOriginCharges[3].sc2 = data.find(item => item.Attribute === "O_BLC").Supplier_2 || "";
-          updatedOriginCharges[4].sc2 = data.find(item => item.Attribute === "O_LUS").Supplier_2 || "";
+          updatedOriginCharges[0].sc2 = data.find(item => item.Attribute === "D_CCD").Supplier_2 || "";
+          updatedOriginCharges[1].sc2 = data.find(item => item.Attribute === "D_LTS").Supplier_2 || "";
+          updatedOriginCharges[2].sc2 = data.find(item => item.Attribute === "D_THC").Supplier_2 || "";
+          updatedOriginCharges[3].sc2 = data.find(item => item.Attribute === "D_BLC").Supplier_2 || "";
+          updatedOriginCharges[4].sc2 = data.find(item => item.Attribute === "D_LUS").Supplier_2 || "";
           // updatedOriginCharges[5].sc2 = data.find(item => item.Attribute === "O_Halt").Supplier_2 || "";
 
           
@@ -333,19 +339,19 @@ const QuotationTable = () => {
           updatedSeaFreightCharges[2].sc2 = data.find(item => item.Attribute === "S_SSC").Supplier_2 || "";
           // updatedSeaFreightCharges[3].sc2 = data.find(item => item.Attribute === "S_ITT").Supplier_2 || "";
 
-          updatedDestinationCharges[0].sc2 = data.find(item => item.Attribute === "D_CC").Supplier_2 || "";
-          updatedDestinationCharges[1].sc2 = data.find(item => item.Attribute === "D_CCF").Supplier_2 || "";
-          updatedDestinationCharges[2].sc2 = data.find(item => item.Attribute === "D_DOC").Supplier_2 || "";
-          updatedDestinationCharges[3].sc2 = data.find(item => item.Attribute === "D_CFS").Supplier_2 || "";
-          updatedDestinationCharges[4].sc2 = data.find(item => item.Attribute === "D_LU").Supplier_2 || "";
-          updatedDestinationCharges[5].sc2 = data.find(item => item.Attribute === "D_Del").Supplier_2 || "";
+          updatedDestinationCharges[0].sc2 = data.find(item => item.Attribute === "O_CC").Supplier_2 || "";
+          updatedDestinationCharges[1].sc2 = data.find(item => item.Attribute === "O_CCF").Supplier_2 || "";
+          updatedDestinationCharges[2].sc2 = data.find(item => item.Attribute === "O_DOC").Supplier_2 || "";
+          updatedDestinationCharges[3].sc2 = data.find(item => item.Attribute === "O_CFS").Supplier_2 || "";
+          updatedDestinationCharges[4].sc2 = data.find(item => item.Attribute === "O_LU").Supplier_2 || "";
+          updatedDestinationCharges[5].sc2 = data.find(item => item.Attribute === "O_Del").Supplier_2 || "";
           // updatedDestinationCharges[6].sc2 = data.find(item => item.Attribute === "D_LOC").Supplier_2 || "";
 
-          updatedOriginCharges[0].sc3 = data.find(item => item.Attribute === "O_CCD").Supplier_3 || "";
-          updatedOriginCharges[1].sc3 = data.find(item => item.Attribute === "O_LTG").Supplier_3 || "";
-          updatedOriginCharges[2].sc3 = data.find(item => item.Attribute === "O_THC").Supplier_3 || "";
-          updatedOriginCharges[3].sc3 = data.find(item => item.Attribute === "O_BLC").Supplier_3 || "";
-          updatedOriginCharges[4].sc3 = data.find(item => item.Attribute === "O_LUS").Supplier_3 || "";
+          updatedOriginCharges[0].sc3 = data.find(item => item.Attribute === "D_CCD").Supplier_3 || "";
+          updatedOriginCharges[1].sc3 = data.find(item => item.Attribute === "D_LTS").Supplier_3 || "";
+          updatedOriginCharges[2].sc3 = data.find(item => item.Attribute === "D_THC").Supplier_3 || "";
+          updatedOriginCharges[3].sc3 = data.find(item => item.Attribute === "D_BLC").Supplier_3 || "";
+          updatedOriginCharges[4].sc3 = data.find(item => item.Attribute === "D_LUS").Supplier_3 || "";
           // updatedOriginCharges[5].sc3 = data.find(item => item.Attribute === "O_Halt").Supplier_3 || "";
 
           
@@ -354,18 +360,18 @@ const QuotationTable = () => {
           updatedSeaFreightCharges[2].sc3 = data.find(item => item.Attribute === "S_SSC").Supplier_3 || "";
           // updatedSeaFreightCharges[3].sc3 = data.find(item => item.Attribute === "S_ITT").Supplier_3 || "";
 
-          updatedDestinationCharges[0].sc3 = data.find(item => item.Attribute === "D_CC").Supplier_3 || "";
-          updatedDestinationCharges[1].sc3 = data.find(item => item.Attribute === "D_CCF").Supplier_3 || "";
-          updatedDestinationCharges[2].sc3 = data.find(item => item.Attribute === "D_DOC").Supplier_3 || "";
-          updatedDestinationCharges[3].sc3 = data.find(item => item.Attribute === "D_CFS").Supplier_3 || "";
-          updatedDestinationCharges[4].sc3 = data.find(item => item.Attribute === "D_LU").Supplier_3 || "";
-          updatedDestinationCharges[5].sc3 = data.find(item => item.Attribute === "D_Del").Supplier_3 || "";
+          updatedDestinationCharges[0].sc3 = data.find(item => item.Attribute === "O_CC").Supplier_3 || "";
+          updatedDestinationCharges[1].sc3 = data.find(item => item.Attribute === "O_CCF").Supplier_3 || "";
+          updatedDestinationCharges[2].sc3 = data.find(item => item.Attribute === "O_DOC").Supplier_3 || "";
+          updatedDestinationCharges[3].sc3 = data.find(item => item.Attribute === "O_CFS").Supplier_3 || "";
+          updatedDestinationCharges[4].sc3 = data.find(item => item.Attribute === "O_LU").Supplier_3 || "";
+          updatedDestinationCharges[5].sc3 = data.find(item => item.Attribute === "O_Del").Supplier_3 || "";
           // updatedDestinationCharges[6].sc3 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
 
           setTotalA([
-            data.find(item => item.Attribute === "O_Total_Chg").Supplier_1 || "",
-            data.find(item => item.Attribute === "O_Total_Chg").Supplier_2 || "",
-            data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || "",
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_1 || "",
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_2 || "",
+            data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || "",
             "",
             "",
             ""
@@ -379,9 +385,9 @@ const QuotationTable = () => {
             ""
           ])
           setTotalC([
-            data.find(item => item.Attribute === "D_Total_Chg").Supplier_1 || "",
-            data.find(item => item.Attribute === "D_Total_Chg").Supplier_2 || "",
-            data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || "",
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_1 || "",
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_2 || "",
+            data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || "",
             "",
             "",
             ""
@@ -667,7 +673,7 @@ const QuotationTable = () => {
     const cleanedDeliveryAddress = deliveryAddress.replace(/\n/g, " ");
 
     tableBody.push([
-        { content: "Delivery Address", colSpan: 3, styles: { fontStyle: "bold" } },
+        { content: "Pickup Address", colSpan: 3, styles: { fontStyle: "bold" } },
         { content: cleanedDeliveryAddress, colSpan: 7, styles: { whiteSpace: "nowrap", fontSize: 7 } }
     ]);
     tableBody.push([{ content: "FX Rate", colSpan: 3, styles: { fontStyle: "bold" } }, 
@@ -685,13 +691,11 @@ const QuotationTable = () => {
     doc.setFontSize(10);
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
-    doc.setFontSize(8);
-    doc.text(`ADOC Import LCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} ADOC LCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Quote for ${actual_Location} to GTI Sea shipment ${containerSize}`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
     doc.setFontSize(8);
     
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
@@ -701,7 +705,7 @@ const QuotationTable = () => {
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
-    const startY = 24;
+    const startY = 22;
       
     doc.autoTable({
         head: tableHeaders,
@@ -745,7 +749,7 @@ const QuotationTable = () => {
                   }`
                 }
                 </p>
-              <p className="text-xs text-gray-100">Quote for GTI to {locationName || "{select location}"} shipment</p>
+              <p className="text-xs text-gray-100">Quote for {locationName || "{select location}"} to GTI Sea shipment</p>
             </div>
             <div className="flex flex-col lg:flex-row justify-end items-start lg:items-center lg:space-y-0 sm:space-x-2 space-y-2">
             <div className="flex flex-row items-center justify-start lg:flex-row justify-end gap-4">
@@ -981,7 +985,7 @@ const QuotationTable = () => {
                 <td colSpan="8" className="py-1 px-3 border text-left">{incoterms}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Delivery Address</td>             
+                <td colSpan="2" className="py-1 px-3 border text-start">Pickup Address</td>             
                 <td colSpan="8" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>
@@ -1011,7 +1015,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="2" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Container / CBM :</td>
                 <td colSpan="3" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>

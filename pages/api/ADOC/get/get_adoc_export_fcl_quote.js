@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     await runMiddleware(req, res, cors);
 
     if (req.method === "POST") {
-        const { Loc_Code,sc,containerSize  } = req.body;
+        const { Loc_Code,sc,containerSize,Quote_Date  } = req.body;
         if (!Loc_Code || !sc || !containerSize) {
             return res.status(400).json({ message: "Location code and Container Size is required" });
         }

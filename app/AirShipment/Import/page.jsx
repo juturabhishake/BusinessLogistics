@@ -53,7 +53,7 @@ const QuotationTable = () => {
     { description: "Customs Clearence", 20: "", remarks: "" },
     { description: "CC Fee", 20: "", remarks: "" },
     { description: "D.O Charges", 20: "", remarks: "" },
-    { description: "LINER CHARGES", 20: "", remarks: "" },
+    { description: "LINER CHARGES (At Actual)", 20: "", remarks: "" },
     { description: "Loading / Unloading", 20: "", remarks: "" },
     { description: "Delivery", 20: "", remarks: "" },
     // { description: "LOLO Charges", 20: "", remarks: "" },
@@ -79,6 +79,11 @@ const QuotationTable = () => {
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [weight, setWeight] = useState("");
   const [containerSize, setContainerSize] = useState("N/A");
+  const [quoteDate, setquoteDate] = useState("");
+  const [quoteTime, setquoteTime] = useState("");
+  const [cmmQ, setcmmQ] = useState("");
+  const [Request_Id, setRequest_Id] = useState(0); 
+  
 
   useEffect(() => {
     let flag = false
@@ -222,6 +227,8 @@ const QuotationTable = () => {
       locationCode: selectedLocation,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
+      quote_Date: quoteDate,
+      cbm:cmmQ,
       originData: filterCharges(originCharges),
       seaFreightData: filterCharges(seaFreightCharges),
       destinationData: filterCharges(destinationCharges),
@@ -231,6 +238,7 @@ const QuotationTable = () => {
       totalDestination: totalDestination,
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
+       Request_Id:Request_Id,
     };
     console.log("Quote Data:", quoteData);
     try {
@@ -388,6 +396,10 @@ const QuotationTable = () => {
           setUploadedPdfPath(data.result[0].UploadedPDF || "");
           setContainerSize(data.result[0].Container_Size || "N/A");
           setWeight(parseFloat(data.result[0].Weight) || "");
+          setquoteDate(data.result[0].Request_Date);
+          setquoteTime("11:00 AM");
+          setcmmQ(data.result[0].Container_Size);
+          setRequest_Id(data.result[0].Request_Id);
           console.log("Supplier details fetched successfully:", data.result[0]);
         }
       } catch (error) {
@@ -412,6 +424,10 @@ const QuotationTable = () => {
         setUploadedPdfPath('');
         setContainerSize("N/A");
         setWeight("");
+        setcmmQ("");       
+        setquoteDate("");
+        setRequest_Id(0);
+        setquoteTime("");
       if (selectedLocation) {
         fetchSupplierDetails(selectedLocation);
         fetchQuotationData(selectedLocation);
@@ -429,7 +445,7 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
-              <p className="text-xs text-gray-100">"Air shipment Import rates for {currentDateInfo}"</p>
+              <p className="text-xs text-gray-100">"Air shipment Import"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4">
@@ -494,9 +510,15 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Mode of Transport : Air</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Mode of Transport : Air {" "} <span className="text-red-500">
+    ( {quoteDate
+                      ? new Date(quoteDate).toLocaleDateString(
+                          "en-GB"
+                        )
+                      : ""} {quoteTime})
+  </span></th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
-                <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
+                <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for  {locationName || "{select location}"} to GTI shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
               </tr>
               <tr>
@@ -608,8 +630,11 @@ const QuotationTable = () => {
                   {sections.destination ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
-              {sections.destination &&
-                destinationCharges.map((item, index) => (
+             {sections.destination &&
+              destinationCharges.map((item, index) => {
+                const isCFS = item.description === "LINER CHARGES (At Actual)";
+
+                return (
                   <tr key={index} className="border">
                     <td className="py-1 px-3 border">{index + 12}</td>
                     <td className="py-1 px-3 border text-start">{item.description}</td>
@@ -621,20 +646,15 @@ const QuotationTable = () => {
                         className="w-full bg-transparent border-none focus:outline-none text-right"
                         value={item[20]}
                         onChange={(e) => handleDestinationChange(index, 20, e.target.value)}
+                        readOnly={isCFS}
                       />
                     </td>
                     <td colSpan="2" className="py-1 px-3 border">
-                    {item.remarks}
-                      {/* <input
-                        type="text"
-                        readOnly
-                        className="w-full bg-transparent border-none focus:outline-none text-center"
-                        value={item.remarks}
-                        onChange={(e) => handleDestinationChange(index, "remarks", e.target.value)}
-                      /> */}
+                      {item.remarks}
                     </td>
                   </tr>
-                ))}
+                );
+              })}
               {sections.destination && (
                 <tr className="border">
                   <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
@@ -658,7 +678,7 @@ const QuotationTable = () => {
                 <td colSpan="4" className="py-1 px-3 border text-left">{locationName}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border  text-start">Delivery Address</td>             
+                <td colSpan="2" className="py-1 px-3 border  text-start">Pickup Location</td>             
                 <td colSpan="4" className="py-1 px-3 border text-left" dangerouslySetInnerHTML={{ __html: deliveryAddress }} />
               </tr>
               <tr>

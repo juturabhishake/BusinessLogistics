@@ -124,15 +124,19 @@ const QuotationTable = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/get_locations_venders' , {
+        const response = await fetch('/api/get_locations', {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ RFQType: 'LCL', sc: secureLocalStorage.getItem("sc") || "Unknown Supplier" }),
+          body: JSON.stringify({ RFQType: 'LCL' }),
         });
         const data = await response.json();
         setLocations(data.result);
+        if (data.result.length > 0) {
+          setSelectedLocation(data.result[0].Location_Code);
+          setLocationName(data.result[0].Location_Name);
+        }
       } catch (error) {
         console.error("Error fetching locations:", error);
       }

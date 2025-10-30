@@ -96,7 +96,7 @@ const QuotationTable = () => {
   const [Avg_Cont_Per_Mnth, setAvg_Cont_Per_Mnth] = useState(""); 
   const [HSN_Code, setHSN_Code] = useState(""); 
   const [Pref_Liners, setPref_Liners] = useState(""); 
-
+  const [actual_Location, setActual_Location] = useState("");  
   const tableRef = useRef();
 
   useEffect(() => {
@@ -135,12 +135,14 @@ const QuotationTable = () => {
   useEffect(() => {
       const fetchLocations = async () => {
         try {
-          const response = await fetch('/api/get_locations_Adhoc_Air' , {
+           const selectedMonth = dayjs(selectedDate).month() + 1;
+           const selectedYear = dayjs(selectedDate).year();
+           const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ Shipment_Type: 'AIR',Transport_Type: 'export'   }),
+            body: JSON.stringify({ Shipment_Type: 'AIR',Transport_Type: 'export'   ,Month_No:selectedMonth ,Year_No: selectedYear  }),
           });
           const data = await response.json();
           setLocations(data.result);
@@ -201,12 +203,14 @@ const QuotationTable = () => {
 
   const fetchSupplierDetails = async (locCode) => {
               try {
-                const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+               const selectedMonth = dayjs(selectedDate).month() + 1;
+                 const selectedYear = dayjs(selectedDate).year();
+                const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({ Shipment_Type: 'AIR',Transport_Type: 'export',Loc_Code: locCode }),
+                  body: JSON.stringify({ Shipment_Type: 'AIR',Transport_Type: 'export',Loc_Code: locCode, Container_Size: 'Air' ,MonthNo: selectedMonth,YearNo: selectedYear }),
                 });
                 const data = await response.json();
                 if (data.result && data.result.length > 0) {
@@ -226,6 +230,7 @@ const QuotationTable = () => {
                   setUploadedPdfPath(data.result[0].UploadedPDF || "");
                   setContainerSize(data.result[0].Container_Size || "N/A");
                   setWeight(parseFloat(data.result[0].Weight) || "");
+                    setActual_Location(data.result[0].Actual_Location || "");
                   console.log("Supplier details fetched successfully:", data.result[0]);
                 }
               } catch (error) {
@@ -250,6 +255,7 @@ const QuotationTable = () => {
                 setUploadedPdfPath('');
                 setContainerSize("N/A");
                 setWeight("");
+                 setActual_Location("");
               if (selectedLocation) {
                 fetchSupplierDetails(selectedLocation);
                 fetchQuotationData(selectedLocation);
@@ -628,7 +634,7 @@ const QuotationTable = () => {
     addChargesToBody(seaFreightCharges, "INR", "Sea Freight Charges");
     tableBody.push([
         "",
-        { content: "Total Sea Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
+        { content: "Total Air Freight Charges (INR)", colSpan: 2, styles: { halign: "center", fontStyle: "bold" } },
         ...totalB.map(val => ({ content: (val === 0 || val === '0.00' || val === '0' || val === 0.00) ? "" : val || "", styles: { halign: "center" , fontStyle: "bold"} })),
         "",
     ]);
@@ -671,7 +677,7 @@ const QuotationTable = () => {
         { content: "EURO", styles: { halign: "center" } }, 
         { content: EUR.toFixed(2),  styles: { halign: "center" } }]); 
   
-    tableBody.push([{ content: "Weight of cargo :", colSpan: 2, styles: { fontStyle: "bold" } }, 
+    tableBody.push([{ content: "Weight of cargo in kgs :", colSpan: 2, styles: { fontStyle: "bold" } }, 
         { content: weight, colSpan: 2 }, 
         { content: "Required Transit Days", colSpan: 1, styles: { fontStyle: "bold" } }, 
         { content: transitDays, colSpan: 1 }]);
@@ -703,7 +709,7 @@ const QuotationTable = () => {
     doc.setFontSize(8);
     // doc.text(`Air Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} Air shipment`, 5, 14, { align: "left" });
+    doc.text(`Quote for GTI to ${actual_Location} Air shipment`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
@@ -932,7 +938,7 @@ const QuotationTable = () => {
                 ))}
               {sections.seaFreight && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Sea Freight Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Air Freight Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td className="py-1 px-3 border">{totalB[0] || ""}</td>
                   <td className="py-1 px-3 border">{totalB[1] || ""}</td>
@@ -1016,7 +1022,7 @@ const QuotationTable = () => {
               </tr>
              
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo :</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Weight of cargo in kgs :</td>
                 <td colSpan="8" className="py-1 px-3 border text-left">{weight}</td>
               </tr>
               <tr>

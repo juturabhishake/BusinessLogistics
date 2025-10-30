@@ -91,6 +91,7 @@ const QuotationTable = () => {
   const [total, setTotal] = useState(["", "", "", "", "", ""]);
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [weight, setWeight] = useState("");
+  const [actual_Location, setActual_Location] = useState("");  
   const [containerSize, setContainerSize] = useState("N/A");
   const [remarks, setRemarks] = useState("");
   const [Free_Days, setFree_Days] = useState(""); 
@@ -137,12 +138,14 @@ const QuotationTable = () => {
   useEffect(() => {
         const fetchLocations = async () => {
           try {
-            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+             const selectedMonth = dayjs(selectedDate).month() + 1;
+            const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export'   }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export' ,Month_No:selectedMonth ,Year_No: selectedYear  }),
             });
             const data = await response.json();
             setLocations(data.result);
@@ -175,10 +178,12 @@ const QuotationTable = () => {
       })
       const fetchContainerSizes = async () => {
           try {
-              const response = await fetch('/api/ADOC/get_containers', {
+             const selectedMonth = dayjs(selectedDate).month() + 1;
+              const selectedYear = dayjs(selectedDate).year();
+              const response = await fetch('/api/ADOC/get_containers_admin', {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "export", locCode: selectedLocation || "N/A" }),
+                  body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "export", locCode: selectedLocation || "N/A",MonthNo:selectedMonth ,YearNo: selectedYear }),
               });
               const data = await response.json();
               console.log("Container Sizes Data:", data);
@@ -237,12 +242,14 @@ const QuotationTable = () => {
 
   const fetchSupplierDetails = async (locCode) => {
         try {
-          const response = await fetch('/api/ADOC/ADOCFCL_Terms', {
+           const selectedMonth = dayjs(selectedDate).month() + 1;
+           const selectedYear = dayjs(selectedDate).year();
+          const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode, Container_Size: selectedContainerSize }),
+            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode, Container_Size: selectedContainerSize ,MonthNo: selectedMonth,YearNo: selectedYear }),
           });
           const data = await response.json();
           console.log("Request body:", { Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode, Container_Size: selectedContainerSize });
@@ -258,11 +265,13 @@ const QuotationTable = () => {
             setPref_Liners(data.result[0].Pref_Liners);
             setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
             setHSN_Code(data.result[0].HSN_Code);
+            setWeight(data.result[0].Weight);
             setRemarks(data.result[0].Remarks || "");
             setUSD(parseFloat(data.result[0].USD));
             setEUR(parseFloat(data.result[0].EURO));
             setUploadedPdfPath(data.result[0].UploadedPDF || "");
             setContainerSize(data.result[0].Container_Size || "N/A");
+            setActual_Location(data.result[0].Actual_Location || "");
             console.log("Supplier details fetched successfully:", data.result[0]);
           }
         } catch (error) {
@@ -286,7 +295,8 @@ const QuotationTable = () => {
           setRemarks("");
           setContainerSize("N/A");
           setUploadedPdfPath('');
-          // setWeight("");
+           setWeight("");
+           setActual_Location("");
         if (selectedLocation) {
           fetchSupplierDetails(selectedLocation);
           fetchQuotationData(selectedLocation);
@@ -417,114 +427,6 @@ const QuotationTable = () => {
             data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_2 || "",
             data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || ""
           ])
-
-        // } 
-        // else if (contFeet === 40) {
-        //   setSuppliers((prev) => [
-        //     prev[0],
-        //     prev[1],
-        //     prev[2],
-        //     data.find(item => item.Attribute === "Vendor_Name").Supplier_1,
-        //     data.find(item => item.Attribute === "Vendor_Name").Supplier_2,
-        //     data.find(item => item.Attribute === "Vendor_Name").Supplier_3,
-        //   ]);
-          
-        //   updatedOriginCharges[0].sc4 = data.find(item => item.Attribute === "O_CCD").Supplier_1 || "";
-        //   updatedOriginCharges[1].sc4 = data.find(item => item.Attribute === "O_LTG").Supplier_1 || "";
-        //   updatedOriginCharges[2].sc4 = data.find(item => item.Attribute === "O_THC").Supplier_1 || "";
-        //   updatedOriginCharges[3].sc4 = data.find(item => item.Attribute === "O_BLC").Supplier_1 || "";
-        //   updatedOriginCharges[4].sc4 = data.find(item => item.Attribute === "O_LUS").Supplier_1 || "";
-        //   // updatedOriginCharges[5].sc4 = data.find(item => item.Attribute === "O_Halt").Supplier_1 || "";
-
-          
-        //   updatedSeaFreightCharges[0].sc4 = data.find(item => item.Attribute === "S_SeaFre").Supplier_1 || "";
-        //   updatedSeaFreightCharges[1].sc4 = data.find(item => item.Attribute === "S_ENS").Supplier_1 || "";
-        //   updatedSeaFreightCharges[2].sc4 = data.find(item => item.Attribute === "S_ISPS").Supplier_1 || "";
-        //   updatedSeaFreightCharges[3].sc4 = data.find(item => item.Attribute === "S_ITT").Supplier_1 || "";
-
-        //   updatedDestinationCharges[0].sc4 = data.find(item => item.Attribute === "D_DTH").Supplier_1 || "";
-        //   updatedDestinationCharges[1].sc4 = data.find(item => item.Attribute === "D_BLF").Supplier_1 || "";
-        //   updatedDestinationCharges[2].sc4 = data.find(item => item.Attribute === "D_DBR").Supplier_1 || "";
-        //   updatedDestinationCharges[3].sc4 = data.find(item => item.Attribute === "D_DOF").Supplier_1 || "";
-        //   updatedDestinationCharges[4].sc4 = data.find(item => item.Attribute === "D_HC").Supplier_1 || "";
-        //   updatedDestinationCharges[5].sc4 = data.find(item => item.Attribute === "D_TDO").Supplier_1 || "";
-        //   updatedDestinationCharges[6].sc4 = data.find(item => item.Attribute === "D_LOC").Supplier_1 || "";
-
-        //   updatedOriginCharges[0].sc5 = data.find(item => item.Attribute === "O_CCD").Supplier_2 || "";
-        //   updatedOriginCharges[1].sc5 = data.find(item => item.Attribute === "O_LTG").Supplier_2 || "";
-        //   updatedOriginCharges[2].sc5 = data.find(item => item.Attribute === "O_THC").Supplier_2 || "";
-        //   updatedOriginCharges[3].sc5 = data.find(item => item.Attribute === "O_BLC").Supplier_2 || "";
-        //   updatedOriginCharges[4].sc5 = data.find(item => item.Attribute === "O_LUS").Supplier_2 || "";
-        //   // updatedOriginCharges[5].sc5 = data.find(item => item.Attribute === "O_Halt").Supplier_2 || "";
-
-          
-        //   updatedSeaFreightCharges[0].sc5 = data.find(item => item.Attribute === "S_SeaFre").Supplier_2 || "";
-        //   updatedSeaFreightCharges[1].sc5 = data.find(item => item.Attribute === "S_ENS").Supplier_2 || "";
-        //   updatedSeaFreightCharges[2].sc5 = data.find(item => item.Attribute === "S_ISPS").Supplier_2 || "";
-        //   updatedSeaFreightCharges[3].sc5 = data.find(item => item.Attribute === "S_ITT").Supplier_2 || "";
-
-        //   updatedDestinationCharges[0].sc5 = data.find(item => item.Attribute === "D_DTH").Supplier_2 || "";
-        //   updatedDestinationCharges[1].sc5 = data.find(item => item.Attribute === "D_BLF").Supplier_2 || "";
-        //   updatedDestinationCharges[2].sc5 = data.find(item => item.Attribute === "D_DBR").Supplier_2 || "";
-        //   updatedDestinationCharges[3].sc5 = data.find(item => item.Attribute === "D_DOF").Supplier_2 || "";
-        //   updatedDestinationCharges[4].sc5 = data.find(item => item.Attribute === "D_HC").Supplier_2 || "";
-        //   updatedDestinationCharges[5].sc5 = data.find(item => item.Attribute === "D_TDO").Supplier_2 || "";
-        //   updatedDestinationCharges[6].sc5 = data.find(item => item.Attribute === "D_LOC").Supplier_2 || "";
-
-        //   updatedOriginCharges[0].sc6 = data.find(item => item.Attribute === "O_CCD").Supplier_3 || "";
-        //   updatedOriginCharges[1].sc6 = data.find(item => item.Attribute === "O_LTG").Supplier_3 || "";
-        //   updatedOriginCharges[2].sc6 = data.find(item => item.Attribute === "O_THC").Supplier_3 || "";
-        //   updatedOriginCharges[3].sc6 = data.find(item => item.Attribute === "O_BLC").Supplier_3 || "";
-        //   updatedOriginCharges[4].sc6 = data.find(item => item.Attribute === "O_LUS").Supplier_3 || "";
-        //   // updatedOriginCharges[5].sc6 = data.find(item => item.Attribute === "O_Halt").Supplier_3 || "";
-
-          
-        //   updatedSeaFreightCharges[0].sc6 = data.find(item => item.Attribute === "S_SeaFre").Supplier_3 || "";
-        //   updatedSeaFreightCharges[1].sc6 = data.find(item => item.Attribute === "S_ENS").Supplier_3 || "";
-        //   updatedSeaFreightCharges[2].sc6 = data.find(item => item.Attribute === "S_ISPS").Supplier_3 || "";
-        //   updatedSeaFreightCharges[3].sc6 = data.find(item => item.Attribute === "S_ITT").Supplier_3 || "";
-
-        //   updatedDestinationCharges[0].sc6 = data.find(item => item.Attribute === "D_DTH").Supplier_3 || "";
-        //   updatedDestinationCharges[1].sc6 = data.find(item => item.Attribute === "D_BLF").Supplier_3 || "";
-        //   updatedDestinationCharges[2].sc6 = data.find(item => item.Attribute === "D_DBR").Supplier_3 || "";
-        //   updatedDestinationCharges[3].sc6 = data.find(item => item.Attribute === "D_DOF").Supplier_3 || "";
-        //   updatedDestinationCharges[4].sc6 = data.find(item => item.Attribute === "D_HC").Supplier_3 || "";
-        //   updatedDestinationCharges[5].sc6 = data.find(item => item.Attribute === "D_TDO").Supplier_3 || "";
-        //   updatedDestinationCharges[6].sc6 = data.find(item => item.Attribute === "D_LOC").Supplier_3 || "";
-
-        //   setTotalA((prev) =>[
-        //     prev[0],
-        //     prev[1],
-        //     prev[2],
-        //     data.find(item => item.Attribute === "O_Total_Chg").Supplier_1 || "",
-        //     data.find(item => item.Attribute === "O_Total_Chg").Supplier_2 || "",
-        //     data.find(item => item.Attribute === "O_Total_Chg").Supplier_3 || "",
-        //   ])
-        //   setTotalB((prev) =>[
-        //     prev[0],
-        //     prev[1],
-        //     prev[2],
-        //     data.find(item => item.Attribute === "S_Total_Chg").Supplier_1 || "",
-        //     data.find(item => item.Attribute === "S_Total_Chg").Supplier_2 || "",
-        //     data.find(item => item.Attribute === "S_Total_Chg").Supplier_3 || "",
-        //   ])
-        //   setTotalC((prev) =>[
-        //     prev[0],
-        //     prev[1],
-        //     prev[2],
-        //     data.find(item => item.Attribute === "D_Total_Chg").Supplier_1 || "",
-        //     data.find(item => item.Attribute === "D_Total_Chg").Supplier_2 || "",
-        //     data.find(item => item.Attribute === "D_Total_Chg").Supplier_3 || "",
-        //   ])
-        //   setTotal((prev) =>[
-        //     prev[0],
-        //     prev[1],
-        //     prev[2],
-        //     data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_1 || "",
-        //     data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_2 || "",
-        //     data.find(item => item.Attribute === "Total_Ship_Cost").Supplier_3 || "",
-        //   ])
-        // }
 
         setOriginCharges(updatedOriginCharges);
         setSeaFreightCharges(updatedSeaFreightCharges);
@@ -711,7 +613,7 @@ const QuotationTable = () => {
     doc.setFontSize(8);
     // doc.text(`ADOC Export FCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} Export FCL shipment`, 5, 14, { align: "left" });
+    doc.text(`Sea Export for GTI to ${actual_Location} ${containerSize} shipment`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
@@ -1063,7 +965,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="2" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Container / CBM :</td>
                 <td colSpan="3" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>

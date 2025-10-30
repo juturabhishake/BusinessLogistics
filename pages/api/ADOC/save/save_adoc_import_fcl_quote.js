@@ -29,6 +29,7 @@ export default async function handler(req, res) {
     supplierCode,
     locationCode,
     containerSize,
+    Quote_Date,
     quoteMonth,
     quoteYear,
     originData,
@@ -40,6 +41,7 @@ export default async function handler(req, res) {
     totalDestination,
     createdBy,
     remarks,
+    Request_Id,
   } = req.body;
 
   if (
@@ -65,6 +67,7 @@ export default async function handler(req, res) {
     Supplier_Code: supplierCode,
     Location_Code: locationCode || "",
     Container_Size: containerSize,
+    Quote_Date:Quote_Date,
     Quote_Month: quoteMonth,
     Quote_Year: quoteYear,
     O_CCD: parseDecimal(originData[0]?.[20]),
@@ -91,6 +94,7 @@ export default async function handler(req, res) {
     Created_Date: new Date(),
     Created_By: createdBy || "Unknown",
     remarks: remarks || "",
+     Request_Id: Request_Id,
   };
 
   try {

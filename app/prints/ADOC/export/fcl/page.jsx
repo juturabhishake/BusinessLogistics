@@ -137,12 +137,14 @@ const QuotationTable = () => {
   useEffect(() => {
       const fetchLocations = async () => {
         try {
-          const response = await fetch('/api/get_locations_Adhoc_Air' , {
+           const selectedMonth = dayjs(selectedDate).month() + 1;
+           const selectedYear = dayjs(selectedDate).year();
+          const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export'   }),
+            body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export' ,Month_No:selectedMonth ,Year_No: selectedYear  }),
           });
           const data = await response.json();
           setLocations(data.result);
@@ -151,7 +153,7 @@ const QuotationTable = () => {
         }
       };
       fetchLocations();
-    }, []);
+    }, [selectedDate]);
     useEffect(() => {
       if (selectedLocation) {
         fetchSupplierDetails(selectedLocation);
@@ -172,10 +174,12 @@ const QuotationTable = () => {
     }, [selectedLocation]);
     const fetchContainerSizes = async () => {
         try {
-            const response = await fetch('/api/ADOC/get_containers', {
+            const selectedMonth = dayjs(selectedDate).month() + 1;
+            const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/ADOC/get_containers_admin', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "export", locCode: selectedLocation || "N/A" }),
+                body: JSON.stringify({ shipType: "ADOCFCL", transport_type: "export", locCode: selectedLocation || "N/A" ,MonthNo:selectedMonth ,YearNo: selectedYear }),
             });
             const data = await response.json();
             console.log("Container Sizes Data:", data);
@@ -449,12 +453,14 @@ const QuotationTable = () => {
   };
   const fetchSupplierDetails = async (locCode) => {
       try {
-        const response = await fetch('/api/ADOC/ADOCFCL_Terms', {
+        const selectedMonth = dayjs(selectedDate).month() + 1;
+          const selectedYear = dayjs(selectedDate).year();
+          const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode, Container_Size: selectedContainerSize }),
+          body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode, Container_Size: selectedContainerSize ,MonthNo: selectedMonth,YearNo: selectedYear }),
         });
         const data = await response.json();
         console.log("Request body:", { Shipment_Type: 'ADOCFCL',Transport_Type: 'export',Loc_Code: locCode, Container_Size: selectedContainerSize });
@@ -514,7 +520,7 @@ const QuotationTable = () => {
   const downloadPDF = () => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   
-    const now = moment().add(20, 'days');
+    const now = moment().add(0, 'days');
     const formattedDate = now.format("DD-MM-YYYY");
     const startDate = selectedDate.clone().startOf("month").format("DD");
     const endDate = selectedDate.clone().endOf("month").format("DD");
@@ -642,7 +648,7 @@ const QuotationTable = () => {
     doc.text("Greentech Industries (India) Pvt. Ltd", 5, 10, { align: "left" });
   
     doc.setFontSize(8);
-    doc.text(`Adhoc Export rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+    doc.text(`Adhoc Export rates`, 5, 14, { align: "left" });
     const loc = locationName.split('|')[0].trim();
     doc.text(`Quote for GTI to ${loc} FCL shipment`, 5, 18, { align: "left" });
     doc.setFontSize(7);
@@ -1011,7 +1017,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Required Container / CBM :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>

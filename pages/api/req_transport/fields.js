@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
 
   try {
-    const result = await prisma.$queryRaw`select * from req_Transport_feilds`;
+    const result = await prisma.$queryRaw`select * from [Adhoc_Request].[dbo].[Req_Transport_feilds]`;
 
     return res.status(200).json({ result });
   } catch (error) {

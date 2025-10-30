@@ -11,7 +11,7 @@ model Web_Login {
   Login_id     Int       @id @default(autoincrement())
   Username     String?   @db.VarChar(100)
   Email        String?   @db.VarChar(100)
-  Password     String?   @db.VarChar(15)
+  Password     String?   @db.VarChar(25)
   Phone        String?   @db.VarChar(20)
   Company      String?   @db.VarChar(100)
   Address      String?   @db.VarChar(Max)
@@ -31,6 +31,7 @@ model Currency_Exchange {
   Created_Date DateTime? @default(now(), map: "DF_Currency_Exchange_Created_Date") @db.DateTime
   Updated_By   String?   @db.VarChar(50)
   Updated_Date DateTime? @db.DateTime
+  status       Int?
 
   @@ignore
 }
@@ -64,12 +65,12 @@ model FCL_Quote {
   D_LOC           Decimal?  @db.Decimal(18, 2)
   D_Total_Chg     Decimal?  @db.Decimal(18, 2)
   Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
-  Is_Locked       Int?
+  Is_Locked       Int?      @default(1, map: "DF_FCL_Quote_Is_Locked")
   Created_Date    DateTime? @default(now(), map: "DF_FCL_Quote_Created_Date") @db.DateTime
   Created_By      String?   @db.VarChar(100)
   Updated_Date    DateTime? @db.DateTime
   Updated_By      String?   @db.VarChar(100)
-  remarks         String?   @db.VarChar(Max)
+  Remarks         String?   @db.VarChar(Max)
 
   @@ignore
 }
@@ -100,12 +101,12 @@ model LCL_Quote {
   D_Del           Decimal?  @db.Decimal(18, 2)
   D_Total_Chg     Decimal?  @db.Decimal(18, 2)
   Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
-  Is_Locked       Int?
+  Is_Locked       Int?      @default(1, map: "DF_LCL_Quote_Is_Locked")
   Created_Date    DateTime? @default(now(), map: "DF_LCL_Quote_Created_Date") @db.DateTime
   Created_By      String?   @db.VarChar(100)
   Updated_Date    DateTime? @db.DateTime
   Updated_By      String?   @db.VarChar(100)
-  remarks         String?   @db.VarChar(Max)
+  Remarks         String?   @db.VarChar(Max)
 
   @@ignore
 }
@@ -153,11 +154,11 @@ model Location_Master {
 }
 
 model ErrorLogs {
-  Id           Int       @id(map: "PK__ErrorLog__3214EC074A814EC5") @default(autoincrement())
+  Id           Int       @id(map: "PK__ErrorLog__3214EC07D4ABE966") @default(autoincrement())
   Proc_Name    String?   @db.VarChar(200)
   T_Parameter1 String?   @db.VarChar(Max)
   ErrorMessage String?   @db.NVarChar(4000)
-  ErrorDate    DateTime? @default(now(), map: "DF__ErrorLogs__Error__47DBAE45") @db.DateTime
+  ErrorDate    DateTime? @default(now(), map: "DF__ErrorLogs__Error__5AEE82B9") @db.DateTime
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -186,12 +187,12 @@ model Import_LCL_Quote {
   O_Del           Decimal?  @db.Decimal(18, 2)
   O_Total_Chg     Decimal?  @db.Decimal(18, 2)
   Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
-  Is_Locked       Int?
+  Is_Locked       Int?      @default(1, map: "DF_Import_LCL_Quote_Is_Locked")
   Created_Date    DateTime? @default(now(), map: "DF_Import_LCL_Quote_Created_Date") @db.DateTime
   Created_By      String?   @db.VarChar(100)
   Updated_Date    DateTime? @db.DateTime
   Updated_By      String?   @db.VarChar(100)
-  remarks         String?   @db.VarChar(Max)
+  Remarks         String?   @db.VarChar(Max)
 
   @@ignore
 }
@@ -200,6 +201,8 @@ model Vendors {
   Vendor_Id     Int       @default(autoincrement())
   Vendor_Code   String    @id(map: "PK_Vendors") @db.VarChar(10)
   Vendor_Name   String    @db.VarChar(200)
+  Short_Name    String?   @db.VarChar(10)
+  Short_Code    String?   @db.VarChar(2)
   Contact_Name  String    @db.VarChar(200)
   Contact_No    String    @db.VarChar(50)
   Contact_Email String    @db.VarChar(50)
@@ -211,11 +214,322 @@ model Vendors {
   CreatedBy     String?   @db.VarChar(50)
   UpdatedDate   DateTime? @db.DateTime
   UpdatedBy     String?   @db.VarChar(50)
-  Short_Name    String?   @db.VarChar(10)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Import_FCL_Quote {
+  FCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  Quote_Month     Int
+  Quote_Year      Int
+  Cont_Feet       Int
+  O_CCD           Decimal?  @db.Decimal(18, 2)
+  O_LTG           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_BLC           Decimal?  @db.Decimal(18, 2)
+  O_LUS           Decimal?  @db.Decimal(18, 2)
+  O_Halt          Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_ENS           Decimal?  @db.Decimal(18, 2)
+  S_ISPS          Decimal?  @db.Decimal(18, 2)
+  S_ITT           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_DTH           Decimal?  @db.Decimal(18, 2)
+  D_BLF           Decimal?  @db.Decimal(18, 2)
+  D_DBR           Decimal?  @db.Decimal(18, 2)
+  D_DOF           Decimal?  @db.Decimal(18, 2)
+  D_HC            Decimal?  @db.Decimal(18, 2)
+  D_TDO           Decimal?  @db.Decimal(18, 2)
+  D_LOC           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?      @default(1, map: "DF_Import_FCL_Quote_Is_Locked")
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  Remarks         String?   @db.VarChar(Max)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Quote_Calendar {
+  Tran_Id       Int       @default(autoincrement())
+  Month_No      Int?
+  Year_No       Int?
+  Start_Date    DateTime  @db.DateTime
+  End_Time      DateTime  @db.DateTime
+  Finalize_Date DateTime  @db.DateTime
+  Created_By    String?   @db.VarChar(50)
+  Created_Date  DateTime? @default(now(), map: "DF_Quote_Calendar_Created_Date") @db.DateTime
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Adhoc_Locations {
+  Location_Id     Int       @default(autoincrement())
+  Location_Code   String    @db.NVarChar(100)
+  Location        String    @db.NVarChar(100)
+  Country         String    @db.NVarChar(100)
+  Actual_Location String    @db.NVarChar(100)
+  Loc_Address     String    @db.NVarChar(Max)
+  Currency        String    @db.VarChar(10)
+  Status          Int?      @default(1, map: "DF_Adhoc_Locations_Status")
+  Created_by      String?   @db.VarChar(50)
+  Created_date    DateTime? @default(now(), map: "DF_Adhoc_Locations_Created_date") @db.DateTime
+  Updated_by      String?   @db.VarChar(50)
+  Updated_date    DateTime? @db.DateTime
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ADOC_Export_FCL_Quote {
+  FCL_Id            Int       @default(autoincrement())
+  Supplier_Code     String    @db.VarChar(50)
+  Location_Code     String    @db.VarChar(50)
+  Container_Size    String?   @db.VarChar(50)
+  Quote_Month       Int
+  Quote_Year        Int
+  Quote_Date        DateTime? @db.Date
+  O_CCD             Decimal?  @db.Decimal(18, 2)
+  O_LTG             Decimal?  @db.Decimal(18, 2)
+  O_THC             Decimal?  @db.Decimal(18, 2)
+  O_BLC             Decimal?  @db.Decimal(18, 2)
+  O_LUS             Decimal?  @db.Decimal(18, 2)
+  O_Halt            Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg       Decimal?  @db.Decimal(18, 2)
+  S_SeaFre          Decimal?  @db.Decimal(18, 2)
+  S_ENS             Decimal?  @db.Decimal(18, 2)
+  S_ISPS            Decimal?  @db.Decimal(18, 2)
+  S_ITT             Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg       Decimal?  @db.Decimal(18, 2)
+  D_DTH             Decimal?  @db.Decimal(18, 2)
+  D_BLF             Decimal?  @db.Decimal(18, 2)
+  D_DBR             Decimal?  @db.Decimal(18, 2)
+  D_DOF             Decimal?  @db.Decimal(18, 2)
+  D_HC              Decimal?  @db.Decimal(18, 2)
+  D_TDO             Decimal?  @db.Decimal(18, 2)
+  D_LOC             Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg       Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost   Decimal?  @db.Decimal(18, 2)
+  Is_Locked         Int?
+  Created_Date      DateTime? @db.DateTime
+  Created_By        String?   @db.VarChar(100)
+  Updated_Date      DateTime? @db.DateTime
+  Updated_By        String?   @db.VarChar(100)
+  remarks           String?   @db.VarChar(Max)
+  uploaded_pdf_path String?   @db.VarChar(Max)
+  Request_Id        Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ADOC_Export_LCL_Quote {
+  LCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  CBM             String?   @db.VarChar(20)
+  Quote_Month     Int?
+  Quote_Year      Int?
+  Quote_Date      DateTime? @db.Date
+  O_CCD           Decimal?  @db.Decimal(18, 2)
+  O_LTG           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_BLC           Decimal?  @db.Decimal(18, 2)
+  O_LUS           Decimal?  @db.Decimal(18, 2)
+  O_CFS           Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_FSC           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_CUC           Decimal?  @db.Decimal(18, 2)
+  D_CCF           Decimal?  @db.Decimal(18, 2)
+  D_DOC           Decimal?  @db.Decimal(18, 2)
+  D_AAI           Decimal?  @db.Decimal(18, 2)
+  D_LU            Decimal?  @db.Decimal(18, 2)
+  D_Del           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  remarks         String?   @db.VarChar(Max)
+  Request_Id      Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ADOC_Import_FCL_Quote {
+  FCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  Container_Size  String?   @db.VarChar(50)
+  Quote_Month     Int
+  Quote_Year      Int
+  Quote_Date      DateTime? @db.Date
+  O_CCD           Decimal?  @db.Decimal(18, 2)
+  O_LTG           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_BLC           Decimal?  @db.Decimal(18, 2)
+  O_LUS           Decimal?  @db.Decimal(18, 2)
+  O_Halt          Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_ENS           Decimal?  @db.Decimal(18, 2)
+  S_ISPS          Decimal?  @db.Decimal(18, 2)
+  S_ITT           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_DTH           Decimal?  @db.Decimal(18, 2)
+  D_BLF           Decimal?  @db.Decimal(18, 2)
+  D_DBR           Decimal?  @db.Decimal(18, 2)
+  D_DOF           Decimal?  @db.Decimal(18, 2)
+  D_HC            Decimal?  @db.Decimal(18, 2)
+  D_TDO           Decimal?  @db.Decimal(18, 2)
+  D_LOC           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  remarks         String?   @db.VarChar(Max)
+  Request_Id      Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ADOC_Import_LCL_Quote {
+  LCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  Quote_Month     Int?
+  Quote_Year      Int?
+  Quote_Date      DateTime? @db.Date
+  CBM             String?   @db.VarChar(50)
+  D_CCD           Decimal?  @db.Decimal(18, 2)
+  D_LTS           Decimal?  @db.Decimal(18, 2)
+  D_THC           Decimal?  @db.Decimal(18, 2)
+  D_BLC           Decimal?  @db.Decimal(18, 2)
+  D_LUS           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_FSC           Decimal?  @db.Decimal(18, 2)
+  S_SSC           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  O_CC            Decimal?  @db.Decimal(18, 2)
+  O_CCF           Decimal?  @db.Decimal(18, 2)
+  O_DOC           Decimal?  @db.Decimal(18, 2)
+  O_CFS           Decimal?  @db.Decimal(18, 2)
+  O_LU            Decimal?  @db.Decimal(18, 2)
+  O_Del           Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?      @default(1, map: "DF_ADOC_Import_LCL_Quote_Is_Locked")
+  Created_Date    DateTime? @default(now(), map: "DF_ADOC_Import_LCL_Quote_Created_Date") @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  Remarks         String?   @db.VarChar(Max)
+  Request_Id      Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Air_Export_Quote {
+  FCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  CBM             String?   @db.VarChar(50)
+  Quote_Month     Int?
+  Quote_Year      Int?
+  Quote_Date      DateTime? @db.Date
+  O_PU            Decimal?  @db.Decimal(18, 2)
+  O_CC            Decimal?  @db.Decimal(18, 2)
+  O_HDO           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_DOC           Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_AirFre        Decimal?  @db.Decimal(18, 2)
+  S_FSC           Decimal?  @db.Decimal(18, 2)
+  S_SSC           Decimal?  @db.Decimal(18, 2)
+  S_ISS           Decimal?  @db.Decimal(18, 2)
+  S_Xray          Decimal?  @db.Decimal(18, 2)
+  S_AAI           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_CC            Decimal?  @db.Decimal(18, 2)
+  D_CCF           Decimal?  @db.Decimal(18, 2)
+  D_DOC           Decimal?  @db.Decimal(18, 2)
+  D_LC            Decimal?  @db.Decimal(18, 2)
+  D_LU            Decimal?  @db.Decimal(18, 2)
+  D_DEL           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  remarks         String?   @db.VarChar(Max)
+  Request_Id      Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Air_Import_Quote {
+  FCL_Id          Int       @default(autoincrement())
+  Supplier_Code   String    @db.VarChar(50)
+  Location_Code   String    @db.VarChar(50)
+  CBM             String?   @db.VarChar(50)
+  Quote_Month     Int?
+  Quote_Year      Int?
+  Quote_Date      DateTime? @db.Date
+  O_PU            Decimal?  @db.Decimal(18, 2)
+  O_CC            Decimal?  @db.Decimal(18, 2)
+  O_HDO           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_DOC           Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_AirFre        Decimal?  @db.Decimal(18, 2)
+  S_FSC           Decimal?  @db.Decimal(18, 2)
+  S_SSC           Decimal?  @db.Decimal(18, 2)
+  S_ISS           Decimal?  @db.Decimal(18, 2)
+  S_Xray          Decimal?  @db.Decimal(18, 2)
+  S_AAI           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_CC            Decimal?  @db.Decimal(18, 2)
+  D_CCF           Decimal?  @db.Decimal(18, 2)
+  D_DOC           Decimal?  @db.Decimal(18, 2)
+  D_LC            Decimal?  @db.Decimal(18, 2)
+  D_LU            Decimal?  @db.Decimal(18, 2)
+  D_DEL           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  remarks         String?   @db.VarChar(Max)
+  Request_Id      Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model FCL_Quote_May {
   FCL_Id          Int       @default(autoincrement())
   Supplier_Code   String    @db.VarChar(50)
   Location_Code   String    @db.VarChar(50)
@@ -248,21 +562,264 @@ model Import_FCL_Quote {
   Created_By      String?   @db.VarChar(100)
   Updated_Date    DateTime? @db.DateTime
   Updated_By      String?   @db.VarChar(100)
-  remarks         String?   @db.VarChar(Max)
+  Remarks         String?   @db.VarChar(Max)
 
   @@ignore
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model Quote_Calendar {
-  Tran_Id       Int       @default(autoincrement())
-  Month_No      Int?
-  Year_No       Int?
-  Start_Date    DateTime  @db.DateTime
-  End_Time      DateTime  @db.DateTime
-  Finalize_Date DateTime  @db.DateTime
-  Created_By    String?   @db.VarChar(50)
-  Created_Date  DateTime? @default(now(), map: "DF_Quote_Calendar_Created_Date") @db.DateTime
+model Previous_FCL_Quote {
+  Pre_Id          Int       @default(autoincrement())
+  FCL_Id          Int?
+  Supplier_Code   String?   @db.VarChar(50)
+  Location_Code   String?   @db.VarChar(50)
+  Quote_Month     Int?
+  Quote_Year      Int?
+  Cont_Feet       Int?
+  O_CCD           Decimal?  @db.Decimal(18, 2)
+  O_LTG           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_BLC           Decimal?  @db.Decimal(18, 2)
+  O_LUS           Decimal?  @db.Decimal(18, 2)
+  O_Halt          Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_ENS           Decimal?  @db.Decimal(18, 2)
+  S_ISPS          Decimal?  @db.Decimal(18, 2)
+  S_ITT           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_DTH           Decimal?  @db.Decimal(18, 2)
+  D_BLF           Decimal?  @db.Decimal(18, 2)
+  D_DBR           Decimal?  @db.Decimal(18, 2)
+  D_DOF           Decimal?  @db.Decimal(18, 2)
+  D_HC            Decimal?  @db.Decimal(18, 2)
+  D_TDO           Decimal?  @db.Decimal(18, 2)
+  D_LOC           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  Remarks         String?   @db.VarChar(Max)
+  Ranks           Int?
 
   @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Previous_Import_LCL_Quote {
+  Pre_Id          Int       @default(autoincrement())
+  LCL_Id          Int?
+  Supplier_Code   String?   @db.VarChar(50)
+  Location_Code   String?   @db.VarChar(50)
+  Quote_Month     Int?
+  Quote_Year      Int?
+  CBM             Int?
+  D_CCD           Decimal?  @db.Decimal(18, 2)
+  D_LTS           Decimal?  @db.Decimal(18, 2)
+  D_THC           Decimal?  @db.Decimal(18, 2)
+  D_BLC           Decimal?  @db.Decimal(18, 2)
+  D_LUS           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_FSC           Decimal?  @db.Decimal(18, 2)
+  S_SSC           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  O_CC            Decimal?  @db.Decimal(18, 2)
+  O_CCF           Decimal?  @db.Decimal(18, 2)
+  O_DOC           Decimal?  @db.Decimal(18, 2)
+  O_CFS           Decimal?  @db.Decimal(18, 2)
+  O_LU            Decimal?  @db.Decimal(18, 2)
+  O_Del           Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  Remarks         String?   @db.VarChar(Max)
+  Ranks           Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Previous_LCL_Quote {
+  Pre_Id          Int       @default(autoincrement())
+  LCL_Id          Int?
+  Supplier_Code   String?   @db.VarChar(50)
+  Location_Code   String?   @db.VarChar(50)
+  Quote_Month     Int?
+  Quote_Year      Int?
+  CBM             Int?
+  O_CCD           Decimal?  @db.Decimal(18, 2)
+  O_LTG           Decimal?  @db.Decimal(18, 2)
+  O_THC           Decimal?  @db.Decimal(18, 2)
+  O_BLC           Decimal?  @db.Decimal(18, 2)
+  O_LUS           Decimal?  @db.Decimal(18, 2)
+  O_CFS           Decimal?  @db.Decimal(18, 2)
+  O_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  S_SeaFre        Decimal?  @db.Decimal(18, 2)
+  S_FSC           Decimal?  @db.Decimal(18, 2)
+  S_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  D_CUC           Decimal?  @db.Decimal(18, 2)
+  D_CCF           Decimal?  @db.Decimal(18, 2)
+  D_DOC           Decimal?  @db.Decimal(18, 2)
+  D_AAI           Decimal?  @db.Decimal(18, 2)
+  D_LU            Decimal?  @db.Decimal(18, 2)
+  D_Del           Decimal?  @db.Decimal(18, 2)
+  D_Total_Chg     Decimal?  @db.Decimal(18, 2)
+  Total_Ship_Cost Decimal?  @db.Decimal(18, 2)
+  Is_Locked       Int?
+  Created_Date    DateTime? @db.DateTime
+  Created_By      String?   @db.VarChar(100)
+  Updated_Date    DateTime? @db.DateTime
+  Updated_By      String?   @db.VarChar(100)
+  Remarks         String?   @db.VarChar(Max)
+  Ranks           Int?
+
+  @@ignore
+}
+
+model Req_Transport_feilds {
+  id              Int       @id(map: "PK__Req_Tran__3213E83FB3563C43") @default(autoincrement())
+  transport_types String?   @db.VarChar(50)
+  Shipment_types  String?   @db.VarChar(50)
+  container_sizes String?   @db.VarChar(255)
+  created_at      DateTime? @default(now(), map: "DF__Req_Trans__creat__395884C4") @db.DateTime
+  created_by      String?   @db.VarChar(50)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model temp {
+  Quote_Month Int?
+  Quote_Year  Int?
+  CBM         Int?
+  SC          String? @db.VarChar(100)
+  Loc_Code    String? @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Temp_Location_Details_220725 {
+  Loc_Details_ID    Int       @default(autoincrement())
+  Location_Code     String    @db.VarChar(50)
+  Customer_Name     String?   @db.VarChar(100)
+  Delivery_Address  String    @db.VarChar(Max)
+  Commodity         String?   @db.VarChar(500)
+  HSN_Code          String?   @db.VarChar(100)
+  Incoterms         String    @db.VarChar(50)
+  Transit_Days      Int?
+  Dest_Port         String?   @db.VarChar(100)
+  Free_Days         Int?
+  Pref_Vessel       String?   @db.VarChar(100)
+  Pref_Service      String?   @db.VarChar(100)
+  Pref_Liners       String?   @db.VarChar(Max)
+  Avg_Cont_Per_Mnth String?   @db.VarChar(100)
+  Created_By        String?   @db.VarChar(50)
+  Created_Date      DateTime? @db.DateTime
+  Updated_By        String?   @db.VarChar(50)
+  Updated_Date      DateTime? @db.DateTime
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TempParams {
+  Location_code  String? @db.VarChar(100)
+  sc             String? @db.VarChar(100)
+  Container_Size String? @db.VarChar(100)
+  Quote_Date     String? @db.VarChar(100)
+
+  @@ignore
+}
+
+model TopFCLQuotes {
+  Id              Int     @id(map: "PK__TopFCLQu__3214EC0738D61ED3") @default(autoincrement())
+  Vendor_Code     String  @db.NVarChar(50)
+  Vendor_Name     String  @db.NVarChar(100)
+  Location_Code   String  @db.NVarChar(50)
+  Location        String  @db.NVarChar(500)
+  Quote_Month     Int
+  Quote_Year      Int
+  Cont_Feet       Int
+  Total_Ship_Cost Decimal @db.Decimal(18, 2)
+  Rank            Int
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TopFCLQuotes_History {
+  Id              Int     @default(autoincrement())
+  Vendor_Code     String  @db.NVarChar(50)
+  Vendor_Name     String  @db.NVarChar(100)
+  Location_Code   String  @db.NVarChar(50)
+  Location        String  @db.NVarChar(500)
+  Quote_Month     Int
+  Quote_Year      Int
+  Cont_Feet       Int
+  Total_Ship_Cost Decimal @db.Decimal(18, 2)
+  Rank            Int
+
+  @@ignore
+}
+
+model TopImportLCLQuotes {
+  Id              Int     @id(map: "PK__TopImpor__3214EC078B1639DA") @default(autoincrement())
+  Vendor_Code     String  @db.NVarChar(50)
+  Vendor_Name     String  @db.NVarChar(100)
+  Location_Code   String  @db.NVarChar(50)
+  Location        String  @db.NVarChar(500)
+  Quote_Month     Int
+  Quote_Year      Int
+  CBM             Int
+  Total_Ship_Cost Decimal @db.Decimal(18, 2)
+  Rank            Int
+}
+
+model TopLCLQuotes {
+  Id              Int     @id(map: "PK__TopLCLQu__3214EC07EDF26F46") @default(autoincrement())
+  Vendor_Code     String  @db.NVarChar(50)
+  Vendor_Name     String  @db.NVarChar(100)
+  Location_Code   String  @db.NVarChar(50)
+  Location        String  @db.NVarChar(500)
+  Quote_Month     Int
+  Quote_Year      Int
+  CBM             Int
+  Total_Ship_Cost Decimal @db.Decimal(18, 2)
+  Rank            Int
+}
+
+model TransportRequests {
+  ID                 Int       @id(map: "PK_TransportRequests") @default(autoincrement())
+  Request_Date       DateTime  @db.Date
+  Transport_Type     String    @db.NVarChar(50)
+  Shipment_Type      String?   @db.NVarChar(50)
+  Container_Size     String?   @db.NVarChar(50)
+  From_Location_Code String?   @db.NVarChar(100)
+  From_Location_Name String?   @db.NVarChar(255)
+  To_Location_Code   String?   @db.NVarChar(100)
+  To_Location_Name   String?   @db.NVarChar(255)
+  Commodity          String?   @db.NVarChar(255)
+  HSN_Code           String?   @db.NVarChar(50)
+  Incoterms          String?   @db.NVarChar(50)
+  USD                Decimal?  @db.Decimal(18, 2)
+  EURO               Decimal?  @db.Decimal(18, 2)
+  Transit_Days       Int?
+  Dest_Port          String?   @db.NVarChar(100)
+  Free_Days          Int?
+  Pref_Vessel        String?   @db.NVarChar(255)
+  Pref_Service       String?   @db.NVarChar(255)
+  Pref_Liners        String?   @db.NVarChar(Max)
+  Avg_Cont_Per_Mnth  Int?
+  Created_By         String?   @db.NVarChar(100)
+  Created_Date       DateTime? @default(now(), map: "DF__Transport__Creat__1B0907CE") @db.DateTime
+  Weight             Decimal?  @db.Decimal(18, 2)
+  Remarks            String?   @db.NVarChar(Max)
+  UploadedPDF        String?   @db.NVarChar(300)
+  Location_Address   String?   @db.VarChar(Max)
+  Req_Status         Int?      @default(1, map: "DF_TransportRequests_Req_Status")
 }

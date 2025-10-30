@@ -33,12 +33,12 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Container" },
-    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Container" },
-    { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
-    { description: "Halting", 20: "", remarks: "If any" },
+   { description: "Customs clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "CC Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "LINER CHARGES", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+    { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
   ]);
   
   const [seaFreightCharges, setSeaFreightCharges] = useState([
@@ -49,13 +49,13 @@ const QuotationTable = () => {
   ]);
   
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Destination Terminal Handling Charges", 20: "", remarks: "Per Container" },
-    { description: "BL Fee", 20: "", remarks: "Per BL" },
-    { description: "Delivery by Barge/Road", 20: "", remarks: "Per Container" },
-    { description: "Delivery Order Fees", 20: "", remarks: "Per Container" },
-    { description: "Handling Charges", 20: "", remarks: "Per Container" },
-    { description: "T1 Doc", 20: "", remarks: "Per Container" },
-    { description: "LOLO Charges", 20: "", remarks: "Per Container" },
+    { description: "Pickup & Clerance Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Custom Clearance", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "Handling / DO/ ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Terminal Handling Charge ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Documentation ", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "T1 Doc", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
   ]);
   const [open, setOpen] = React.useState(false)
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -80,6 +80,9 @@ const QuotationTable = () => {
   const [Pref_Liners, setPref_Liners] = useState(""); 
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [containerSize, setContainerSize] = useState("");
+  const [quoteDate, setquoteDate] = useState("");
+  const [quoteTime, setquoteTime] = useState("");
+  const [Request_Id, setRequest_Id] = useState(0); 
   
   useEffect(() => {
     let flag = false
@@ -265,6 +268,7 @@ const QuotationTable = () => {
       supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
       containerSize: selectedContainerSize || "N/A",
+      Quote_Date: quoteDate,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
       originData: filterCharges(originCharges),
@@ -276,6 +280,7 @@ const QuotationTable = () => {
       totalDestination: totalDestination,
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
+      Request_Id:Request_Id,
     };
     console.log("Quote Data:", quoteData);
     try {
@@ -432,6 +437,9 @@ const QuotationTable = () => {
         setEUR(parseFloat(data.result[0].EURO));
         setContainerSize(data.result[0].Container_Size || "");
         setUploadedPdfPath(data.result[0].UploadedPDF || "");
+        setquoteDate(data.result[0].Request_Date);
+        setquoteTime("11:00 AM");
+        setRequest_Id(data.result[0].Request_Id);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -453,8 +461,11 @@ const QuotationTable = () => {
     setUSD(0);
     setEUR(0);
     setRemarks("");
+     setquoteDate("");
+      setquoteTime("");
     setUploadedPdfPath('');
     setContainerSize("N/A");
+    setRequest_Id(0);
       // setWeight("");
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
@@ -568,7 +579,13 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight RFQ - Adhoc FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]  ">Sea Freight Import - Adhoc FCL {" "} <span className="text-red-500">
+    ( {quoteDate
+                      ? new Date(quoteDate).toLocaleDateString(
+                          "en-GB"
+                        )
+                      : ""} {quoteTime})
+  </span></th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -584,7 +601,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.destination ? "▼" : "▶"} Destination Charges
+                  {sections.destination ? "▼" : "▶"} EX Works Charges
                 </td>
               </tr>
               {sections.destination &&
@@ -616,7 +633,7 @@ const QuotationTable = () => {
                 ))}
               {sections.destination && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total EX Works Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td colSpan="2" className="py-1 px-3 border">{totalDestination[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
@@ -672,7 +689,7 @@ const QuotationTable = () => {
               >
                 <td>A.</td>
                 <td colSpan="5" className="py-2 px-3 text-start flex items-center">
-                  {sections.origin ? "▼" : "▶"} Origin Charges
+                  {sections.origin ? "▼" : "▶"} Destination Charges
                 </td>
               </tr>
             
@@ -711,7 +728,7 @@ const QuotationTable = () => {
               })}
               {sections.origin && (
                 <tr className="border">
-                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Origin Charges</td>
+                  <td colSpan="2" className="font-bold py-1 px-3 border">Total Destination Charges</td>
                   <td className="py-1 px-3 border">INR</td>
                   <td colSpan="2" className="py-1 px-3 border">{totalOrigin[20].toFixed(2)}</td>
                   <td className="py-1 px-3 border"></td>
@@ -754,11 +771,11 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Required Container / CBM  :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Shipment Details</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">
                   {uploadedPdfPath ? 
                   <a href={uploadedPdfPath} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">

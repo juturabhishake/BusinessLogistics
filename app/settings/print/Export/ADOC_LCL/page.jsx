@@ -41,28 +41,28 @@ const QuotationTable = () => {
   });
 
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Local Transportation From GTI-Chennai", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Terminal Handling Charges - Origin", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Customs Clearance & Documentation", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
+    { description: "Local Transportation From GTI-Chennai", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
+    { description: "Terminal Handling Charges - Origin", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
     { description: "Bill of Lading Charges", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading / SSR", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
+    { description: "Loading/Unloading / SSR", remarks: "Per Shipment", sc1: "", sc2: "", sc3: ""},
     { description: "CFS Charges", remarks: "At Actual", sc1: "", sc2: "", sc3: "" },
   ]);
 
   const [seaFreightCharges, setSeaFreightCharges] = useState([
-    { description: "Sea Freight", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Sea Freight", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
     { description: "FSC (Fuel Surcharge)", remarks: "", sc1: "", sc2: "", sc3: "" },
     // { description: "ISPS", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     // { description: "Seal Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
   ]);
 
   const [destinationCharges, setDestinationCharges] = useState([
-    { description: "Custom Clearance", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "Custom Clearance", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
     { description: "CC Fee", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
-    { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "AAI Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Loading/Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "Deliver", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
+    { description: "D.O Charges", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
+    { description: "AAI Charges", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
+    { description: "Loading/Unloading", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
+    { description: "Deliver", remarks: "Per Shipment", sc1: "", sc2: "", sc3: "" },
     // { description: "LOLO Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
   ]);
 
@@ -88,6 +88,7 @@ const QuotationTable = () => {
   const [total, setTotal] = useState(["", "", "", "", "", ""]);
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [weight, setWeight] = useState("");
+  const [actual_Location, setActual_Location] = useState("");  
   const [containerSize, setContainerSize] = useState("N/A");
   const [remarks, setRemarks] = useState("");
   const [Free_Days, setFree_Days] = useState(""); 
@@ -133,12 +134,14 @@ const QuotationTable = () => {
   useEffect(() => {
         const fetchLocations = async () => {
           try {
-            const response = await fetch('/api/get_locations_Adhoc_Air' , {
+             const selectedMonth = dayjs(selectedDate).month() + 1;
+             const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/get_locations_Adhoc_Air_Print' , {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'export'   }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'export'   ,Month_No:selectedMonth ,Year_No: selectedYear  }),
             });
             const data = await response.json();
             setLocations(data.result);
@@ -199,12 +202,14 @@ const QuotationTable = () => {
 
   const fetchSupplierDetails = async (locCode) => {
           try {
-            const response = await fetch('/api/Get_Terms_Adhoc_AIR', {
+            const selectedMonth = dayjs(selectedDate).month() + 1;
+             const selectedYear = dayjs(selectedDate).year();
+            const response = await fetch('/api/ADOC/ADOCFCL_Terms_Print', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'export',Loc_Code: locCode }),
+              body: JSON.stringify({ Shipment_Type: 'ADOCLCL',Transport_Type: 'export',Loc_Code: locCode,Container_Size: 'LCL' ,MonthNo: selectedMonth,YearNo: selectedYear }),
             });
             const data = await response.json();
             if (data.result && data.result.length > 0) {
@@ -224,6 +229,7 @@ const QuotationTable = () => {
               setUploadedPdfPath(data.result[0].UploadedPDF || "");
               setContainerSize(data.result[0].Container_Size || "N/A");
               setWeight(parseFloat(data.result[0].Weight) || "");
+              setActual_Location(data.result[0].Actual_Location || "");
               console.log("Supplier details fetched successfully:", data.result[0]);
             }
           } catch (error) {
@@ -248,6 +254,7 @@ const QuotationTable = () => {
             setUploadedPdfPath('');
             setContainerSize("N/A");
             setWeight("");
+            setActual_Location("");
           if (selectedLocation) {
             fetchSupplierDetails(selectedLocation);
             fetchQuotationData(selectedLocation);
@@ -684,13 +691,12 @@ const QuotationTable = () => {
     doc.setFontSize(10);
     doc.text("Comparative Statement of Quotations", 5, 10, { align: "left" });
 
-    doc.setFontSize(8);
-    doc.text(`ADOC Export LCL rates for ${selectedMonthYear} (${startDate}.${selectedMonthYear} - ${endDate}.${selectedMonthYear})`, 5, 14, { align: "left" });
+
     const loc = locationName.split('|')[0].trim();
-    doc.text(`Quote for GTI to ${loc} ADOC LCL shipment`, 5, 18, { align: "left" });
+    doc.text(`Quote for GTI to ${actual_Location} Sea shipment ${containerSize}`, 5, 14, { align: "left" });
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 22, { align: "left" });
+    doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", 5, 18, { align: "left" });
     doc.setFontSize(8);
     
     let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
@@ -700,7 +706,7 @@ const QuotationTable = () => {
     let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
     doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     
-    const startY = 24;
+    const startY = 22;
       
     doc.autoTable({
         head: tableHeaders,
@@ -1010,7 +1016,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="2" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Required Container / CBM :</td>
                 <td colSpan="3" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>

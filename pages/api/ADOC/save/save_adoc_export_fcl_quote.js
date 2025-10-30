@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     supplierCode,
     locationCode,
     containerSize,
+    Quote_Date,
     quoteMonth,
     quoteYear,
     originData,
@@ -49,6 +50,7 @@ export default async function handler(req, res) {
     createdBy,
     remarks,
     uploaded_pdf_path,
+    Request_Id,
   } = req.body;
 
   if (
@@ -74,6 +76,7 @@ export default async function handler(req, res) {
     Supplier_Code: supplierCode,
     Location_Code: locationCode || "",
     Container_Size: containerSize,
+    Quote_Date:Quote_Date,
     Quote_Month: quoteMonth,
     Quote_Year: quoteYear,
     O_CCD: parseDecimal(originData[0]?.[20]),
@@ -101,6 +104,7 @@ export default async function handler(req, res) {
     Created_By: createdBy || "Unknown",
     remarks: remarks || "",
     uploaded_pdf_path: uploaded_pdf_path || "",
+    Request_Id: Request_Id,
   };
   console.log("Payload:", quoteData);
   try {

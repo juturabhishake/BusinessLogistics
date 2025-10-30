@@ -64,6 +64,8 @@ const QuotationTable = () => {
   const [locationName, setLocationName] = useState("");
   const [containerSizeOpen, setContainerSizeOpen] = useState(false);
   const [selectedContainerSize, setSelectedContainerSize] = useState("");
+  const [quoteDate, setquoteDate] = useState("");
+  const [quoteTime, setquoteTime] = useState("");
   const [containerSizes, setContainerSizes] = useState([]);
   const [USD, setUSD] = useState(0.00);
   const [EUR, setEUR] = useState(0.00);
@@ -84,7 +86,7 @@ const QuotationTable = () => {
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [containerSize, setContainerSize] = useState("N/A");
-
+    const [Request_Id, setRequest_Id] = useState(0); 
   useEffect(() => {
     let flag = false
     const check_sc = secureLocalStorage.getItem("sc");
@@ -121,9 +123,9 @@ const QuotationTable = () => {
       // fetchContainerSizes();
     }
     if (selectedLocation && selectedContainerSize) {
-      fetchQuotationData(selectedLocation, selectedContainerSize);
+      fetchQuotationData(selectedLocation, selectedContainerSize,quoteDate);
     }
-  }, [selectedLocation, selectedContainerSize]);
+  }, [selectedContainerSize]);
   useEffect(() => {
     if (selectedLocation) {
       // fetchQuotationData(selectedLocation, selectedContainerSize);
@@ -147,22 +149,7 @@ const QuotationTable = () => {
       }
   };
 
-  // useEffect(() => {
-  //   const fetchCurrency = async () => {
-  //     try {
-  //       const response = await fetch('/api/get_currency');
-  //       const data = await response.json();
-  //       if (data.result && data.result.length > 0) {
-  //         setUSD(parseFloat(data.result[0].USD));
-  //         setEUR(parseFloat(data.result[0].EURO));
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching currency:", error);
-  //     }
-  //   };
 
-  //   fetchCurrency();
-  // }, []);
 
   useEffect(() => {
     const currentDate = new Date();
@@ -179,7 +166,7 @@ const QuotationTable = () => {
     console.log(formattedDate, currentDate);
     setCurrentDateInfo(formattedDate);
   }, []);
-  const fetchQuotationData = async (locationCode, containerSize) => {
+  const fetchQuotationData = async (locationCode, contaiquoteDatenerSize,quoteDate) => {
     // resetCharges();
     if (!locationCode || !containerSize) return;
 
@@ -190,7 +177,9 @@ const QuotationTable = () => {
         body: JSON.stringify({ 
             Loc_Code: locationCode, 
             sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",
-            containerSize: selectedContainerSize || "N/A" 
+            containerSize: selectedContainerSize || "N/A" ,
+            Quote_Date : quoteDate
+
         }),
       });
 
@@ -273,6 +262,7 @@ const QuotationTable = () => {
       supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
       containerSize: selectedContainerSize || "N/A",
+      Quote_Date: quoteDate,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
       originData: filterCharges(originCharges),
@@ -285,6 +275,7 @@ const QuotationTable = () => {
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
       uploaded_pdf_path: pdfPath || "",
+      Request_Id:Request_Id,
     };
     console.log("Quote Data:", quoteData);
     try {
@@ -439,11 +430,14 @@ const QuotationTable = () => {
         setPref_Liners(data.result[0].Pref_Liners);
         setAvg_Cont_Per_Mnth(data.result[0].Avg_Cont_Per_Mnth);
         setHSN_Code(data.result[0].HSN_Code);
+        setquoteDate(data.result[0].Request_Date);
+        setquoteTime("11:00 AM");
         setRemarks(data.result[0].Remarks || "");
         setUSD(parseFloat(data.result[0].USD));
         setEUR(parseFloat(data.result[0].EURO));
         setUploadedPdfPath(data.result[0].UploadedPDF || "");
         setContainerSize(data.result[0].Container_Size || "N/A");
+        setRequest_Id(data.result[0].Request_Id);
         console.log("Supplier details fetched successfully:", data.result[0]);
       }
     } catch (error) {
@@ -462,15 +456,18 @@ const QuotationTable = () => {
       setPref_Liners("");
       setAvg_Cont_Per_Mnth("");
       setHSN_Code("");
+      setquoteDate("");
+      setquoteTime("");
       setUSD(0);
       setEUR(0);
       setRemarks("");
       setContainerSize("N/A");
       setUploadedPdfPath('');
+      setRequest_Id(0);
       // setWeight("");
     if (selectedLocation) {
       fetchSupplierDetails(selectedLocation);
-      fetchQuotationData(selectedLocation);
+      //fetchQuotationData(selectedLocation);
     }
   }, [selectedLocation, selectedContainerSize]);
 
@@ -485,7 +482,7 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
-              <p className="text-xs text-gray-100">"RFQ Export rates for {currentDateInfo}"</p>
+              <p className="text-xs text-gray-100">"RFQ Export rates"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-col items-start justify-start lg:flex-row justify-end gap-2">
@@ -580,7 +577,13 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight Export Adhoc FCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] ">Sea Freight Export Adhoc FCL  {" "} <span className="text-red-500">
+    ( {quoteDate
+                      ? new Date(quoteDate).toLocaleDateString(
+                          "en-GB"
+                        )
+                      : ""} {quoteTime})
+  </span></th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)] ">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -766,11 +769,11 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Required Container / CBM :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>
-                <td colSpan="2" className="py-1 px-3 border text-start">Upload PDF</td>
+                <td colSpan="2" className="py-1 px-3 border text-start">Shipment Details</td>
                 <td colSpan="4" className="py-1 px-3 border text-left">
                   {/* <div className="flex items-center gap-4">
                     <label htmlFor="pdf-upload" className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded-md text-xs flex items-center gap-2 hover:bg-blue-600 transition-colors">

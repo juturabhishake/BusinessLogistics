@@ -113,8 +113,8 @@ export default function PremiumTransportFormFixed() {
       return;
     }
 
-    if (file.size > 1.5 * 1024 * 1024) {
-      setFileError('File is too large. Maximum size is 1.5MB.');
+    if (file.size > 5 * 1024 * 1024) {
+      setFileError('File is too large. Maximum size is 5MB.');
       setFileStatus('error');
       setSelectedFile(null);
       return;
@@ -429,7 +429,7 @@ export default function PremiumTransportFormFixed() {
                         </div>
 
                         <div className="space-y-2 self-end">
-                            <Label htmlFor="pdfUpload">Upload Document (PDF, Max 1.5MB)</Label>
+                            <Label htmlFor="pdfUpload">Upload Document (PDF, Max 5 MB)</Label>
                             <Input id="pdfUpload" type="file" accept=".pdf" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
                             <Button variant="outline" onClick={() => fileInputRef.current?.click()} className={cn("w-full justify-start text-left font-normal", fileStatus === 'error' && "border-destructive text-destructive animate-shake", fileStatus === 'success' && "border-green-500 text-green-600")}>
                                 {fileStatus === 'success' && <Check className="mr-2 h-4 w-4" />}
@@ -453,14 +453,15 @@ export default function PremiumTransportFormFixed() {
                     </Tooltip>
                   )}
                 </h3>
-                <fieldset disabled={!allSelectionsComplete || !locationIsSelected} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 disabled:opacity-40 transition-opacity">
-                  {[
+                <fieldset disabled={!allSelectionsComplete || !locationIsSelected} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 disabled:opacity-40 transition-opacity">                 
+                  {
+                  [
                     { id: 'Commodity', label: 'Commodity', placeholder: 'e.g., Turbo charger and Engine components' }, { id: 'HSN_Code', label: 'HSN Code', placeholder: 'e.g., 851712' },
                     { id: 'Incoterms', label: 'Incoterms', placeholder: 'e.g., DAP' }, { id: 'USD', label: 'USD', placeholder: 'e.g., In Indian Rupees' },
                     { id: 'EURO', label: 'EURO', placeholder: 'e.g., In Indian Rupees' }, { id: 'Transit_Days', label: 'Transit Days', placeholder: 'e.g., 42' },
                     { id: 'Dest_Port', label: 'Destination Port', placeholder: 'e.g., Antwerp' }, { id: 'Free_Days', label: 'Free Days', placeholder: 'e.g., 14' },
                     { id: 'Pref_Vessel', label: 'Preferred Vessel', placeholder: 'e.g., Direct Vessel' }, { id: 'Pref_Service', label: 'Preferred Service', placeholder: 'e.g., Truck' },
-                    { id: 'Pref_Liners', label: 'Preferred Liners', placeholder: 'e.g., All direct vessel liners' }, { id: 'Avg_Cont_Per_Mnth', label: 'Avg Containers/Month', placeholder: 'e.g., 10' }
+                    { id: 'Pref_Liners', label: 'Preferred Liners', placeholder: 'e.g., All direct vessel liners' }, { id: 'Avg_Cont_Per_Mnth', label: 'Required Containers', placeholder: 'e.g., 10' }
                   ].map(input => (
                     <div className="space-y-2" key={input.id}>
                       <Label htmlFor={input.id}>{input.label}</Label>
@@ -481,7 +482,7 @@ export default function PremiumTransportFormFixed() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="w-full sm:w-auto">
-                  <Button onClick={handleSave} disabled={!allFieldsComplete || isSaving || isSaved} className="w-full">
+                  <Button onClick={handleSave} disabled={!allFieldsComplete || isSaving || isSaved  || !formData.USD?.trim() || !formData.EURO?.trim() || !formData.Incoterms?.trim()} className="w-full">
                     {isSaving ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>)
                       : isSaved ? (<><Check className="mr-2 h-4 w-4" /> Saved Successfully</>)
                         : ('Create Request')}

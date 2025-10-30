@@ -155,7 +155,8 @@ export function getMenuList(pathname: string): Group[] {
               icon: FilePlus, 
               submenus: [
                 { href: "/settings/req_transport", label: "Create" },
-                { href: "/settings/req_transport/view", label: "View/Edit" }
+                { href: "/settings/req_transport/view", label: "View" },
+                { href: "/settings/req_transport/status", label: "Status" }
               ]
             },
             {
@@ -164,7 +165,8 @@ export function getMenuList(pathname: string): Group[] {
               icon: LocateFixedIcon,
               submenus: [
                 { href: "/settings/location_settings", label: "Location Master" },
-                { href: "/settings/location_details", label: "Location Details" }
+                { href: "/settings/location_details", label: "Location Details" },
+                 { href: "/settings/adhoc_locations", label: "Adhoc Locations" }
               ]
             },
             {

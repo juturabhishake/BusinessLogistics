@@ -33,11 +33,11 @@ const QuotationTable = () => {
   const [saveState, setSaveState] = useState("idle");  
   
   const [originCharges, setOriginCharges] = useState([
-    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Container" },
-    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Container" },
-    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Container" },
+    { description: "Customs Clearance & Documentation", 20: "", remarks: "Per Shipment" },
+    { description: "Local Transportation From GTI-Chennai", 20: "", remarks: "Per Shipment" },
+    { description: "Terminal Handling Charges - Origin", 20: "", remarks: "Per Shipment" },
     { description: "Bill of Lading Charges", 20: "", remarks: "Per BL" },
-    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Container" },
+    { description: "Loading/Unloading / SSR", 20: "", remarks: "Per Shipment" },
     // { description: "Halting", 20: "", remarks: "If any" },
     { description: "CFS Charges", 20: "", remarks: "At Actual" },
   ]);
@@ -76,6 +76,11 @@ const QuotationTable = () => {
   const [uploadedPdfPath, setUploadedPdfPath] = useState('');
   // const [isUploading, setIsUploading] = useState(false);
   const [containerSize, setContainerSize] = useState("N/A");
+  const [quoteDate, setquoteDate] = useState("");
+  const [quoteTime, setquoteTime] = useState("");
+  const [cmmQ, setcmmQ] = useState("");
+  const [Request_Id, setRequest_Id] = useState(0); 
+
 
   useEffect(() => {
     let flag = false
@@ -109,23 +114,7 @@ const QuotationTable = () => {
       fetchLocations();
     }, []);
 
-  useEffect(() => {
-    const fetchCurrency = async () => {
-      try {
-        const response = await fetch('/api/get_currency');
-        const data = await response.json();
-        if (data.result && data.result.length > 0) {
-          // setUSD(parseFloat(data.result[0].USD));
-          // setEUR(parseFloat(data.result[0].EURO));
-          console.log("OLD API USD and EURO values:", USD, EUR);
-        }
-      } catch (error) {
-        console.error("Error fetching currency:", error);
-      }
-    };
 
-    fetchCurrency();
-  }, []);
 
   useEffect(() => {
     const currentDate = new Date();
@@ -149,7 +138,7 @@ const QuotationTable = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Loc_Code: locationCode, sc: secureLocalStorage.getItem("sc") || "Unknown Supplier", }),
+        body: JSON.stringify({ Loc_Code: locationCode, sc: secureLocalStorage.getItem("sc") || "Unknown Supplier",CBM: containerSize }),
       });
 
       const data = await response.json();    
@@ -214,6 +203,8 @@ const QuotationTable = () => {
     const quoteData = {
       supplierCode: secureLocalStorage.getItem("sc") || "Unknown Supplier",
       locationCode: selectedLocation,
+      quote_Date: quoteDate,
+      cbm:cmmQ,
       quoteMonth: new Date().getMonth() + 1,
       quoteYear: new Date().getFullYear(),
       originData: filterCharges(originCharges),
@@ -225,6 +216,7 @@ const QuotationTable = () => {
       totalDestination: totalDestination,
       createdBy: secureLocalStorage.getItem("un") || "Unknown",
       remarks: remarks || "",
+      Request_Id:Request_Id,
     };
     console.log("Quote Data:", quoteData);
     try {
@@ -379,8 +371,12 @@ const QuotationTable = () => {
           setRemarks(data.result[0].Remarks || "");
           setUSD(parseFloat(data.result[0].USD));
           setEUR(parseFloat(data.result[0].EURO));
+          setquoteDate(data.result[0].Request_Date);
+          setquoteTime("11:00 AM");
+          setcmmQ(data.result[0].Container_Size);
           setContainerSize(data.result[0].Container_Size || "N/A");
           setUploadedPdfPath(data.result[0].UploadedPDF || "");
+          setRequest_Id(data.result[0].Request_Id);
           console.log("Supplier details fetched successfully:", data.result[0]);
         }
       } catch (error) {
@@ -403,7 +399,11 @@ const QuotationTable = () => {
         setEUR(0);
         setRemarks("");
         setContainerSize("N/A");
+        setcmmQ("");
         setUploadedPdfPath('');
+        setquoteDate("");
+        setquoteTime("");
+        setRequest_Id(0);
         // setWeight("");
       if (selectedLocation) {
         fetchSupplierDetails(selectedLocation);
@@ -422,7 +422,7 @@ const QuotationTable = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center">
             <div className="flex flex-col">
               <h2 className="text-sm font-bold">Comparitive Statement of quotations </h2>
-              <p className="text-xs text-gray-100">"RFQ Export rates for {currentDateInfo}"</p>
+              <p className="text-xs text-gray-100">"RFQ Export rates for LCL"</p>
               <p className="text-xs text-gray-100">We are following "IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit"</p>
             </div>
             <div className="flex flex-col items-center justify-start lg:flex-row justify-end gap-4">
@@ -487,7 +487,13 @@ const QuotationTable = () => {
             <thead className="bg-[var(--bgBody3)] text-[var(--buttonHover)] border border-[var(--bgBody)]">
               <tr> 
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">S.No</th>
-                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight Export Adhoc LCL</th>
+                <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)] text-orange-500 ">Sea Freight Export Adhoc LCL {" "} <span className="text-red-500">
+    ( {quoteDate
+                      ? new Date(quoteDate).toLocaleDateString(
+                          "en-GB"
+                        )
+                      : ""} {quoteTime})
+  </span></th>
                 <th rowSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Currency in</th>
                 <th colSpan="1" className="py-1 px-2 border border-[var(--bgBody)]">Quote for GTI to {locationName || "{select location}"} shipment</th>
                 <th rowSpan="2" colSpan="2" className="py-1 px-2 border border-[var(--bgBody)]">Remarks</th>
@@ -673,7 +679,7 @@ const QuotationTable = () => {
               <tr>
                 <td colSpan="2" className="py-1 px-3 border text-start">HSN Code :</td>
                 <td colSpan="1" className="py-1 px-3 border text-left">{HSN_Code}</td>
-                <td colSpan="1" className="py-1 px-3 border text-start">Average Container Requirement / Month :</td>
+                <td colSpan="1" className="py-1 px-3 border text-start">Required Container / CBM :</td>
                 <td colSpan="2" className="py-1 px-3 border text-left">{Avg_Cont_Per_Mnth}</td>
               </tr>
               <tr>
