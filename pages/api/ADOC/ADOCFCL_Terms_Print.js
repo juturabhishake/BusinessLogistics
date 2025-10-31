@@ -31,6 +31,7 @@ export default async function handler(req, res) {
         }
         try {
             const result = await prisma.$queryRaw`EXEC [dbo].[Get_Terms_AdhocFCL_AIR_Print] ${Shipment_Type},${Transport_Type},${Loc_Code}, ${Container_Size},${MonthNo},${YearNo}`;
+            console.log('GET_Supplier_LOC_details Data:', result);
             return res.status(200).json({ result });
         } catch (error) {
             console.error('Error fetching GET_Supplier_LOC_details:', error);

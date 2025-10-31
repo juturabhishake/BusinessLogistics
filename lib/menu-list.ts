@@ -138,7 +138,8 @@ export function getMenuList(pathname: string): Group[] {
                 { href: "/settings/print/Import/FCL", label: "FCL" },
                 { href: "/settings/print/Import/LCL", label: "LCL" },
                 { href: "/settings/print/Import/ADOC_LCL", label: "Adhoc LCL" },
-                { href: "/settings/print/Import/ADOC_FCL", label: "Adhoc FCL" }
+                { href: "/settings/print/Import/ADOC_FCL", label: "Adhoc FCL" },
+                { href: "/settings/print/Import/Multi_ADOC_FCL", label: "Multi Adhoc FCL" },
               ]
             },
             {
