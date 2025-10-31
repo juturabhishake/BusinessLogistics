@@ -278,7 +278,7 @@ const QuotationTable = () => {
     } catch (error) { console.error("Error fetching supplier details:", error); }
   };
 
-  const downloadPDF = () => { window.location.href = "/prints/ADOC/import/fcl"; };
+  const downloadPDF = () => { window.location.href = "/prints/ADOC/import/multi_fcl"; };
   
   return (
     <div>
