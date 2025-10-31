@@ -40,7 +40,8 @@ export default function PremiumTransportFormFixed() {
   const [selectedDate, setSelectedDate] = React.useState(null);
   const [transportType, setTransportType] = React.useState('');
   const [shipmentType, setShipmentType] = React.useState('');
-  const [containerSize, setContainerSize] = React.useState('');
+  // const [containerSize, setContainerSize] = React.useState('');
+  const [containerSize, setContainerSize] = React.useState([]);
   const [weight, setWeight] = React.useState('');
 
   const [fromLocation, setFromLocation] = React.useState(null);
@@ -136,7 +137,8 @@ export default function PremiumTransportFormFixed() {
     setSelectedDate(null);
     setTransportType('');
     setShipmentType('');
-    setContainerSize('');
+    // setContainerSize('');
+    setContainerSize([]);
     setWeight('');
     setFromLocation(null);
     setToLocation(null);
@@ -190,7 +192,7 @@ export default function PremiumTransportFormFixed() {
         requestDate: format(selectedDate, 'yyyy-MM-dd'),
         transportType,
         shipmentType,
-        containerSize,
+        containerSize: containerSize.join(','),
         weight: parseFloat(weight) || 0,
         fromLocation: finalFrom,
         toLocation: finalTo,
@@ -224,7 +226,8 @@ export default function PremiumTransportFormFixed() {
     }
   };
 
-  const allSelectionsComplete = !!selectedDate && !!transportType && !!shipmentType && !!containerSize && !!weight;
+  // const allSelectionsComplete = !!selectedDate && !!transportType && !!shipmentType && !!containerSize && !!weight;
+  const allSelectionsComplete = !!selectedDate && !!transportType && !!shipmentType && containerSize.length > 0 && !!weight;
   const locationIsSelected = transportType === 'import' ? !!fromLocation : transportType === 'export' ? !!toLocation : false;
   const fileIsSelected = fileStatus === 'success';
   const allFieldsComplete = allSelectionsComplete && locationIsSelected && fileIsSelected;
@@ -279,7 +282,8 @@ export default function PremiumTransportFormFixed() {
                               {transportTypeOptions.map((type) => (
                                 <CommandItem key={type} value={type} onSelect={(currentValue) => {
                                   const newType = currentValue === transportType ? '' : currentValue;
-                                  setTransportType(newType); setShipmentType(''); setContainerSize(''); setWeight('');
+                                  // setTransportType(newType); setShipmentType(''); setContainerSize(''); setWeight('');
+                                  setTransportType(newType); setShipmentType(''); setContainerSize([]); setWeight('');
                                   setFromLocation(null); setToLocation(null); setTransportOpen(false);
                                 }}>
                                   <Check className={cn("mr-2 h-4 w-4", transportType === type ? "opacity-100" : "opacity-0")} />
@@ -310,8 +314,10 @@ export default function PremiumTransportFormFixed() {
                             <CommandGroup>
                               {shipmentTypeOptions.map((type) => (
                                 <CommandItem key={type} value={type} onSelect={(currentValue) => {
+                                  // setShipmentType(currentValue === shipmentType ? '' : currentValue);
                                   setShipmentType(currentValue === shipmentType ? '' : currentValue);
-                                  setContainerSize(''); setWeight(''); setShipmentOpen(false);
+                                  // setContainerSize(''); setWeight(''); setShipmentOpen(false);
+                                  setContainerSize([]); setWeight(''); setShipmentOpen(false);
                                 }}>
                                   <Check className={cn("mr-2 h-4 w-4", shipmentType === type ? "opacity-100" : "opacity-0")} />
                                   {type}
@@ -326,7 +332,7 @@ export default function PremiumTransportFormFixed() {
 
                   <div className="space-y-2">
                     <Label>Container Size</Label>
-                    <Popover open={containerOpen} onOpenChange={setContainerOpen}>
+                    {/* <Popover open={containerOpen} onOpenChange={setContainerOpen}>
                       <PopoverTrigger asChild>
                         <Button variant="outline" role="combobox" disabled={!shipmentType} className="w-full justify-between">
                           <span className="truncate">{containerSize || "Select size..."}</span>
@@ -348,6 +354,57 @@ export default function PremiumTransportFormFixed() {
                                   {size}
                                 </CommandItem>
                               ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover> */}
+                    <Popover open={containerOpen} onOpenChange={setContainerOpen}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" role="combobox" disabled={!shipmentType} className="w-full justify-between">
+                          <span className="truncate">
+                            {containerSize.length > 0 ? containerSize.join(', ') : "Select size..."}
+                          </span>
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search size..." />
+                          <CommandList>
+                            <CommandEmpty>No size found.</CommandEmpty>
+                            <CommandGroup>
+                              {transportType === 'import' && shipmentType === 'ADOCFCL' && (
+                                  <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                      Select up to 4 containers.
+                                  </div>
+                              )}
+                              {containerSizeOptions.map((size) => {
+                                const isMultiSelectMode = transportType === 'import' && shipmentType === 'ADOCFCL';
+                                const isSelected = containerSize.includes(size);
+
+                                return (
+                                  <CommandItem 
+                                    key={size} 
+                                    value={size} 
+                                    onSelect={(currentValue) => {
+                                      if (isMultiSelectMode) {
+                                        if (isSelected) {
+                                          setContainerSize(containerSize.filter(s => s !== currentValue));
+                                        } else if (containerSize.length < 4) {
+                                          setContainerSize([...containerSize, currentValue]);
+                                        }
+                                      } else {
+                                        setContainerSize([currentValue]);
+                                        setContainerOpen(false);
+                                      }
+                                    }}
+                                  >
+                                    <Check className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
+                                    {size}
+                                  </CommandItem>
+                                );
+                              })}
                             </CommandGroup>
                           </CommandList>
                         </Command>

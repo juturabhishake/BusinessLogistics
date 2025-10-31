@@ -80,6 +80,7 @@ export function getMenuList(pathname: string): Group[] {
               { href: "/RFQ-Prices/FCL", label: "FCL" },
               { href: "/RFQ-Prices/LCL", label: "LCL" },
               { href: "/RFQ-Prices/ADOC_FCL", label: "Adhoc FCL" },
+              { href: "/RFQ-Prices/M-ADOC_FCL", label: "Mul Adhoc FCL" },
               { href: "/RFQ-Prices/ADOC_LCL", label: "Adhoc LCL" },
             ],
           },
