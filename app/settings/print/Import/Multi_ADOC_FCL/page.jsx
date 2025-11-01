@@ -408,7 +408,7 @@ const QuotationTable = () => {
                          <Popover open={open} onOpenChange={setOpen}><PopoverTrigger asChild>
                              <Button role="combobox" variant="outline" className="w-full lg:w-[200px] justify-between mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded text-xs">{selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation)?.Location_Name : "Select Location..."}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button>
                          </PopoverTrigger><PopoverContent className="w-[200px] p-0"><Command><CommandInput placeholder="Search location..." className="h-9" /><CommandList><CommandEmpty>No location found.</CommandEmpty><CommandGroup>
-                            {locations.map((loc) => (<CommandItem key={loc.Location_Code} value={loc.Location_Code} onSelect={(v) => { setSelectedLocation(loc.Location_Code); setLocationName(loc.Location_Name); setOpen(false); }}>
+                            {locations.map((loc) => (<CommandItem key={loc.Location_Code} value={loc.Location_Code} onSelect={(v) => { setSelectedLocation(loc.Location_Code); setLocationName(loc.Location_Name); setSelectedContainerGroup(""); setContainerSizeOptions([]); setS1DetailColumns([]); setOpen(false); }}>
                                 {loc.Location_Name}<Check className={cn("ml-auto h-4 w-4", selectedLocation === loc.Location_Code ? "opacity-100" : "opacity-0")} /></CommandItem>))}
                          </CommandGroup></CommandList></Command></PopoverContent></Popover>
                          <Popover open={containerSizeOpen} onOpenChange={setContainerSizeOpen}><PopoverTrigger asChild>
