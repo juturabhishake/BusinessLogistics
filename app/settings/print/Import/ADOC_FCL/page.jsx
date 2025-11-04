@@ -135,6 +135,8 @@ const QuotationTable = () => {
 
   useEffect(() => {
           const fetchLocations = async () => {
+            console.log('Use Location and Container Size to fetch data',selectedDate);
+            if (!selectedDate) return;
             try {
                 const selectedMonth = dayjs(selectedDate).month() + 1;
                 const selectedYear = dayjs(selectedDate).year();
@@ -146,7 +148,11 @@ const QuotationTable = () => {
                 body: JSON.stringify({ Shipment_Type: 'ADOCFCL',Transport_Type: 'import' ,Month_No:selectedMonth ,Year_No: selectedYear  }),
               });
               const data = await response.json();
-              setLocations(data.result);
+              setLocations(data.result || []);
+              setSelectedLocation("");
+              setLocationName("");
+              setSelectedContainerSize("");
+              setContainerSizes([]);
             } catch (error) {
               console.error("Error fetching locations:", error);
             }
@@ -218,7 +224,6 @@ const QuotationTable = () => {
   useEffect(() => {
     fetchCurrency();
   }, [selectedDate]);
-  
 
   useEffect(() => {
     const currentDate = new Date();
@@ -790,7 +795,10 @@ const QuotationTable = () => {
                   <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
-                      {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."}
+                      {/* {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."} */}
+                      {
+                        locations.find(loc => loc.Location_Code === selectedLocation)?.Location_Name || "Select Location..."
+                      }
                       <ChevronsUpDown className="opacity-50" />
                     </Button> 
                   </PopoverTrigger>
