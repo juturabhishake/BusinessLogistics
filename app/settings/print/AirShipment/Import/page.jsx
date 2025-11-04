@@ -152,7 +152,7 @@ const QuotationTable = () => {
         };
     
         fetchLocations();
-      }, []);
+      }, [selectedDate]);
   const fetchCurrency = async () => {
     try {
       const month = selectedDate ? selectedDate.month() + 1 : new Date().getMonth() + 1;
