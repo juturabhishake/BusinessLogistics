@@ -284,7 +284,7 @@ const QuotationTable = () => {
         charges.forEach(charge => {
             tableBody.push([
                 counter++, charge.description, `${currencyName}/Shipment`,
-                ...s1DetailColumns.map(col => ({ content: (charge[col] === '0.00' || !charge[col]) ? '' : charge[col], styles: { halign: 'right' } })),
+                ...s1DetailColumns.map(col => ({ content: (!charge[col] || charge[col] === '0' || charge[col] === 0 || charge[col] === '0.00') ? '' : charge[col], styles: { halign: 'right' } })),
                 { content: (charge.S1_Total === '0.00' || !charge.S1_Total) ? '' : charge.S1_Total, styles: { halign: 'right', fontStyle: 'bold' } },
                 { content: (charge.S2_Total === '0.00' || !charge.S2_Total) ? '' : charge.S2_Total, styles: { halign: 'right', fontStyle: 'bold' } },
                 { content: (charge.S3_Total === '0.00' || !charge.S3_Total) ? '' : charge.S3_Total, styles: { halign: 'right', fontStyle: 'bold' } },
