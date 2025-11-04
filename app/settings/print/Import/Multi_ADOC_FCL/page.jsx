@@ -18,27 +18,27 @@ const cn = (...classes) => {
 };
 
 const initialDestinationCharges = [
-    { attribute: "D_DTH", description: "Pickup & Clerance Charges", remarks: "/ Shipment" },
-    { attribute: "D_BLF", description: "Custom Clearance", remarks: "/ Shipment" },
-    { attribute: "D_DBR", description: "Handling / DO/", remarks: "/ Shipment" },
-    { attribute: "D_DOF", description: "Terminal Handling Charge", remarks: "/ Shipment" },
-    { attribute: "D_HC", description: "Documentation", remarks: "/ Shipment" },
-    { attribute: "D_TDO", description: "T1 Doc", remarks: "/ Shipment" },
-    { attribute: "D_LOC", description: "LOLO Charges", remarks: "/ Shipment" },
+    { attribute: "D_DTH", description: "Pickup & Clerance Charges", remarks: "Per Container" },
+    { attribute: "D_BLF", description: "Custom Clearance", remarks: "Per BL" },
+    { attribute: "D_DBR", description: "Handling / DO/", remarks: "Per Container" },
+    { attribute: "D_DOF", description: "Terminal Handling Charge", remarks: "Per Container" },
+    { attribute: "D_HC", description: "Documentation", remarks: "Per Container" },
+    { attribute: "D_TDO", description: "T1 Doc", remarks: "Per Container" },
+    { attribute: "D_LOC", description: "LOLO Charges", remarks: "Per Container" },
 ];
 const initialSeaFreightCharges = [
-    { attribute: "S_SeaFre", description: "Sea Freight", remarks: "USD / Shipment" },
-    { attribute: "S_ENS", description: "ENS", remarks: "USD / Shipment" },
-    { attribute: "S_ISPS", description: "ISPS", remarks: "USD / Shipment" },
-    { attribute: "S_ITT", description: "Seal Fee", remarks: "USD / Shipment" },
+    { attribute: "S_SeaFre", description: "Sea Freight", remarks: "Per Container" },
+    { attribute: "S_ENS", description: "ENS", remarks: "Per BL" },
+    { attribute: "S_ISPS", description: "ISPS", remarks: "Per Container" },
+    { attribute: "S_ITT", description: "Seal Fee", remarks: "Per Container" },
 ];
 const initialOriginCharges = [
-    { attribute: "O_CCD", description: "Customs clearence", remarks: "INR / Shipment" },
-    { attribute: "O_LTG", description: "CC Fee", remarks: "INR / Shipment" },
-    { attribute: "O_THC", description: "D.O Charges", remarks: "INR / Shipment" },
-    { attribute: "O_BLC", description: "LINER CHARGES (At Actuals)", remarks: "INR / Shipment" },
-    { attribute: "O_LUS", description: "Loading / Unloading", remarks: "INR / Shipment" },
-    { attribute: "O_Halt", description: "Delivery", remarks: "INR / Shipment" },
+    { attribute: "O_CCD", description: "Customs clearence", remarks: "Per Container" },
+    { attribute: "O_LTG", description: "CC Fee", remarks: "Per Container" },
+    { attribute: "O_THC", description: "D.O Charges", remarks: "Per Container" },
+    { attribute: "O_BLC", description: "LINER CHARGES (At Actuals)", remarks: "Per BL" },
+    { attribute: "O_LUS", description: "Loading / Unloading", remarks: "Per Container" },
+    { attribute: "O_Halt", description: "Delivery", remarks: "" },
 ];
 
 const QuotationTable = () => {
@@ -260,7 +260,8 @@ const QuotationTable = () => {
   
   const downloadPDF = () => {
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-
+  const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
     const tableHeaders = [[
         { content: "S.No", rowSpan: 2, styles: { valign: "middle" } },
         { content: "Sea Freight RFQ - FCL", rowSpan: 2, styles: { valign: "middle" } },
@@ -279,7 +280,7 @@ const QuotationTable = () => {
     const totalCols = s1DetailColumns.length + 7;
 
     const addSection = (title, sectionChar, charges, currencyName, totalRow) => {
-        tableBody.push([{ content: `${sectionChar}. ${title}`, colSpan: totalCols, styles: { fontStyle: "bold", fillColor: [220, 220, 220] } }]);
+        tableBody.push([{ content: `${sectionChar}. ${title}`, colSpan: totalCols, styles: { fontStyle: "bold", fillColor: [255, 255, 255] } }]);
         charges.forEach(charge => {
             tableBody.push([
                 counter++, charge.description, `${currencyName}/Shipment`,
@@ -292,7 +293,7 @@ const QuotationTable = () => {
         });
         if (totalRow && Object.keys(totalRow).length > 0) {
             tableBody.push([
-                "", { content: `Total ${title}`, styles: { fontStyle: "bold" } }, currencyName, 
+                "", { content: `Total ${title}`, styles: { fontStyle: "bold" } }, "INR", 
                 ...s1DetailColumns.map(col => ({ content: totalRow[col], styles: { halign: 'right', fontStyle: 'bold' } })),
                 { content: totalRow.S1_Total, styles: { halign: 'right', fontStyle: 'bold' } },
                 { content: totalRow.S2_Total, styles: { halign: 'right', fontStyle: 'bold' } }, 
@@ -301,19 +302,19 @@ const QuotationTable = () => {
         }
     };
     
-    addSection("Destination Charges", "A", destinationCharges, currency, totals.destination);
+    addSection("EX Works Charges", "A", destinationCharges, currency, totals.destination);
     addSection("Sea Freight Charges", "B", seaFreightCharges, "USD", totals.seaFreight);
-    addSection("Origin Charges", "C", originCharges, "INR", totals.origin);
+    addSection("Destination Charges", "C", originCharges, "INR", totals.origin);
 
     if (totals.grandTotal && Object.keys(totals.grandTotal).length > 0) {
         tableBody.push([
-            "", { content: "Total Shipment Cost (A+B+C)", styles: { fontStyle: "bold", fillColor: [255, 255, 0] } },
-            { content: "INR", styles: { fontStyle: "bold", fillColor: [255, 255, 0] } },
-            ...s1DetailColumns.map(col => ({ content: totals.grandTotal[col], styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 255, 0] } })),
-            { content: totals.grandTotal.S1_Total, styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 255, 0] } },
-            { content: totals.grandTotal.S2_Total, styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 255, 0] } },
-            { content: totals.grandTotal.S3_Total, styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 255, 0] } },
-            { content: "", styles: { fillColor: [255, 255, 0] } },
+            "", { content: "Total Shipment Cost (A+B+C)", styles: { fontStyle: "bold" } },
+            { content: "INR", styles: { fontStyle: "bold" } },
+            ...s1DetailColumns.map(col => ({ content: totals.grandTotal[col], styles: { halign: 'right', fontStyle: 'bold' } })),
+            { content: totals.grandTotal.S1_Total, styles: { halign: 'right', fontStyle: 'bold' } },
+            { content: totals.grandTotal.S2_Total, styles: { halign: 'right', fontStyle: 'bold' } },
+            { content: totals.grandTotal.S3_Total, styles: { halign: 'right', fontStyle: 'bold' } },
+            { content: "", styles: { fontStyle: 'bold' } },
         ]);
     }
 
@@ -333,37 +334,41 @@ const QuotationTable = () => {
     addTermRow("INCO Term", incoterms);
     addTermRow("Pickup Address", deliveryAddress.replace(/<br\s*\/?>/gi, ", "));
     addTermRow("FX Rate", `USD: ${USD} | EURO: ${EUR}`);
-    addComplexTermRow("Origin Port", Dest_Port, "Preferred Liners", Pref_Liners);
-    addTermRow("Upload PDF", uploadedPdfPath ? uploadedPdfPath.split('/').pop() : 'No PDF Uploaded');
+    addTermRow("Origin Port", Dest_Port);
+    // addComplexTermRow("Origin Port", Dest_Port, "Preferred Liners", Pref_Liners);
+    // addTermRow("Upload PDF", uploadedPdfPath ? uploadedPdfPath.split('/').pop() : 'No PDF Uploaded');
     addTermRow("Remarks", remarks);
 
     doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-    doc.text("Comparative Statement of quotations", 14, 10);
+    doc.text("Comparative Statement of quotations", 5, 10);
 
-    doc.setFont("helvetica", "normal"); doc.setFontSize(8);
-    const dateRange = selectedDate ? `(${selectedDate.startOf("month").format("DD.MM.YY")} - ${selectedDate.endOf("month").format("DD.MM.YY")})` : "";
-    doc.text(`Import Print ADOC FCL rates for ${selectedDate.format("MMMM YY")} ${dateRange}`, 14, 15);
-    doc.text(`Quote for GTI to ${locationName || "{select location}"} | Europe shipment`, 14, 19);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10);   
+    doc.text(`Sea Import for GTI to ${locationName || "{select location}"}  shipment`, 5, 15);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8);   
+    doc.text(`We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'`, 5, 19);
     
-    let dateText = `Date: ${dayjs().format('DD-MM-YYYY')}`;
-    let pageWidth = doc.internal.pageSize.getWidth();
-    doc.text(dateText, pageWidth - 14 - doc.getTextWidth(dateText), 10);
-
+   let dateTextWidth = doc.getStringUnitWidth(`Date: ${formattedDate}`) * doc.internal.scaleFactor;
+    let xPosition = doc.internal.pageSize.width - 10;
+    doc.text(`Date: ${formattedDate}`, xPosition - dateTextWidth, 10);
+    const approvalText = "Approved by:                                          Checked by:                                          Prepared by:                                  ";
+    let approvalTextWidth = doc.getStringUnitWidth(approvalText) * doc.internal.scaleFactor;
+    doc.text(approvalText, xPosition - approvalTextWidth - 5, 20);
     doc.autoTable({
         head: tableHeaders,
         body: tableBody,
         startY: 22,
         theme: "grid",
+         margin: { left: 5, right: 5 },
         styles: { fontSize: 7, cellPadding: 1.2, lineWidth: 0.1, lineColor: [0, 0, 0] },
-        headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontSize: 6, halign: 'center' },
-        didParseCell: function(data) {
-            const fc = data.cell?.raw?.styles?.fillColor;
-            if (Array.isArray(fc) && fc.length === 3 && fc[0] === 255 && fc[1] === 255 && fc[2] === 0) {
-                data.cell.styles.textColor = [0, 0, 0];
-            }
-        }
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontSize: 6, lineWidth: 0.15,lineColor: [0, 0, 0] }, 
+      //   didParseCell: function(data) {
+      //       const fc = data.cell?.raw?.styles?.fillColor;
+      //       if (Array.isArray(fc) && fc.length === 3 && fc[0] === 255 && fc[1] === 255 && fc[2] === 0) {
+      //           data.cell.styles.textColor = [0, 0, 0];
+      //       }
+      //   }
     });
-
+    doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
     doc.save(`Quotation_${actual_Location || 'location'}_${dayjs().format('YYYYMMDD')}.pdf`);
   };
 

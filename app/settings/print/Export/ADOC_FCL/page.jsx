@@ -154,7 +154,7 @@ const QuotationTable = () => {
           }
         };
         fetchLocations();
-      }, []);
+      }, [selectedDate]);
       useEffect(() => {
         if (selectedLocation) {
           fetchSupplierDetails(selectedLocation);

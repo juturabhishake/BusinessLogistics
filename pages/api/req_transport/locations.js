@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   await runMiddleware(req, res, cors);
 
   try {
-    const result = await prisma.$queryRaw`SELECT [Location_Code],[Location] FROM [dbo].[Adhoc_Locations] Where Status=1`;
+    const result = await prisma.$queryRaw`SELECT * from get_Adoc_locations_and_codes()`;
 
     return res.status(200).json({ result });
   } catch (error) {

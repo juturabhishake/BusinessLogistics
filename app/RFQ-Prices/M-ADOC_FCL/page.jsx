@@ -37,7 +37,7 @@ const QuotationTable = () => {
   const [isContainersLoading, setIsContainersLoading] = useState(false);
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
 
-  const initialOriginCharges = [ { description: "Customs clearence", remarks: "Per Container" }, { description: "CC Fee", remarks: "Per Container" }, { description: "D.O Charges", remarks: "Per Container" }, { description: "LINER CHARGES", remarks: "Per BL" }, { description: "Loading / Unloading", remarks: "Per Container" }, { description: "Delivery", remarks: "" } ];
+  const initialOriginCharges = [ { description: "Customs clearence", remarks: "Per Container" }, { description: "CC Fee", remarks: "Per Container" }, { description: "D.O Charges", remarks: "Per Container" }, { description: "LINER CHARGES (At Actuals)", remarks: "Per BL" }, { description: "Loading / Unloading", remarks: "Per Container" }, { description: "Delivery", remarks: "" } ];
   const initialSeaFreightCharges = [ { description: "Sea Freight", remarks: "Per Container" }, { description: "ENS", remarks: "Per BL" }, { description: "ISPS", remarks: "Per Container" }, { description: "IT Transmission", remarks: "Per Container" } ];
   const initialDestinationCharges = [ { description: "Pickup & Clerance Charges", remarks: "Per Container" }, { description: "Custom Clearance", remarks: "Per BL" }, { description: "Handling / DO/ ", remarks: "Per Container" }, { description: "Terminal Handling Charge ", remarks: "Per Container" }, { description: "Documentation ", remarks: "Per Container" }, { description: "T1 Doc", remarks: "Per Container" }, { description: "LOLO Charges", remarks: "Per Container" } ];
 
@@ -187,7 +187,7 @@ const QuotationTable = () => {
             O_CCD: parseValue(originCharges, "Customs clearence", size),
             O_LTG: parseValue(originCharges, "CC Fee", size),
             O_THC: parseValue(originCharges, "D.O Charges", size),
-            O_BLC: parseValue(originCharges, "LINER CHARGES", size),
+            O_BLC: parseValue(originCharges, "LINER CHARGES (At Actuals)", size),
             O_LUS: parseValue(originCharges, "Loading / Unloading", size),
             O_Halt: parseValue(originCharges, "Delivery", size),
             O_Total_Chg: totalOriginForSize,
@@ -363,16 +363,45 @@ const QuotationTable = () => {
                           <tr className="font-bold bg-[var(--bgBody)] border cursor-pointer" onClick={() => setSections(p => ({...p, [section]: !p[section]}))}>
                               <td>{prefix}.</td><td colSpan={selectedContainerSizes.length + 3} className="py-2 px-3 text-start flex items-center">{sections[section] ? "▼" : "▶"} {title}</td>
                           </tr>
-                          {sections[section] && data.map((item, index) => (
+                          {sections[section] && data.map((item, index) => {
+                            const isLinerCharges = item.description === "LINER CHARGES (At Actuals)";
+                            return (
                               <tr key={index} className="border">
-                                  <td className="py-1 px-3 border">{sectionIndex * 10 + index + 1}</td>
-                                  <td className="py-1 px-3 border text-start">{item.description}</td>
-                                  <td className="py-1 px-3 border">{section === "seaFreight" ? "USD" : section === "destination" ? currency : "INR"} / Shipment</td>
-                                  {selectedContainerSizes.map(size => ( <td key={size} className="py-1 px-3 border"> <input type="number" placeholder="0" className="w-full bg-transparent border-none focus:outline-none text-right" value={item[size] || ""} onChange={(e) => handler(index, size, e.target.value)} /> </td> ))}
-                                  <td className="py-1 px-3 border font-bold">{(selectedContainerSizes.reduce((a,c) => a + parseFloat(item[c]||0), 0)).toFixed(2)}</td>
-                                  <td className="py-1 px-3 border">{item.remarks}</td>
+                                <td className="py-1 px-3 border">{sectionIndex * 10 + index + 1}</td>
+                                <td className="py-1 px-3 border text-start">{item.description}</td>
+                                <td className="py-1 px-3 border">
+                                  {section === "seaFreight"
+                                    ? "USD"
+                                    : section === "destination"
+                                    ? currency
+                                    : "INR"}{" "}
+                                  / Shipment
+                                </td>
+
+                                {selectedContainerSizes.map(size => (
+                                  <td key={size} className="py-1 px-3 border">
+                                    <input
+                                      type="number"
+                                      placeholder="0"
+                                      className={`w-full bg-transparent border-none focus:outline-none text-right ${
+                                        isLinerCharges ? "opacity-50 cursor-not-allowed" : ""
+                                      }`}
+                                      value={item[size] || ""}
+                                      onChange={(e) => handler(index, size, e.target.value)}
+                                      disabled={isLinerCharges}
+                                    />
+                                  </td>
+                                ))}
+
+                                <td className="py-1 px-3 border font-bold">
+                                  {selectedContainerSizes
+                                    .reduce((a, c) => a + parseFloat(item[c] || 0), 0)
+                                    .toFixed(2)}
+                                </td>
+                                <td className="py-1 px-3 border">{item.remarks}</td>
                               </tr>
-                          ))}
+                            );
+                          })}
                           {sections[section] && (
                               <tr className="border">
                                   <td colSpan="2" className="font-bold py-1 px-3 border">Total {title}</td>

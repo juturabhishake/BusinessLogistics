@@ -152,7 +152,7 @@ const QuotationTable = () => {
             }
           };
           fetchLocations();
-        }, []);
+        }, [selectedDate]);
         useEffect(() => {
           if (selectedLocation && selectedContainerSize) {
             fetchSupplierDetails(selectedLocation);
@@ -218,6 +218,7 @@ const QuotationTable = () => {
   useEffect(() => {
     fetchCurrency();
   }, [selectedDate]);
+  
 
   useEffect(() => {
     const currentDate = new Date();

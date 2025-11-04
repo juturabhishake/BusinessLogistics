@@ -152,7 +152,7 @@ const QuotationTable = () => {
       };
   
       fetchLocations();
-    }, []);
+    }, [selectedDate]);
 
   useEffect(() => {
     const fetchCurrency = async () => {
