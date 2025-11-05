@@ -137,6 +137,7 @@ const QuotationTable = () => {
 
   useEffect(() => {
         const fetchLocations = async () => {
+          if (!selectedDate) return;
           try {
              const selectedMonth = dayjs(selectedDate).month() + 1;
             const selectedYear = dayjs(selectedDate).year();
@@ -149,6 +150,11 @@ const QuotationTable = () => {
             });
             const data = await response.json();
             setLocations(data.result);
+            setSelectedLocation("");
+            setLocationName("");
+            setSelectedContainerSize("");
+            setContainerSize("");
+            setContainerSizes([]);
           } catch (error) {
             console.error("Error fetching locations:", error);
           }

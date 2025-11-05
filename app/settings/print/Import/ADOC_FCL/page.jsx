@@ -136,6 +136,7 @@ const QuotationTable = () => {
   useEffect(() => {
           const fetchLocations = async () => {
             console.log('Use Location and Container Size to fetch data',selectedDate);
+            // alert("selected date: " + selectedDate);
             if (!selectedDate) return;
             try {
                 const selectedMonth = dayjs(selectedDate).month() + 1;
@@ -175,6 +176,7 @@ const QuotationTable = () => {
           }
         }, [selectedLocation]);
         const fetchContainerSizes = async () => {
+          // if (!selectedLocation) return;
             try {
                const selectedMonth = dayjs(selectedDate).month() + 1;
               const selectedYear = dayjs(selectedDate).year();
@@ -796,9 +798,9 @@ const QuotationTable = () => {
                   <PopoverTrigger asChild>
                     <Button role="combobox" aria-expanded={open} variant="outline" className="mt-1 mb-1 bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] px-3 py-1 rounded" style={{ minWidth: "80px", fontSize:"12px" }}>
                       {/* {selectedLocation ? locations.find(loc => loc.Location_Code === selectedLocation).Location_Name : "Select Location..."} */}
-                      {
+                       {
                         locations.find(loc => loc.Location_Code === selectedLocation)?.Location_Name || "Select Location..."
-                      }
+                      } 
                       <ChevronsUpDown className="opacity-50" />
                     </Button> 
                   </PopoverTrigger>
