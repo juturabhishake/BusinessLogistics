@@ -38,14 +38,38 @@ type Group = {
 export function getMenuList(pathname: string): Group[] {
   const [menuList, setMenuList] = useState<Group[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isGen, setIsGen] = useState(false);
   useEffect(() => {
     const sc = secureLocalStorage.getItem("sc");
     setIsAdmin(sc === "admin");
+    setIsGen(sc === "gen");
   }, []);
-
+  useEffect(() => {
+    const sc = secureLocalStorage.getItem("sc");
+    if (!sc) {
+        window.location.href = "/";
+        return; 
+    }
+    const genAllowedPaths = [
+      "/Gen/Import/chennai",
+      "/Gen/Import/mumbai",
+      "/Gen/export/pune",
+      "/account"
+    ];
+    if (sc === "gen") {
+      if (!genAllowedPaths.includes(pathname)) {
+        window.location.href = "/account";
+      }
+    } 
+    else {
+      if (pathname.startsWith("/Gen/")) {
+        window.location.href ="/account";
+      }
+    }
+  }, [pathname, isGen, isAdmin]);
   useEffect(() => {
     const generatedMenuList: Group[] = [
-      !isAdmin ? 
+      !isAdmin && !isGen ? 
       {
         groupLabel: "",
         menus: [
@@ -58,7 +82,7 @@ export function getMenuList(pathname: string): Group[] {
           }
         ]
       }: null,
-      !isAdmin ? {
+      !isAdmin && !isGen ? {
         groupLabel: "Contents",
         menus: [
           {
@@ -103,6 +127,29 @@ export function getMenuList(pathname: string): Group[] {
           //   label: "Tags",
           //   icon: Tag
           // }
+        ]
+      } : null,
+      isGen ? 
+      {
+        groupLabel: "General",
+        menus: [
+          {
+            href: "",
+            label: "Import",
+            icon: FilePlus,
+            submenus: [
+              { href: "/Gen/Import/chennai", label: "chennai" },
+              { href: "/Gen/Import/mumbai", label: "Mumbai" }
+            ]
+          },
+          {
+            href: "",
+            label: "Export",
+            icon: FilePlus,
+            submenus: [
+              { href: "/Gen/export/pune", label: "Pune" }
+            ]
+          }
         ]
       } : null,
       isAdmin ? 
@@ -191,7 +238,7 @@ export function getMenuList(pathname: string): Group[] {
     ].filter(Boolean) as Group[]; 
 
     setMenuList(generatedMenuList);
-  }, [isAdmin, pathname]);
+  }, [isAdmin, isGen, pathname]);
 
   return menuList;
 }

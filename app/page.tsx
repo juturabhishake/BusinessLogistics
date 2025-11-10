@@ -161,7 +161,11 @@ export default function Home() {
           setTimeout(() => {
             if (user.Vendor_Code === 'admin') {
               window.location.href = "/settings/dashboarda";
-            } else {
+            } 
+            else if (user.Vendor_Code === 'gen') {
+              window.location.href = "/account";
+            }
+            else {
               window.location.href = "/dashboard";
             }
           }, 1500);
