@@ -199,6 +199,15 @@ export function getMenuList(pathname: string): Group[] {
               ]
             },
             {
+              href: "",
+              label: "Prints(Gen)",
+              icon: Database,
+              submenus: [
+                { href: "/settings/print/Gen/import/chennai", label: "Chennai-GTI" },
+                // { href: "/settings/print/AirShipment/Import", label: "Import" }
+              ]
+            },
+            {
               href: "/settings/req_transport",
               label: "Req. Transport",
               icon: FilePlus, 
