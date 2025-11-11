@@ -6,7 +6,7 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
-    format: 'a3'
+    format: 'a4'
   });
 
   const currentDate = moment().format("DD-MM-YYYY");
@@ -14,30 +14,31 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
   const totalColumns = 3 + (vendors.length * 4);
 
   const columnStyles = {
-    0: { cellWidth: 10 },
-    1: { cellWidth: 60 },
+    0: { cellWidth: 8 },
+    1: { cellWidth: 55 },
     2: { cellWidth: 15 },
   };
   
   let tableWidth = columnStyles[0].cellWidth + columnStyles[1].cellWidth + columnStyles[2].cellWidth;
-  const dynamicColWidth = (pageWidth - tableWidth - 20) / (vendors.length * 4);
-  tableWidth += vendors.length * 4 * dynamicColWidth;
+  const fixedMargin = 5;
+  const availableWidth = pageWidth - (fixedMargin * 2) - tableWidth;
+  tableWidth += availableWidth; 
 
   const margin = (pageWidth - tableWidth) / 2;
 
-  doc.setFontSize(9);
+  doc.setFontSize(7);
   doc.setTextColor(40);
   doc.setFont(undefined, 'bold');
 
-  doc.text('Comparitive Statement of quotations', margin, 15);
-  doc.text(`RFQ Chennai to GTI Import CHA rates for ${year} ( January to December )`, margin, 20);
-  doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", margin, 25);
+  doc.text('Comparitive Statement of quotations', margin, 10);
+  doc.text(`RFQ Chennai to GTI Import CHA rates for ${year} ( January to December )`, margin, 14);
+  doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", margin, 18);
 
-  doc.text(`Date: ${currentDate}`, pageWidth - margin, 15, { align: 'right' });
+  doc.text(`Date: ${currentDate}`, pageWidth - margin, 10, { align: 'right' });
 
-  doc.text('Approved By: ____________________', margin + (tableWidth * 0.35), 25);
-  doc.text('Checked By: ____________________', margin + (tableWidth * 0.55), 25);
-  doc.text('Prepared By: ____________________', margin + (tableWidth * 0.75), 25);
+  doc.text('Approved By: ____________________', margin + (tableWidth * 0.35), 18);
+  doc.text('Checked By: ____________________', margin + (tableWidth * 0.55), 18);
+  doc.text('Prepared By: ____________________', margin + (tableWidth * 0.75), 18);
 
   doc.setFont(undefined, 'normal');
 
@@ -50,7 +51,7 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
       styles: { 
         halign: 'center', 
         fontStyle: 'bold', 
-        fontSize: 14, 
+        fontSize: 11, 
         fillColor: '#ffffff', 
         textColor: '#000000',
         lineWidth: 0.1,
@@ -84,7 +85,6 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
     vendors.forEach(vendor => {
       const vendorData = row[vendor] || {};
       if (row.sno === 14) {
-        // rowData.push({ content: 'AT ACTUAL', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold' } });
         rowData.push({ content: 'AT ACTUAL', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold', valign: 'middle' } });
       } else {
         rowData.push({ content: vendorData.ft20 || '', styles: { halign: 'right' } });
@@ -123,20 +123,20 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
     totalRow.push({ content: totals[vendor].lcl.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
     totalRow.push({ content: totals[vendor].air.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
   });
-  // body.push(totalRow);
 
   doc.autoTable({
-    startY: 30,
+    startY: 25,
     head: head,
     body: body,
     foot: [totalRow],
     theme: 'grid',
-    styles: { fontSize: 8, cellPadding: 1.5, textColor: '#000000', lineColor: [0,0,0], lineWidth: 0.1 },
+    styles: { fontSize: 6.5, cellPadding: 1, textColor: '#000000', lineColor: [0,0,0], lineWidth: 0.1 },
     headStyles: { 
         fillColor: '#e5e7eb', 
         textColor: '#000000', 
         fontStyle: 'bold', 
         halign: 'center',
+        fontSize: 7,
     },
     footStyles: {
         fillColor: '#e5e7eb',
