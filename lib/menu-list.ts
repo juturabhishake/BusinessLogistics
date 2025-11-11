@@ -54,7 +54,9 @@ export function getMenuList(pathname: string): Group[] {
       "/Gen/Import/chennai",
       "/Gen/Import/chennai/print",
       "/Gen/Import/mumbai",
+      "/Gen/Import/mumbai/print",
       "/Gen/export/pune",
+      "/Gen/export/pune/print",
       "/account"
     ];
     if (sc === "gen") {
