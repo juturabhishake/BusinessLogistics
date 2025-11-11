@@ -113,19 +113,23 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
     }
   });
 
-  const totalRow = [{ content: 'TOTAL', colSpan: 3, styles: { fontStyle: 'bold', halign: 'right' } }];
+  const totalRow = [
+    { content: 'TOTAL', colSpan: 2, styles: { fontStyle: 'bold', halign: 'center' } },
+    { content: 'INR', styles: { fontStyle: 'bold', halign: 'left' } },
+  ];
   vendors.forEach(vendor => {
     totalRow.push({ content: totals[vendor].ft20.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
     totalRow.push({ content: totals[vendor].ft40.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
     totalRow.push({ content: totals[vendor].lcl.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
     totalRow.push({ content: totals[vendor].air.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
   });
-  body.push(totalRow);
+  // body.push(totalRow);
 
   doc.autoTable({
     startY: 30,
     head: head,
     body: body,
+    foot: [totalRow],
     theme: 'grid',
     styles: { fontSize: 8, cellPadding: 1.5, textColor: '#000000', lineColor: [0,0,0], lineWidth: 0.1 },
     headStyles: { 
@@ -133,6 +137,11 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
         textColor: '#000000', 
         fontStyle: 'bold', 
         halign: 'center',
+    },
+    footStyles: {
+        fillColor: '#e5e7eb',
+        textColor: '#000000',
+        fontStyle: 'bold',
     },
     columnStyles: columnStyles,
     margin: { left: margin, right: margin }
