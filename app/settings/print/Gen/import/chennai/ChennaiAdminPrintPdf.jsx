@@ -11,20 +11,41 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
 
   const currentDate = moment().format("DD-MM-YYYY");
   const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 10;
+  const totalColumns = 3 + (vendors.length * 4);
 
-  doc.setFontSize(12);
+  doc.setFontSize(9);
   doc.setTextColor(40);
-  doc.text('Comparitive Statement of quotations', margin, 15);
-  doc.text(`RFQ Chennai to GTI Import CHA rates for ${year}`, margin, 22);
-  doc.text(`Date: ${currentDate}`, pageWidth - margin, 15, { align: 'right' });
 
-  doc.setFontSize(16);
-  doc.setFont(undefined, 'bold');
-  doc.text(`From Chennai to GTI CHA IMPORT QUOTATION ${year}`, pageWidth / 2, 35, { align: 'center' });
-  
+  doc.text('Comparitive Statement of quotations', margin, 15);
+  doc.text(`RFQ Chennai to GTI Import CHA rates for ${year} ( January to December )`, margin, 20);
+  doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", margin, 25);
+
+  doc.text(`Date: ${currentDate}`, pageWidth - margin, 15, { align: 'right' });
+  // doc.text('Page: 01 of 01', pageWidth - margin, 20, { align: 'right' });
+
+  doc.text('Approved By: ____________________', margin + 130, 25);
+  doc.text('Checked By: ____________________', margin + 215, 25);
+  doc.text('Prepared By: ____________________', margin + 310, 25);
+
   const head = [];
+
+  head.push([
+    { 
+      content: `From Chennai to GTI CHA IMPORT QUOTATION 1st JAN ${year} to 31st DEC ${year}`, 
+      colSpan: totalColumns, 
+      styles: { 
+        halign: 'center', 
+        fontStyle: 'bold', 
+        fontSize: 14, 
+        fillColor: '#ffffff', 
+        textColor: '#000000',
+        lineWidth: 0.1,
+        lineColor: [0,0,0]
+      } 
+    }
+  ]);
+
   const topRow = [
     { content: 'S.NO', rowSpan: 2, styles: { valign: 'middle', halign: 'center' } },
     { content: 'Particulars', rowSpan: 2, styles: { valign: 'middle' } },
@@ -62,57 +83,47 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
   });
   
   const totals = {};
-    vendors.forEach(vendor => {
-        totals[vendor] = { ft20: 0, ft40: 0, lcl: 0, air: 0 };
-    });
+  vendors.forEach(vendor => {
+    totals[vendor] = { ft20: 0, ft40: 0, lcl: 0, air: 0 };
+  });
 
-    transformedData.forEach(row => {
-        if (row.sno !== 14) {
-            vendors.forEach(vendor => {
-                const vendorData = row[vendor] || {};
-                totals[vendor].ft20 += parseFloat(vendorData.ft20) || 0;
-                totals[vendor].ft40 += parseFloat(vendorData.ft40) || 0;
-                totals[vendor].lcl += parseFloat(vendorData.lcl) || 0;
-                totals[vendor].air += parseFloat(vendorData.air) || 0;
-            });
-        }
-    });
+  transformedData.forEach(row => {
+    if (row.sno !== 14) {
+      vendors.forEach(vendor => {
+        const vendorData = row[vendor] || {};
+        totals[vendor].ft20 += parseFloat(vendorData.ft20) || 0;
+        totals[vendor].ft40 += parseFloat(vendorData.ft40) || 0;
+        totals[vendor].lcl += parseFloat(vendorData.lcl) || 0;
+        totals[vendor].air += parseFloat(vendorData.air) || 0;
+      });
+    }
+  });
 
-    const totalRow = [{ content: 'TOTAL', colSpan: 3, styles: { fontStyle: 'bold', halign: 'right' } }];
-    vendors.forEach(vendor => {
-        totalRow.push({ content: totals[vendor].ft20.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
-        totalRow.push({ content: totals[vendor].ft40.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
-        totalRow.push({ content: totals[vendor].lcl.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
-        totalRow.push({ content: totals[vendor].air.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
-    });
-    body.push(totalRow);
-
+  const totalRow = [{ content: 'TOTAL', colSpan: 3, styles: { fontStyle: 'bold', halign: 'right' } }];
+  vendors.forEach(vendor => {
+    totalRow.push({ content: totals[vendor].ft20.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
+    totalRow.push({ content: totals[vendor].ft40.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
+    totalRow.push({ content: totals[vendor].lcl.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
+    totalRow.push({ content: totals[vendor].air.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
+  });
+  body.push(totalRow);
 
   doc.autoTable({
-    startY: 45,
+    startY: 30,
     head: head,
     body: body,
     theme: 'grid',
-    styles: { fontSize: 8, cellPadding: 1.5, textColor: '#1f2937' },
+    styles: { fontSize: 8, cellPadding: 1.5, textColor: '#000000', lineColor: [0,0,0], lineWidth: 0.1 },
     headStyles: { 
         fillColor: '#e5e7eb', 
-        textColor: '#111827', 
+        textColor: '#000000', 
         fontStyle: 'bold', 
         halign: 'center',
-        lineWidth: 0.1,
-        lineColor: [150, 150, 150]
     },
     columnStyles: {
       0: { cellWidth: 10 },
       1: { cellWidth: 60 },
       2: { cellWidth: 15 },
-    },
-     didDrawPage: (data) => {
-      doc.setFontSize(10);
-      const signatureY = pageHeight - 15;
-      doc.text('Prepared By', margin, signatureY);
-      doc.text('Checked By', pageWidth / 2, signatureY, { align: 'center' });
-      doc.text('Approved By', pageWidth - margin, signatureY, { align: 'right' });
     }
   });
 
