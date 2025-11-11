@@ -207,6 +207,8 @@ export function getMenuList(pathname: string): Group[] {
               icon: Database,
               submenus: [
                 { href: "/settings/print/Gen/import/chennai", label: "Chennai-GTI" },
+                { href: "/settings/print/Gen/import/mumbai", label: "Mumbai-GTI" },
+                { href: "/settings/print/Gen/export/pune", label: "GTI-Pune" },
                 // { href: "/settings/print/AirShipment/Import", label: "Import" }
               ]
             },
