@@ -3,14 +3,14 @@ import 'jspdf-autotable';
 import secureLocalStorage from "react-secure-storage";
 import moment from "moment";
 
-export const exportToPdf = (tableData) => {
+export const exportToPdf = (tableData, selectedYear) => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4'
   });
 
-  const currentYear = new Date().getFullYear();
+  const currentYear = selectedYear;
   const currentDate = moment().format("DD-MM-YYYY");
   const supplierName = secureLocalStorage.getItem("un") || "SHRI CHANDRA";
   const pageWidth = doc.internal.pageSize.getWidth();

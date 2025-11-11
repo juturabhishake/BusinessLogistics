@@ -52,6 +52,7 @@ export function getMenuList(pathname: string): Group[] {
     }
     const genAllowedPaths = [
       "/Gen/Import/chennai",
+      "/Gen/Import/chennai/print",
       "/Gen/Import/mumbai",
       "/Gen/export/pune",
       "/account"

@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import secureLocalStorage from "react-secure-storage";
-import { FiSave, FiCheck, FiLoader, FiFileText } from "react-icons/fi";
-// import { exportToPdf } from "./generatePdf";
+import { FiFileText } from "react-icons/fi";
+import { exportToPdf } from "./generatePdf";
 
 const particularToColumnMap = {
   1: 'ICCF1CNTR', 2: 'ICCF2CNTR', 3: 'LAUC', 4: 'TCUT15MTI',
@@ -32,9 +32,11 @@ const initialTableData = [
   { sno: 16, particulars: 'MANIFEST / PORTCODE / SEZ CODE / AMENDMENT CHARGES', currency: 'INR', ft20: '', ft40: '', lcl: '', air: '', isEditable: true },
 ];
 
-const Chennai = () => {
+const ViewChennai = () => {
   const [tableData, setTableData] = useState(initialTableData);
-  const [saveState, setSaveState] = useState("idle");
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear + 1);
+  const yearOptions = Array.from({ length: 100 }, (_, i) => currentYear + 1 - i);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,15 +45,15 @@ const Chennai = () => {
       if (!sc || !un) return;
 
       try {
-        const response = await fetch('/api/Gen/Chennai_Quote/get', {
+        const response = await fetch('/api/Gen/Chennai_Quote/View_Chennai_Quote', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sc, un }),
+          body: JSON.stringify({ sc, un, year: selectedYear }),
         });
         const data = await response.json();
 
+        const newTableData = JSON.parse(JSON.stringify(initialTableData));
         if (data.result && data.result.length > 0) {
-            const newTableData = JSON.parse(JSON.stringify(initialTableData));
             data.result.forEach(pivotedRow => {
                 const containerTypeKey = pivotedRow.Container_Type.toLowerCase();
                 Object.entries(pivotedRow).forEach(([dbCol, value]) => {
@@ -64,23 +66,16 @@ const Chennai = () => {
                     }
                 });
             });
-            setTableData(newTableData);
         }
+        setTableData(newTableData);
       } catch (error) {
         console.error("Error fetching quotation data:", error);
+        setTableData(initialTableData);
       }
     };
     fetchData();
-  }, []);
+  }, [selectedYear]);
 
-  const handleInputChange = (sno, field, value) => {
-    setTableData(prevData =>
-      prevData.map(row =>
-        row.sno === sno ? { ...row, [field]: value } : row
-      )
-    );
-  };
-  
   const totals = useMemo(() => {
     return tableData.reduce((acc, row) => {
         if(row.isEditable){
@@ -93,48 +88,8 @@ const Chennai = () => {
     }, { ft20: 0, ft40: 0, lcl: 0, air: 0 });
   }, [tableData]);
 
-  const handleSave = async () => {
-    setSaveState("saving");
-    const sc = secureLocalStorage.getItem("sc");
-    const un = secureLocalStorage.getItem("un");
-    
-    const containerTypes = ['ft20', 'ft40', 'lcl', 'air'];
-
-    const savePromises = containerTypes.map(type => {
-        const payload = {
-            supplierCode: sc, createdBy: un,
-            containerType: type.toUpperCase()
-        };
-        tableData.forEach(row => {
-            if(row.isEditable){
-                const dbColumn = particularToColumnMap[row.sno];
-                payload[dbColumn] = parseFloat(row[type]) || 0;
-            }
-        });
-        return fetch("/api/Gen/Chennai_Quote/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ quoteData: payload }),
-        });
-    });
-
-    try {
-      const responses = await Promise.all(savePromises);
-      const allOk = responses.every(res => res.ok);
-      if (!allOk) throw new Error("One or more save operations failed.");
-      setSaveState("saved");
-    } catch (error) {
-      console.error("Error saving data:", error);
-      setSaveState("idle");
-      alert("Error saving data. Please try again.");
-    } finally {
-        setTimeout(() => setSaveState("idle"), 3000);
-    }
-  };
-
   const handleExportPdf = () => {
-    // exportToPdf(tableData);
-    window.location.href = "/Gen/Import/chennai/print";
+    exportToPdf(tableData, selectedYear);
   };
 
   return (
@@ -142,24 +97,30 @@ const Chennai = () => {
       <div className="card shadow rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white h-full flex flex-col">
         <div className="flex flex-wrap gap-2 card-header p-4 border-b border-gray-200 dark:border-gray-700 justify-between items-center">
           <div>
-            <h2 className="text-lg font-bold">From Chennai to GTI CHA IMPORT QUOTATION</h2>
+            <h2 className="text-lg font-bold">From Chennai to GTI CHA IMPORT QUOTATION (View)</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">Comparitive Statement of quotations</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+             <div>
+              <label htmlFor="year-select" className="sr-only">Select Year</label>
+              <select
+                id="year-select"
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                {yearOptions.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button
               onClick={handleExportPdf}
-              className="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all duration-300"
+              className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-all duration-300"
             >
-              <FiFileText className="mr-2"/> Print
-            </button>
-            <button
-              onClick={handleSave}
-              className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-all duration-300"
-              style={{ minWidth: "100px" }} disabled={saveState !== 'idle'}
-            >
-              {saveState === "idle" && <><FiSave className="mr-2"/> Save</>}
-              {saveState === "saving" && <><FiLoader className="animate-spin mr-2"/> Saving...</>}
-              {saveState === "saved" && <><FiCheck className="mr-2"/> Saved!</>}
+              <FiFileText className="mr-2"/> Export PDF
             </button>
           </div>
         </div>
@@ -182,53 +143,25 @@ const Chennai = () => {
                   <td className="px-4 py-2 font-medium">{row.sno}</td>
                   <td className="px-4 py-2">{row.particulars}</td>
                   <td className="px-4 py-2">{row.currency}</td>
-                  <td className="px-4 py-2">
-                    {row.isEditable ? (
-                      <input
-                        type="number"
-                        className="w-full bg-gray-50 dark:bg-gray-900/50 p-1 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-right"
-                        value={row.ft20}
-                        onChange={(e) => handleInputChange(row.sno, 'ft20', e.target.value)}
-                      />
-                    ) : (
-                      <span className="block text-right pr-2 text-yellow-500 dark:text-yellow-400 font-semibold">{row.ft20}</span>
-                    )}
+                  <td className="px-4 py-2 text-right">
+                    <span className={`block pr-2 ${!row.isEditable ? 'text-yellow-500 dark:text-yellow-400 font-semibold' : ''}`}>
+                      {row.ft20}
+                    </span>
                   </td>
-                  <td className="px-4 py-2">
-                     {row.isEditable ? (
-                      <input
-                        type="number"
-                        className="w-full bg-gray-50 dark:bg-gray-900/50 p-1 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-right"
-                        value={row.ft40}
-                        onChange={(e) => handleInputChange(row.sno, 'ft40', e.target.value)}
-                      />
-                    ) : (
-                      <span className="block text-right pr-2 text-yellow-500 dark:text-yellow-400 font-semibold">{row.ft40}</span>
-                    )}
+                  <td className="px-4 py-2 text-right">
+                    <span className={`block pr-2 ${!row.isEditable ? 'text-yellow-500 dark:text-yellow-400 font-semibold' : ''}`}>
+                      {row.ft40}
+                    </span>
                   </td>
-                  <td className="px-4 py-2">
-                     {row.isEditable ? (
-                      <input
-                        type="number"
-                        className="w-full bg-gray-50 dark:bg-gray-900/50 p-1 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-right"
-                        value={row.lcl}
-                        onChange={(e) => handleInputChange(row.sno, 'lcl', e.target.value)}
-                      />
-                    ) : (
-                      <span className="block text-right pr-2 text-yellow-500 dark:text-yellow-400 font-semibold">{row.lcl}</span>
-                    )}
+                  <td className="px-4 py-2 text-right">
+                    <span className={`block pr-2 ${!row.isEditable ? 'text-yellow-500 dark:text-yellow-400 font-semibold' : ''}`}>
+                      {row.lcl}
+                    </span>
                   </td>
-                  <td className="px-4 py-2">
-                     {row.isEditable ? (
-                      <input
-                        type="number"
-                        className="w-full bg-gray-50 dark:bg-gray-900/50 p-1 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-right"
-                        value={row.air}
-                        onChange={(e) => handleInputChange(row.sno, 'air', e.target.value)}
-                      />
-                    ) : (
-                      <span className="block text-right pr-2 text-yellow-500 dark:text-yellow-400 font-semibold">{row.air}</span>
-                    )}
+                  <td className="px-4 py-2 text-right">
+                    <span className={`block pr-2 ${!row.isEditable ? 'text-yellow-500 dark:text-yellow-400 font-semibold' : ''}`}>
+                      {row.air}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -249,4 +182,4 @@ const Chennai = () => {
   );
 };
 
-export default Chennai;
+export default ViewChennai;

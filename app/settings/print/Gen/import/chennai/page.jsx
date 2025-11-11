@@ -21,7 +21,7 @@ const initialParticulars = [
 ];
 
 const ChennaiAdminPrint = () => {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()+1);
   const [allQuotes, setAllQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -83,7 +83,7 @@ const ChennaiAdminPrint = () => {
   }, [transformedData, vendors]);
 
   const handleExportPdf = () => { exportAdminPdf(transformedData, vendors, selectedYear); };
-  const yearOptions = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
+  const yearOptions = Array.from({ length: 100 }, (_, i) => new Date().getFullYear()+1 - i);
 
   return (
     <div className="h-[calc(100vh-2rem)]">
