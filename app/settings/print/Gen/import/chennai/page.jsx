@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { FiFileText, FiLoader } from "react-icons/fi";
 import { exportAdminPdf } from "./ChennaiAdminPrintPdf";
+import secureLocalStorage from "react-secure-storage";
 
 const particularToColumnMap = {
   1: 'ICCF1CNTR', 2: 'ICCF2CNTR', 3: 'LAUC', 4: 'TCUT15MTI', 5: 'TCUT22MTI', 6: 'TCUT28MTI', 7: 'ECPMOA', 8: 'FOC',
@@ -24,6 +25,15 @@ const ChennaiAdminPrint = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()+1);
   const [allQuotes, setAllQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    if (check_sc !== 'admin') {
+      window.location.href = "/account";
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {

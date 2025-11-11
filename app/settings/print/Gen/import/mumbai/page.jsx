@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { FiFileText } from "react-icons/fi";
 import { exportMumbaiAdminPdf } from "./generateMumbaiAdminPdf";
+import secureLocalStorage from "react-secure-storage";
 
 const MumbaiQuoteAdminView = () => {
   const [tableData, setTableData] = useState([]);
@@ -10,6 +11,15 @@ const MumbaiQuoteAdminView = () => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear + 1);
   const yearOptions = Array.from({ length: 10 }, (_, i) => currentYear + 1 - i);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const check_sc = secureLocalStorage.getItem("sc");
+    setIsAdmin(check_sc === 'admin');
+    if (check_sc !== 'admin') {
+      window.location.href = "/account";
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
