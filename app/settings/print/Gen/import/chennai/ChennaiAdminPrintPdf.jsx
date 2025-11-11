@@ -11,22 +11,35 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
 
   const currentDate = moment().format("DD-MM-YYYY");
   const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 10;
   const totalColumns = 3 + (vendors.length * 4);
+
+  const columnStyles = {
+    0: { cellWidth: 10 },
+    1: { cellWidth: 60 },
+    2: { cellWidth: 15 },
+  };
+  
+  let tableWidth = columnStyles[0].cellWidth + columnStyles[1].cellWidth + columnStyles[2].cellWidth;
+  const dynamicColWidth = (pageWidth - tableWidth - 20) / (vendors.length * 4);
+  tableWidth += vendors.length * 4 * dynamicColWidth;
+
+  const margin = (pageWidth - tableWidth) / 2;
 
   doc.setFontSize(9);
   doc.setTextColor(40);
+  doc.setFont(undefined, 'bold');
 
   doc.text('Comparitive Statement of quotations', margin, 15);
   doc.text(`RFQ Chennai to GTI Import CHA rates for ${year} ( January to December )`, margin, 20);
   doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", margin, 25);
 
   doc.text(`Date: ${currentDate}`, pageWidth - margin, 15, { align: 'right' });
-  // doc.text('Page: 01 of 01', pageWidth - margin, 20, { align: 'right' });
 
-  doc.text('Approved By: ____________________', margin + 130, 25);
-  doc.text('Checked By: ____________________', margin + 215, 25);
-  doc.text('Prepared By: ____________________', margin + 310, 25);
+  doc.text('Approved By: ____________________', margin + (tableWidth * 0.35), 25);
+  doc.text('Checked By: ____________________', margin + (tableWidth * 0.55), 25);
+  doc.text('Prepared By: ____________________', margin + (tableWidth * 0.75), 25);
+
+  doc.setFont(undefined, 'normal');
 
   const head = [];
 
@@ -71,7 +84,8 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
     vendors.forEach(vendor => {
       const vendorData = row[vendor] || {};
       if (row.sno === 14) {
-        rowData.push({ content: 'AT ACTUAL', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold' } });
+        // rowData.push({ content: 'AT ACTUAL', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold' } });
+        rowData.push({ content: 'AT ACTUAL', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold', valign: 'middle' } });
       } else {
         rowData.push({ content: vendorData.ft20 || '', styles: { halign: 'right' } });
         rowData.push({ content: vendorData.ft40 || '', styles: { halign: 'right' } });
@@ -120,11 +134,8 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
         fontStyle: 'bold', 
         halign: 'center',
     },
-    columnStyles: {
-      0: { cellWidth: 10 },
-      1: { cellWidth: 60 },
-      2: { cellWidth: 15 },
-    }
+    columnStyles: columnStyles,
+    margin: { left: margin, right: margin }
   });
 
   doc.save(`Chennai_Admin_Quotation_${year}.pdf`);
