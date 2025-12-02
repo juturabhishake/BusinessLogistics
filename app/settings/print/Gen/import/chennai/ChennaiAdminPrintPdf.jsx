@@ -113,30 +113,31 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
     }
   });
 
-  const totalRow = [
-    { content: 'TOTAL', colSpan: 2, styles: { fontStyle: 'bold', halign: 'center' } },
-    { content: 'INR', styles: { fontStyle: 'bold', halign: 'left' } },
-  ];
-  vendors.forEach(vendor => {
-    totalRow.push({ content: totals[vendor].ft20.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
-    totalRow.push({ content: totals[vendor].ft40.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
-    totalRow.push({ content: totals[vendor].lcl.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
-    totalRow.push({ content: totals[vendor].air.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
-  });
+  // const totalRow = [
+  //   { content: 'TOTAL', colSpan: 2, styles: { fontStyle: 'bold', halign: 'center' } },
+  //   { content: 'INR', styles: { fontStyle: 'bold', halign: 'left' } },
+  // ];
+  // vendors.forEach(vendor => {
+  //   totalRow.push({ content: totals[vendor].ft20.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
+  //   totalRow.push({ content: totals[vendor].ft40.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
+  //   totalRow.push({ content: totals[vendor].lcl.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
+  //   totalRow.push({ content: totals[vendor].air.toFixed(2), styles: { fontStyle: 'bold', halign: 'right' } });
+  // });
 
   doc.autoTable({
     startY: 25,
     head: head,
     body: body,
-    foot: [totalRow],
+    //foot: [totalRow],
     theme: 'grid',
-    styles: { fontSize: 6.5, cellPadding: 1, textColor: '#000000', lineColor: [0,0,0], lineWidth: 0.1 },
+    styles: { fontSize: 6.5, cellPadding: 1,cellPadding: 2, valign: 'middle',  textColor: '#000000', lineColor: [0,0,0], lineWidth: 0.1 },
     headStyles: { 
         fillColor: '#e5e7eb', 
         textColor: '#000000', 
         fontStyle: 'bold', 
         halign: 'center',
         fontSize: 7,
+        
     },
     footStyles: {
         fillColor: '#e5e7eb',
@@ -146,6 +147,6 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
     columnStyles: columnStyles,
     margin: { left: margin, right: margin }
   });
-
+    doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
   doc.save(`Chennai_Admin_Quotation_${year}.pdf`);
 };

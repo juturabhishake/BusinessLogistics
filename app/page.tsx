@@ -165,6 +165,9 @@ export default function Home() {
             else if (user.Vendor_Code === 'gen') {
               window.location.href = "/account";
             }
+             else if (user.Vendor_Code === 'spl') {
+              window.location.href = "/account";
+            }
             else {
               window.location.href = "/dashboard";
             }

@@ -39,10 +39,12 @@ export function getMenuList(pathname: string): Group[] {
   const [menuList, setMenuList] = useState<Group[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isGen, setIsGen] = useState(false);
+  const [isSpl, setIsSpl] = useState(false);
   useEffect(() => {
     const sc = secureLocalStorage.getItem("sc");
     setIsAdmin(sc === "admin");
     setIsGen(sc === "gen");
+    setIsSpl(sc === "spl");
   }, []);
   useEffect(() => {
     const sc = secureLocalStorage.getItem("sc");
@@ -50,17 +52,26 @@ export function getMenuList(pathname: string): Group[] {
         window.location.href = "/";
         return; 
     }
-    const genAllowedPaths = [
-      "/Gen/Import/chennai",
-      "/Gen/Import/chennai/print",
+    const genAllowedPaths = [   
       "/Gen/Import/mumbai",
       "/Gen/Import/mumbai/print",
       "/Gen/export/pune",
       "/Gen/export/pune/print",
       "/account"
     ];
+
+       const splAllowedPaths = [
+      "/Gen/Import/chennai",
+      "/Gen/Import/chennai/print",      
+      "/account"
+    ];
     if (sc === "gen") {
       if (!genAllowedPaths.includes(pathname)) {
+        window.location.href = "/account";
+      }
+    } 
+    else if (sc === "spl") {
+      if (!splAllowedPaths.includes(pathname)) {
         window.location.href = "/account";
       }
     } 
@@ -69,10 +80,10 @@ export function getMenuList(pathname: string): Group[] {
         window.location.href ="/account";
       }
     }
-  }, [pathname, isGen, isAdmin]);
+  }, [pathname, isGen,isSpl, isAdmin]);
   useEffect(() => {
     const generatedMenuList: Group[] = [
-      !isAdmin && !isGen ? 
+      !isAdmin && !isGen && !isSpl? 
       {
         groupLabel: "",
         menus: [
@@ -85,7 +96,7 @@ export function getMenuList(pathname: string): Group[] {
           }
         ]
       }: null,
-      !isAdmin && !isGen ? {
+      !isAdmin && !isGen && !isSpl ? {
         groupLabel: "Contents",
         menus: [
           {
@@ -141,7 +152,7 @@ export function getMenuList(pathname: string): Group[] {
             label: "Import",
             icon: FilePlus,
             submenus: [
-              { href: "/Gen/Import/chennai", label: "chennai" },
+              // { href: "/Gen/Import/chennai", label: "chennai" },
               { href: "/Gen/Import/mumbai", label: "Mumbai" }
             ]
           },
@@ -151,6 +162,21 @@ export function getMenuList(pathname: string): Group[] {
             icon: FilePlus,
             submenus: [
               { href: "/Gen/export/pune", label: "Pune" }
+            ]
+          }
+        ]
+      } : null,
+         isSpl ? 
+      {
+        groupLabel: "General",
+        menus: [
+          {
+            href: "",
+            label: "Import",
+            icon: FilePlus,
+            submenus: [
+              { href: "/Gen/Import/chennai", label: "chennai" }
+              // { href: "/Gen/Import/mumbai", label: "Mumbai" }
             ]
           }
         ]
@@ -252,7 +278,7 @@ export function getMenuList(pathname: string): Group[] {
     ].filter(Boolean) as Group[]; 
 
     setMenuList(generatedMenuList);
-  }, [isAdmin, isGen, pathname]);
+  }, [isAdmin, isGen,isSpl, pathname]);
 
   return menuList;
 }

@@ -36,7 +36,7 @@ const QuotationTable = () => {
    { description: "Customs clearence", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "CC Fee", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
     { description: "D.O Charges", remarks: "Per Container", sc1: "", sc2: "", sc3: "" },
-    { description: "LINER CHARGES", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
+    { description: "LINER CHARGES (At Actuals)", remarks: "Per BL", sc1: "", sc2: "", sc3: "" },
     { description: "Loading / Unloading", remarks: "Per Container", sc1: "", sc2: "", sc3: ""},
     { description: "Delivery", remarks: "", sc1: "", sc2: "", sc3: "" },
   ]);
@@ -698,6 +698,7 @@ const QuotationTable = () => {
                 // .filter((item) => item.description !== "Halting")
                 .map((item, index) => {
                   // const isHalting = item.description === "Halting";
+                   const isLinerCharges = item.description === "LINER CHARGES (At Actuals)";
                   return (
                   <tr key={index} className="border border border-[var(--bgBody)]">
                     <td className="py-1 px-3 border">{index + 12}</td>
@@ -707,7 +708,7 @@ const QuotationTable = () => {
                       <input
                         type="number"
                         placeholder="0" 
-                        // readOnly={isHalting}                      
+                        readOnly={isLinerCharges}                      
                         className="w-full bg-transparent border-none focus:outline-none text-right hover:border-gray-400"
                         value={item[20]}
                         onChange={(e) => handleOriginChange(index, 20, e.target.value)}

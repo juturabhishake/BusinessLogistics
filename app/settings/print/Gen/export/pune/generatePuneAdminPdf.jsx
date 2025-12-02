@@ -48,16 +48,16 @@ export const exportPuneAdminPdf = (tableData, vendorColumns, quoteYear) => {
         return [vehicleTypeValue, row.Currency, ...rates];
     });
 
-    const totals = vendorColumns.reduce((acc, vendor) => {
-        acc[vendor] = tableData.reduce((sum, row) => sum + (parseFloat(row[vendor]) || 0), 0);
-        return acc;
-    }, {});
+    // const totals = vendorColumns.reduce((acc, vendor) => {
+    //     acc[vendor] = tableData.reduce((sum, row) => sum + (parseFloat(row[vendor]) || 0), 0);
+    //     return acc;
+    // }, {});
 
-    const totalRow = [
-        { content: 'TOTAL', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-        ...vendorColumns.map(vendor => totals[vendor].toLocaleString('en-IN'))
-    ];
-    mainTableBody.push(totalRow);
+    // const totalRow = [
+    //     { content: 'TOTAL', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+    //     ...vendorColumns.map(vendor => totals[vendor].toLocaleString('en-IN'))
+    // ];
+    // mainTableBody.push(totalRow);
 
     doc.autoTable({
         startY: 40,
@@ -82,10 +82,10 @@ export const exportPuneAdminPdf = (tableData, vendorColumns, quoteYear) => {
             lineColor: '#444', 
             lineWidth: 0.1 
         },
-        columnStyles: {
-            0: { halign: 'left' },
-        }
+        // columnStyles: {
+        //     0: { halign: 'left' },
+        // }
     });
-
+ doc.text("GREENTECH INDUSTRIES Business @2023.04.03 by Muni Kranth.", doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: "center" });
     doc.save(`GTI_to_Pune_Admin_Quote_${quoteYear}.pdf`);
 };

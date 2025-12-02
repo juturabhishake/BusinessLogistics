@@ -35,7 +35,24 @@ const initialTableData = [
 const Chennai = () => {
   const [tableData, setTableData] = useState(initialTableData);
   const [saveState, setSaveState] = useState("idle");
+  const [Yes, setYes] = useState("");
 
+  
+    useEffect(() => {
+      const fetchCurrency = async () => {
+        try {
+          const response = await fetch('/api/Gen/get_yearly_cal');
+          const data = await response.json();
+          if (data.result && data.result.length > 0) {
+            setYes(data.result[0].ISOK);           
+          }
+        } catch (error) {
+          console.error("Error fetching currency:", error);
+        }
+      };
+  
+      fetchCurrency();
+    }, []);
   useEffect(() => {
     const fetchData = async () => {
       const sc = secureLocalStorage.getItem("sc");
@@ -152,15 +169,17 @@ const Chennai = () => {
             >
               <FiFileText className="mr-2"/> Print
             </button>
+            {Yes !== "No" && (
             <button
               onClick={handleSave}
               className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-all duration-300"
-              style={{ minWidth: "100px" }} disabled={saveState !== 'idle'}
+              style={{ minWidth: "100px" }} disabled={saveState !== 'idle' }
             >
               {saveState === "idle" && <><FiSave className="mr-2"/> Save</>}
               {saveState === "saving" && <><FiLoader className="animate-spin mr-2"/> Saving...</>}
               {saveState === "saved" && <><FiCheck className="mr-2"/> Saved!</>}
             </button>
+            )}
           </div>
         </div>
         <div className="card-body flex-grow overflow-y-auto">

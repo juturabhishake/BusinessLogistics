@@ -262,7 +262,9 @@ const QuotationTable = () => {
   const totalShipmentCost = {};
   selectedContainerSizes.forEach(size => { totalShipmentCost[size] = (totalOrigin[size] || 0) + (totalSeaFreight[size] || 0) + (totalDestination[size] || 0); });
   totalShipmentCost.total = Object.values(totalShipmentCost).reduce((acc, val) => acc + val, 0);
-
+const allTotalsGreaterThanZero = selectedContainerSizes.every(
+  size => (totalShipmentCost[size] || 0) > 0
+);
   const fetchSupplierDetails = async () => {
     if (!selectedLocation) return Promise.resolve();
     try {
@@ -320,12 +322,14 @@ const QuotationTable = () => {
                   </Popover>
                 </div>
                 <div className="flex gap-2 pt-1">
-                  <button onClick={handleSave} disabled={!selectedLocation || selectedContainerSizes.length === 0 || saveState !== 'idle' || isQuoteLoading}
+                  {allTotalsGreaterThanZero && (
+                  <button onClick={handleSave} disabled={!selectedLocation || selectedContainerSizes.length === 0 || saveState !== 'idle' || isQuoteLoading }
                     className="mt-0 lg:mt-0 flex items-center justify-center bg-[var(--buttonBg)] text-[var(--borderclr)] hover:bg-[var(--buttonBgHover)] text-sm px-3 py-3 rounded" style={{ minWidth: "80px" }} >
                     {saveState === "idle" && <FiSave size={16} />}
                     {saveState === "saving" && <FiLoader size={16} className="animate-spin" />}
                     {saveState === "saved" && <FiCheck size={16} />}
                   </button>
+                  )}
                   <Button onClick={downloadPDF} variant="outline" className="flex items-center px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                     <FaFileExport />
                   </Button>
