@@ -12,7 +12,7 @@ const columnToSnoMap = Object.fromEntries(Object.entries(particularToColumnMap).
 
 const initialParticulars = [
   { sno: 1, particulars: 'IMPORT CLEARANCE CHARGES FOR 1st CNTR', currency: 'INR' }, { sno: 2, particulars: 'IMPORT CLEARANCE CHARGES FOR 2nd CNTR', currency: 'INR' },
-  { sno: 3, particulars: 'LOADING AND UNLOADING CHARGES', currency: 'INR' }, { sno: 4, particulars: 'TRANSPORTATION CHARGES UP TO 15MT Incl.cont', currency: 'INR' },
+  { sno: 3, particulars: 'LOADING AND UNLOADING CHARGES (AIR 5/Kg)', currency: 'INR' }, { sno: 4, particulars: 'TRANSPORTATION CHARGES UP TO 15MT Incl.cont', currency: 'INR' },
   { sno: 5, particulars: 'TRANSPORTATION CHARGES UP TO 22MT Incl.cont', currency: 'INR' }, { sno: 6, particulars: 'TRANSPORTATION CHARGES UP TO 28MT Incl.cont', currency: 'INR' },
   { sno: 7, particulars: 'EXTRA CHARGES PER MT OVER AND ABOVE', currency: 'INR' }, { sno: 8, particulars: 'FLATRACK OPEN CONTAINER', currency: 'INR' },
   { sno: 9, particulars: 'TRANSPORTATION CHARGES UP TO 1MT ACCORDING TO RTO RESTRICTION', currency: 'INR' }, { sno: 10, particulars: 'TRANSPORTATION CHARGES UP TO 2MT ACCORDING TO RTO RESTRICTION', currency: 'INR' },

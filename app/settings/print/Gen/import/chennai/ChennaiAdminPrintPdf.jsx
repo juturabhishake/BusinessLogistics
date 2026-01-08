@@ -26,12 +26,13 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
 
   const margin = (pageWidth - tableWidth) / 2;
 
-  doc.setFontSize(7);
+  doc.setFontSize(10);
   doc.setTextColor(40);
   doc.setFont(undefined, 'bold');
-
   doc.text('Comparitive Statement of quotations', margin, 10);
+    doc.setFontSize(8);
   doc.text(`RFQ Chennai to GTI Import CHA rates for ${year} ( January to December )`, margin, 14);
+    doc.setFontSize(7);
   doc.text("We are following 'IATF 16949 CAPD Method 10.3 Continuous Improvement Spirit'", margin, 18);
 
   doc.text(`Date: ${currentDate}`, pageWidth - margin, 10, { align: 'right' });
@@ -87,10 +88,10 @@ export const exportAdminPdf = (transformedData, vendors, year) => {
       if (row.sno === 14) {
         rowData.push({ content: 'AT ACTUAL', colSpan: 4, styles: { halign: 'center', fontStyle: 'bold', valign: 'middle' } });
       } else {
-        rowData.push({ content: vendorData.ft20 || '', styles: { halign: 'right' } });
-        rowData.push({ content: vendorData.ft40 || '', styles: { halign: 'right' } });
-        rowData.push({ content: vendorData.lcl || '', styles: { halign: 'right' } });
-        rowData.push({ content: vendorData.air || '', styles: { halign: 'right' } });
+        rowData.push({ content: vendorData.ft20 || '', styles: { halign: 'center' } });
+        rowData.push({ content: vendorData.ft40 || '', styles: { halign: 'center' } });
+        rowData.push({ content: vendorData.lcl || '', styles: { halign: 'center' } });
+        rowData.push({ content: vendorData.air || '', styles: { halign: 'center' } });
       }
     });
     body.push(rowData);

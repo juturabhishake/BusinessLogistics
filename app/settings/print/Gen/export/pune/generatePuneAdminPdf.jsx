@@ -15,11 +15,11 @@ export const exportPuneAdminPdf = (tableData, vendorColumns, quoteYear) => {
     doc.setFontSize(9);
     doc.setTextColor(40);
     doc.setFont(undefined, 'bold');
-
+ doc.setFontSize(8);
     doc.text('Comparitive Statement of quotations', margin, 15);
     doc.text(`Date : ${moment(`01-01-${quoteYear}`).format("DD-MMM-YYYY")}`, pageWidth - margin, 15, { align: 'right' });
 
-    doc.text(`RFQ rates for Pune to GTI shipment (01.01.${quoteYear} - 31.12.${quoteYear})`, margin, 22);
+    doc.text(`RFQ rates for GTI to Pune shipment (01.01.${quoteYear} - 31.12.${quoteYear})`, margin, 22);
     // doc.text('Page 01 of 01', pageWidth - margin, 22, { align: 'right' });
     
     doc.setFont(undefined, 'normal');
@@ -32,7 +32,7 @@ export const exportPuneAdminPdf = (tableData, vendorColumns, quoteYear) => {
 
     const mainTableHead = [
         [
-            { content: `January to December '${quoteYear} Quote for Pune to GTI`, colSpan: vendorColumns.length + 2, styles: { fontSize: 16 } }
+            { content: `January to December '${quoteYear} Quote for GTI to Pune`, colSpan: vendorColumns.length + 2, styles: { fontSize: 16 } }
         ],
         [
             { content: 'Vehicle Type', rowSpan: 2, styles: { valign: 'middle', fontSize: 12 } },
